@@ -46,3 +46,10 @@ relevant_memories = await memory.get_relevant_memories("How are you doing today?
 # Get memory stats
 stats = memory.get_memory_stats()
 ```
+
+## Credits
+
+Based on code by echo.hive
+https://x.com/hive_echo/status/1880895879231721877
+https://www.echohive.live
+https://github.com/echohive42
