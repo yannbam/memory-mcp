@@ -49,6 +49,11 @@ class KeywordMemory:
     
     def __init__(self):
         try:
+            # Ensure required NLTK packages are downloaded
+            nltk_packages = ['punkt', 'stopwords', 'wordnet', 'punkt_tab']
+            for package in nltk_packages:
+                nltk.download(package, quiet=True)
+            
             # Initialize NLTK components
             self.lemmatizer = WordNetLemmatizer()
             self.stop_words = set(stopwords.words('english'))

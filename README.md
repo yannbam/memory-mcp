@@ -25,7 +25,7 @@ uv pip install -r requirements.txt
 uv pip install -e ".[dev]"
 
 # Download required NLTK data
-python -m nltk.downloader punkt stopwords wordnet
+python -m nltk.downloader punkt stopwords wordnet punkt_tab
 ```
 
 ## Usage
