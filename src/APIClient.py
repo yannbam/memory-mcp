@@ -212,7 +212,7 @@ class OpenRouterClient(APIClient):
             "messages": messages,
             "temperature": temperature,
             # Disable the transform parameter to prevent truncating the middle of prompts
-            "transforms": []
+            "extra_body": {"transforms": []}
         }
         
         if max_tokens is not None:
