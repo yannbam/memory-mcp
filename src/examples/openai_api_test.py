@@ -11,7 +11,7 @@ import os
 import numpy as np
 from dotenv import load_dotenv
 from termcolor import colored
-from APIClient import get_api_client
+from ..APIClient import get_api_client
 
 # Load environment variables from .env file
 load_dotenv()
