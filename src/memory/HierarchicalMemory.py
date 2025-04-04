@@ -1,8 +1,7 @@
-import os
 from termcolor import colored
-from openai import AsyncOpenAI
 from datetime import datetime
 import numpy as np
+from src.APIClient import get_api_client
 
 # Constants for HierarchicalMemory
 HIERARCHICAL_MODEL = "gpt-4o"
@@ -34,7 +33,7 @@ class HierarchicalMemory:
     3. Retrieval process:
        - Always includes immediate context
        - Uses embeddings to find relevant long-term memories
-       - Uses GPT to select relevant short-term summaries
+       - Uses LLM to select relevant short-term summaries
        - Combines all relevant information with proper context markers
 
     Key features:
@@ -43,6 +42,7 @@ class HierarchicalMemory:
     - Automatic memory flow between tiers
     - Importance-based filtering
     - Semantic search capabilities
+    - Supports multiple API providers (OpenAI, OpenRouter)
 
     Use cases:
     - Complex, long-running conversations
@@ -50,9 +50,18 @@ class HierarchicalMemory:
     - Situations where memory organization is critical
     """
     
-    def __init__(self):
+    def __init__(self, api_type=None, api_key=None):
+        """
+        Initialize the Hierarchical memory system.
+        
+        Args:
+            api_type: The API type to use ("openai" or "openrouter").
+                     If None, will be determined from environment variables.
+            api_key: The API key to use. If None, will be read from environment variables.
+        """
         try:
-            self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            # Get the appropriate API client based on configuration
+            self.client = get_api_client(api_type=api_type, api_key=api_key)
             # Three-tier memory system
             self.immediate_context = []  # Last few messages
             self.short_term_memory = []  # Recent summaries
@@ -65,18 +74,18 @@ class HierarchicalMemory:
     
     async def _create_embedding(self, text):
         try:
-            response = await self.client.embeddings.create(
+            embedding = await self.client.create_embeddings(
                 model=HIERARCHICAL_EMBEDDING_MODEL,
-                input=text
+                input_text=text
             )
-            return response.data[0].embedding
+            return embedding
         except Exception as e:
             print(colored(f"Error creating embedding: {str(e)}", "red"))
             return None
     
     async def _assess_importance(self, message):
         try:
-            response = await self.client.chat.completions.create(
+            response = await self.client.create_chat_completion(
                 model=HIERARCHICAL_MODEL,
                 messages=[
                     {"role": "system", "content": "Rate the importance of this message for long-term memory on a scale of 0 to 1. Respond with only the number."},
@@ -92,7 +101,7 @@ class HierarchicalMemory:
         try:
             messages_text = "\n".join([f"{m['role']}: {m['content']}" for m in messages])
             
-            response = await self.client.chat.completions.create(
+            response = await self.client.create_chat_completion(
                 model=HIERARCHICAL_MODEL,
                 messages=[
                     {"role": "system", "content": "Create a concise summary of this conversation chunk."},
@@ -183,9 +192,9 @@ class HierarchicalMemory:
                             "content": f"Relevant past context: {memory['summary']}"
                         })
             
-            # Get relevant short-term memories using GPT
+            # Get relevant short-term memories using LLM
             if self.short_term_memory:
-                response = await self.client.chat.completions.create(
+                response = await self.client.create_chat_completion(
                     model=HIERARCHICAL_MODEL,
                     messages=[
                         {"role": "system", "content": "Select indices of relevant summaries for the query. Return space-separated numbers only."},

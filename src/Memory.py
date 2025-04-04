@@ -22,13 +22,17 @@ from src.memory import (
     HierarchicalMemory
 )
 
-def create_memory(memory_type="vector"):
+def create_memory(memory_type="vector", api_type=None, api_key=None):
     """
     Factory function to create a memory system of the specified type.
     
     Args:
         memory_type (str): The type of memory system to create.
             Options: "vector", "summary", "timewindow", "keyword", "hierarchical"
+        api_type (str, optional): The API provider to use ("openai" or "openrouter").
+            If None, will be determined from environment variables.
+        api_key (str, optional): The API key to use with the specified provider.
+            If None, will be read from environment variables.
     
     Returns:
         An instance of the specified memory system
@@ -38,16 +42,19 @@ def create_memory(memory_type="vector"):
     """
     memory_type = memory_type.lower()
     
-    if memory_type == "vector":
-        return VectorMemory()
-    elif memory_type == "summary":
-        return SummaryMemory()
-    elif memory_type == "timewindow":
-        return TimeWindowMemory()
-    elif memory_type == "keyword":
+    # KeywordMemory doesn't use API calls, so doesn't need api_type or api_key
+    if memory_type == "keyword":
         return KeywordMemory()
+    
+    # For API-dependent memory systems, pass the api configuration
+    if memory_type == "vector":
+        return VectorMemory(api_type=api_type, api_key=api_key)
+    elif memory_type == "summary":
+        return SummaryMemory(api_type=api_type, api_key=api_key)
+    elif memory_type == "timewindow":
+        return TimeWindowMemory(api_type=api_type, api_key=api_key)
     elif memory_type == "hierarchical":
-        return HierarchicalMemory()
+        return HierarchicalMemory(api_type=api_type, api_key=api_key)
     else:
         raise ValueError(f"Invalid memory type: {memory_type}")
 

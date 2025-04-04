@@ -1,7 +1,6 @@
-import os
 import numpy as np
 from termcolor import colored
-from openai import AsyncOpenAI
+from src.APIClient import get_api_client
 
 # Constants for VectorMemory
 EMBEDDING_MODEL = "text-embedding-3-small"
@@ -13,11 +12,11 @@ class VectorMemory:
     Vector Memory System
     --------------------
 
-    This memory system uses OpenAI's embeddings to create vector representations of messages
+    This memory system uses embeddings to create vector representations of messages
     and enables semantic search through the conversation history.
 
     How it works:
-    1. Each message is converted into a high-dimensional vector (embedding) using OpenAI's embedding
+    1. Each message is converted into a high-dimensional vector (embedding) using an embedding model
     2. When retrieving memories, the query is also converted to an embedding
     3. Cosine similarity is used to find the most semantically similar messages
     4. Messages above the similarity threshold are returned, sorted by relevance
@@ -27,6 +26,7 @@ class VectorMemory:
     - Maintains a fixed-size memory buffer (MAX_MEMORIES)
     - Uses similarity threshold to ensure quality matches
     - Returns top-k most relevant memories
+    - Supports multiple API providers (OpenAI, OpenRouter)
 
     Use cases:
     - Finding semantically related previous conversations
@@ -34,9 +34,18 @@ class VectorMemory:
     - Maintaining context across long conversations
     """
     
-    def __init__(self):
+    def __init__(self, api_type=None, api_key=None):
+        """
+        Initialize the Vector memory system.
+        
+        Args:
+            api_type: The API type to use ("openai" or "openrouter").
+                     If None, will be determined from environment variables.
+            api_key: The API key to use. If None, will be read from environment variables.
+        """
         try:
-            self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            # Get the appropriate API client based on configuration
+            self.client = get_api_client(api_type=api_type, api_key=api_key)
             self.memories = []
             self.embeddings = []
             print(colored("Vector memory system initialized", "green"))
@@ -46,11 +55,10 @@ class VectorMemory:
     
     async def add_memory(self, message):
         try:
-            embedding_response = await self.client.embeddings.create(
+            embedding = await self.client.create_embeddings(
                 model=EMBEDDING_MODEL,
-                input=message['content']
+                input_text=message['content']
             )
-            embedding = embedding_response.data[0].embedding
             
             self.memories.append(message)
             self.embeddings.append(embedding)
@@ -66,12 +74,10 @@ class VectorMemory:
     
     async def get_relevant_memories(self, query, top_k=3):
         try:
-            query_embedding_response = await self.client.embeddings.create(
+            query_embedding = await self.client.create_embeddings(
                 model=EMBEDDING_MODEL,
-                input=query
+                input_text=query
             )
-            
-            query_embedding = query_embedding_response.data[0].embedding
             
             # Calculate similarities
             similarities = [

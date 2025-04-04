@@ -1,7 +1,6 @@
-import os
 from termcolor import colored
-from openai import AsyncOpenAI
 from datetime import datetime
+from src.APIClient import get_api_client
 
 # Constants for TimeWindowMemory
 IMPORTANCE_MODEL = "gpt-4o"
@@ -19,7 +18,7 @@ class TimeWindowMemory:
 
     How it works:
     1. Recent messages are kept in a sliding window of size WINDOW_SIZE
-    2. Each message is evaluated for importance using GPT
+    2. Each message is evaluated for importance using an LLM
     3. Messages above IMPORTANCE_THRESHOLD are stored in long-term memory
     4. When retrieving memories:
        - Recent messages are always included
@@ -27,10 +26,11 @@ class TimeWindowMemory:
 
     Key features:
     - Maintains recent context with sliding window
-    - GPT-powered importance assessment
+    - LLM-powered importance assessment
     - Dual storage: recent and important memories
     - Timestamp tracking for temporal context
     - Importance-based sorting of long-term memories
+    - Supports multiple API providers (OpenAI, OpenRouter)
 
     Use cases:
     - Balancing recent context with important historical information
@@ -38,9 +38,18 @@ class TimeWindowMemory:
     - Prioritizing critical information while maintaining flow
     """
     
-    def __init__(self):
+    def __init__(self, api_type=None, api_key=None):
+        """
+        Initialize the Time Window memory system.
+        
+        Args:
+            api_type: The API type to use ("openai" or "openrouter").
+                     If None, will be determined from environment variables.
+            api_key: The API key to use. If None, will be read from environment variables.
+        """
         try:
-            self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            # Get the appropriate API client based on configuration
+            self.client = get_api_client(api_type=api_type, api_key=api_key)
             self.recent_memories = []
             self.important_memories = []  # Long-term memory
             print(colored("Time-Window memory system initialized", "green"))
@@ -50,7 +59,7 @@ class TimeWindowMemory:
     
     async def _assess_importance(self, message):
         try:
-            response = await self.client.chat.completions.create(
+            response = await self.client.create_chat_completion(
                 model=IMPORTANCE_MODEL,
                 messages=[
                     {"role": "system", "content": "Rate the importance of this message for long-term memory on a scale of 0 to 1. Respond with only the number."},
@@ -96,7 +105,7 @@ class TimeWindowMemory:
             memories = self.recent_memories.copy()
             
             # Get relevant important memories
-            response = await self.client.chat.completions.create(
+            response = await self.client.create_chat_completion(
                 model=IMPORTANCE_MODEL,
                 messages=[
                     {"role": "system", "content": "Select indices of important memories relevant to the query. Return space-separated numbers only."},

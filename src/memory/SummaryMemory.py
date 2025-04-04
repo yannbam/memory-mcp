@@ -1,6 +1,5 @@
-import os
 from termcolor import colored
-from openai import AsyncOpenAI
+from src.APIClient import get_api_client
 
 # Constants for SummaryMemory
 SUMMARY_MODEL = "gpt-4o"
@@ -17,17 +16,18 @@ class SummaryMemory:
 
     How it works:
     1. Messages are collected into chunks of size SUMMARY_THRESHOLD
-    2. When a chunk is full, GPT creates a summary of the conversation chunk
+    2. When a chunk is full, an LLM creates a summary of the conversation chunk
     3. Summaries are stored along with their original messages
-    4. When retrieving memories, GPT identifies relevant summaries based on the query
+    4. When retrieving memories, the LLM identifies relevant summaries based on the query
     5. Original messages from relevant summaries are returned
 
     Key features:
     - Automatic conversation chunking
-    - GPT-powered summarization
+    - LLM-powered summarization
     - Maintains original messages for context
     - Limited number of summaries (MAX_SUMMARIES)
     - Query-based retrieval of relevant chunks
+    - Supports multiple API providers (OpenAI, OpenRouter)
 
     Use cases:
     - Long conversations where full context is important
@@ -35,9 +35,18 @@ class SummaryMemory:
     - Quick access to conversation highlights
     """
     
-    def __init__(self):
+    def __init__(self, api_type=None, api_key=None):
+        """
+        Initialize the Summary memory system.
+        
+        Args:
+            api_type: The API type to use ("openai" or "openrouter").
+                     If None, will be determined from environment variables.
+            api_key: The API key to use. If None, will be read from environment variables.
+        """
         try:
-            self.client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            # Get the appropriate API client based on configuration
+            self.client = get_api_client(api_type=api_type, api_key=api_key)
             self.current_chunk = []
             self.summaries = []
             print(colored("Summary memory system initialized", "green"))
@@ -60,7 +69,7 @@ class SummaryMemory:
         try:
             chunk_text = "\n".join([f"{m['role']}: {m['content']}" for m in self.current_chunk])
             
-            response = await self.client.chat.completions.create(
+            response = await self.client.create_chat_completion(
                 model=SUMMARY_MODEL,
                 messages=[
                     {"role": "system", "content": "Create a brief, informative summary of this conversation chunk."},
@@ -87,7 +96,7 @@ class SummaryMemory:
     async def get_relevant_memories(self, query):
         try:
             # Get relevant summaries based on query
-            response = await self.client.chat.completions.create(
+            response = await self.client.create_chat_completion(
                 model=SUMMARY_MODEL,
                 messages=[
                     {"role": "system", "content": "Select the most relevant summaries for the given query. Return indices of summaries only."},
