@@ -245,10 +245,10 @@ def get_api_client(
     """
     # If api_type is not provided, try to determine from environment variables
     if api_type is None:
-        if os.getenv("OPENROUTER_API_KEY"):
-            api_type = "openrouter"
-        elif os.getenv("OPENAI_API_KEY"):
+        if os.getenv("OPENAI_API_KEY"):
             api_type = "openai"
+        elif os.getenv("OPENROUTER_API_KEY"):
+            api_type = "openrouter"
         else:
             raise ValueError(
                 "API type not specified and could not be determined from environment variables. "
