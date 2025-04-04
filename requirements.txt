@@ -2,3 +2,4 @@ openai
 numpy
 termcolor
 nltk
+python-dotenv
