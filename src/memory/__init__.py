@@ -1,8 +1,8 @@
-from src.memory.vector_memory import VectorMemory
-from src.memory.summary_memory import SummaryMemory
-from src.memory.time_window_memory import TimeWindowMemory
-from src.memory.keyword_memory import KeywordMemory
-from src.memory.hierarchical_memory import HierarchicalMemory
+from src.memory.VectorMemory import VectorMemory
+from src.memory.SummaryMemory import SummaryMemory
+from src.memory.TimeWindowMemory import TimeWindowMemory
+from src.memory.KeywordMemory import KeywordMemory
+from src.memory.HierarchicalMemory import HierarchicalMemory
 
 __all__ = [
     "VectorMemory",
