@@ -69,19 +69,39 @@ memory = create_memory(
 )
 ```
 
+### API Key Configuration
+
+You can provide API keys in two ways:
+
+1. **Environment Variables**: Set `OPENAI_API_KEY` or `OPENROUTER_API_KEY` in your environment.
+
+2. **.env File**: Create a `.env` file in the project root based on the provided `.env.example`:
+
+```bash
+# Copy example file
+cp .env.example .env
+
+# Edit the file and add your API keys
+# OPENAI_API_KEY=your_openai_api_key_here
+# OPENROUTER_API_KEY=your_openrouter_api_key_here
+```
+
 ### Running Examples
 
 Navigate to the project root and run the examples using `uv`:
 
 ```bash
 # Test OpenAI API functionality
-uv run src/examples/openai_api_test.py
+uv run -m src.examples.openai_api_test
 
 # Test OpenRouter API functionality
-uv run src/examples/openrouter_api_test.py
+uv run -m src.examples.openrouter_api_test
 
 # Run the OpenRouter memory example
-uv run src/examples/openrouter_example.py
+uv run -m src.examples.openrouter_example
+
+# Run all memory systems test
+uv run -m src.examples.memory_system_test
 ```
 
 ## Credits
