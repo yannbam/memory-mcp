@@ -598,3 +598,10 @@ class HierarchicalMemory:
     
     async def get_relevant_memories(self, query, context_size=5):
         # [TRUNCATED!]
+        
+    def get_memory_stats(self):
+        return {
+            "immediate_context": len(self.immediate_context),
+            "medium_term_memory": len(self.medium_term_memory),
+            "long_term_memory": len(self.long_term_memory)
+        }
