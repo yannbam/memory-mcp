@@ -1,0 +1,4 @@
+openai
+numpy
+termcolor
+nltk
