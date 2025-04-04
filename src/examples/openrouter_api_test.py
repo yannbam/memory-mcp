@@ -10,7 +10,7 @@ import asyncio
 import os
 from dotenv import load_dotenv
 from termcolor import colored
-from APIClient import get_api_client
+from ..APIClient import get_api_client
 
 # Load environment variables from .env file
 load_dotenv()
@@ -38,7 +38,8 @@ async def main():
     print(colored("\nTesting chat completion with OpenRouter API...", "cyan"))
     
     # The model name for OpenRouter requires the provider prefix
-    model = "openai/gpt-4o"
+    # model = "openai/gpt-4o"
+    model = "mistralai/mistral-small-3.1-24b-instruct"
     
     messages = [
         {"role": "system", "content": "You are a helpful assistant. Be concise in your answers."},
