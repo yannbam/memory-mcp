@@ -28,13 +28,19 @@ class APIClient(abc.ABC):
     """
     
     @abc.abstractmethod
-    async def create_embeddings(self, model: str, input_text: str) -> List[float]:
+    async def create_embeddings(
+        self, 
+        model: str, 
+        input_text: str,
+        dimensions: Optional[int] = None
+    ) -> List[float]:
         """
         Create embeddings for the given input text.
         
         Args:
             model: The name of the embedding model to use
             input_text: The text to embed
+            dimensions: Optional number of dimensions to reduce the embedding to
             
         Returns:
             A list of floats representing the embedding
@@ -83,21 +89,31 @@ class OpenAIClient(APIClient):
         self.client = AsyncOpenAI(api_key=api_key)
         print(colored("OpenAI API client initialized", "green"))
     
-    async def create_embeddings(self, model: str, input_text: str) -> List[float]:
+    async def create_embeddings(
+        self, 
+        model: str, 
+        input_text: str,
+        dimensions: Optional[int] = None
+    ) -> List[float]:
         """
         Create embeddings using the OpenAI API.
         
         Args:
             model: The name of the embedding model to use (e.g., "text-embedding-3-small")
             input_text: The text to embed
+            dimensions: Optional number of dimensions to reduce the embedding to
             
         Returns:
             A list of floats representing the embedding
         """
-        response = await self.client.embeddings.create(
-            model=model,
-            input=input_text
-        )
+        params = {
+            "model": model,
+            "input": input_text
+        }
+        if dimensions is not None:
+            params["dimensions"] = dimensions
+            
+        response = await self.client.embeddings.create(**params)
         return response.data[0].embedding
     
     async def create_chat_completion(
@@ -169,7 +185,12 @@ class OpenRouterClient(APIClient):
         )
         print(colored("OpenRouter API client initialized", "green"))
     
-    async def create_embeddings(self, model: str, input_text: str) -> List[float]:
+    async def create_embeddings(
+        self, 
+        model: str, 
+        input_text: str,
+        dimensions: Optional[int] = None
+    ) -> List[float]:
         """
         Create embeddings using the OpenRouter API.
         
@@ -177,14 +198,19 @@ class OpenRouterClient(APIClient):
             model: The name of the embedding model to use 
                   (e.g., "text-embedding-3-small" or "openai/text-embedding-3-small")
             input_text: The text to embed
+            dimensions: Optional number of dimensions to reduce the embedding to
             
         Returns:
             A list of floats representing the embedding
         """
-        response = await self.client.embeddings.create(
-            model=model,
-            input=input_text
-        )
+        params = {
+            "model": model,
+            "input": input_text
+        }
+        if dimensions is not None:
+            params["dimensions"] = dimensions
+            
+        response = await self.client.embeddings.create(**params)
         return response.data[0].embedding
     
     async def create_chat_completion(
