@@ -59,7 +59,7 @@ export async function initHttpTransport(server: McpServer, port: number): Promis
 
     // Clean up transport when connection closes
     res.on('close', () => {
-      transport.close();
+      void transport.close();
     });
 
     try {

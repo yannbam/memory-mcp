@@ -1,0 +1,13 @@
+🌳 "quality-review"
+📝 Phase 6: Quality Review for memory-mcp first commit.
+
+Systematic code review using three parallel perspectives:
+- Code simplicity, DRY principles, and elegance
+- Functional correctness and bug detection
+- Project conventions and architectural patterns
+📊 ░░░░░░░░░░ 0% (0/4 tasks)
+
+├── 🔄 |Launch Review Agents| "Launch 3 code-reviewer agents in parallel with different focuses:\n1. Simplicity/DRY/elegance\n2. Bugs/functional correctness\n3. Project conventions/abstractions" (🔴)
+├── ⏸️ |Consolidate Findings| "Review all agent findings and identify highest severity issues that need addressing" (🔴)
+├── ⏸️ |Present to User| "Present consolidated findings to user and ask what they want to do (fix now, fix later, or proceed as-is)" (🔴)
+└── ⏸️ |Address Issues| "Fix issues based on user decision" (🟡)

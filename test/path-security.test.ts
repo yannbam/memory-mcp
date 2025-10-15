@@ -115,6 +115,17 @@ describe('Path Security - validatePath', () => {
         'would escape /memories directory',
       );
     });
+
+    it('should reject escape to sibling directory with similar name', () => {
+      // This tests the fix for startsWith bypass vulnerability
+      // If memoryRoot = '/tmp/test-memory', attacker tries '/tmp/test-memory2'
+      // Previous code: '/tmp/test-memory2'.startsWith('/tmp/test-memory') = TRUE (BYPASSED!)
+      // Fixed code: Adds path.sep check to prevent this
+      const siblingRoot = '/tmp/test-memory2';
+      expect(() => validatePath('/memories/../test-memory2/evil.txt', memoryRoot)).toThrow(
+        'would escape /memories directory',
+      );
+    });
   });
 
   describe('Edge cases', () => {
@@ -182,6 +193,15 @@ describe('Path Security - toMemoryPath', () => {
 
     it('should reject path in different root', () => {
       expect(() => toMemoryPath('/var/log/test.log', memoryRoot)).toThrow(
+        'is not within memory root',
+      );
+    });
+
+    it('should reject sibling directory with similar name', () => {
+      // This tests the fix for startsWith bypass in toMemoryPath
+      // If memoryRoot = '/tmp/test-memory', path = '/tmp/test-memory2/evil.txt'
+      // Previous code would incorrectly accept this
+      expect(() => toMemoryPath('/tmp/test-memory2/evil.txt', memoryRoot)).toThrow(
         'is not within memory root',
       );
     });

@@ -1,0 +1,45 @@
+{
+  "uuid": "b2bd4840-fea9-4479-b4e2-58b640c7f4c4",
+  "name": "quality-review",
+  "details": "Phase 6: Quality Review for memory-mcp first commit.\n\nSystematic code review using three parallel perspectives:\n- Code simplicity, DRY principles, and elegance\n- Functional correctness and bug detection\n- Project conventions and architectural patterns",
+  "tasks": [
+    {
+      "name": "Launch Review Agents",
+      "details": "Launch 3 code-reviewer agents in parallel with different focuses:\n1. Simplicity/DRY/elegance\n2. Bugs/functional correctness\n3. Project conventions/abstractions",
+      "status": "in_progress",
+      "priority": "high",
+      "uuid": "d88c05a5-996e-48fe-80a4-a0441025761e",
+      "created_at": "2025-10-15T20:15:18.770Z",
+      "updated_at": "2025-10-15T20:15:18.770Z"
+    },
+    {
+      "name": "Consolidate Findings",
+      "details": "Review all agent findings and identify highest severity issues that need addressing",
+      "status": "pending",
+      "priority": "high",
+      "uuid": "7acbb903-7d2e-495e-bff8-fbb99e6f26b6",
+      "created_at": "2025-10-15T20:15:18.771Z",
+      "updated_at": "2025-10-15T20:15:18.771Z"
+    },
+    {
+      "name": "Present to User",
+      "details": "Present consolidated findings to user and ask what they want to do (fix now, fix later, or proceed as-is)",
+      "status": "pending",
+      "priority": "high",
+      "uuid": "2687f918-810e-4849-82ed-20e4b1f4c94d",
+      "created_at": "2025-10-15T20:15:18.771Z",
+      "updated_at": "2025-10-15T20:15:18.771Z"
+    },
+    {
+      "name": "Address Issues",
+      "details": "Fix issues based on user decision",
+      "status": "pending",
+      "priority": "medium",
+      "uuid": "e06a1d35-20a8-49a0-a9ee-c053131d279b",
+      "created_at": "2025-10-15T20:15:18.771Z",
+      "updated_at": "2025-10-15T20:15:18.771Z"
+    }
+  ],
+  "created_at": "2025-10-15T20:15:18.771Z",
+  "updated_at": "2025-10-15T20:15:18.771Z"
+}
