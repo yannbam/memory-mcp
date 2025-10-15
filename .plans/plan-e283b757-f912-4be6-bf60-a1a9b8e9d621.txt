@@ -1,0 +1,51 @@
+🌳 "Implementation Execution"
+📝 Detailed implementation plan for MCP Memory Server based on approved architecture.
+
+Core features:
+- 6 memory operations (view, create, str_replace, insert, delete, rename)
+- Hybrid concurrency with file locking + optimistic concurrency control
+- stdio and streamable HTTP transports
+- CLI argument parsing
+- Path security with traversal protection
+- Debug logging to /tmp/memory-mcp/
+📊 ████████░░ 82% (32/39 tasks)
+
+├── ✅ |Setup| "Project setup: dependencies, types, directory structure" (🚨) (100%)
+│   ├── ✅ |Install dependencies| "Add production dependencies: express, cors, proper-lockfile and their type definitions" (🚨)
+│   └── ✅ |Create directory structure| "Create src/memory/, src/server/, src/utils/ directories" (🔴)
+├── ✅ |Core Infrastructure| "Build foundational components: CLI, logging, path security" (🚨) (100%)
+│   ├── ✅ |CLI argument parsing| "Implement CLI with: --memory-root-path/-m, --transport/-t, --port/-p, --debug/-d, --version/-v, --help/-h" (🚨)
+│   ├── ✅ |Debug logger| "Implement logger that writes JSON lines to /tmp/memory-mcp/<instance-id>.log when --debug flag is used" (🔴)
+│   └── ✅ |Path security| "Implement validatePath() with directory traversal protection, must validate paths start with /memories and don't escape" (🚨)
+├── ✅ |File Locking| "Implement file locking with optimistic concurrency control using proper-lockfile" (🚨) (100%)
+│   ├── ✅ |Locking utilities| "Create lock acquisition functions: acquireReadLock() and acquireWriteLock() using proper-lockfile with retries" (🚨)
+│   └── ✅ |Mtime checking| "Implement optimistic concurrency: store mtime before lock, check after acquiring lock, error if changed" (🚨)
+├── ✅ |Memory Operations| "Implement all 6 memory commands with concurrency support" (🔴) (100%)
+│   ├── ✅ |view command| "Implement view for directories and files with optional line ranges. Use shared read lock, wait for lock, no error on concurrent writes" (🔴)
+│   ├── ✅ |create command| "Implement create for files with directory creation. Use exclusive write lock with mtime check, error if file modified" (🔴)
+│   ├── ✅ |str_replace command| "Implement str_replace with uniqueness validation. Use exclusive write lock with mtime check, error if file modified" (🔴)
+│   ├── ✅ |insert command| "Implement insert at line number. Use exclusive write lock with mtime check, error if file modified" (🔴)
+│   ├── ✅ |delete command| "Implement delete for files and directories. Use exclusive write lock, no mtime check needed" (🔴)
+│   └── ✅ |rename command| "Implement rename/move for files and directories. Use exclusive write lock, no mtime check (atomic operation)" (🔴)
+├── ✅ |MCP Server| "Set up MCP server and register memory tools using SDK" (🔴) (100%)
+│   ├── ✅ |Create Zod schemas| "Define Zod schemas for all 6 memory command inputs using zod" (🔴)
+│   ├── ✅ |Register tools| "Register all 6 memory commands as MCP tools using server.registerTool() with proper schemas and handlers" (🔴)
+│   └── ✅ |Initialize server| "Create McpServer instance with name and version, wire up to memory operations" (🔴)
+├── ✅ |Transports| "Implement stdio and streamable HTTP transports" (🔴) (100%)
+│   ├── ✅ |stdio transport| "Implement stdio transport using StdioServerTransport from SDK, make it the default" (🔴)
+│   ├── ✅ |HTTP transport| "Implement stateless streamable HTTP using Express with CORS, create new transport per request to prevent ID collisions" (🔴)
+│   └── ✅ |Transport selection| "Wire CLI --transport flag to select between stdio and HTTP, with appropriate initialization" (🟡)
+├── 🔄 |Testing| "Comprehensive test suite with unit and integration tests" (🔴) (60%)
+│   ├── ✅ |Path security tests| "Test all directory traversal attack vectors: ../, ..\, %2e%2e%2f, absolute paths, etc." (🚨)
+│   ├── ✅ |Memory operations unit tests| "Test each of the 6 operations in isolation with various inputs and edge cases" (🔴)
+│   ├── ⏸️ |Locking unit tests| "Test mtime checking logic, lock acquisition, error on concurrent modification" (🔴)
+│   ├── ⏸️ |Concurrency integration tests| "Spawn multiple child processes, test concurrent file access, verify no data corruption" (🔴)
+│   └── ✅ |Error handling tests| "Test all error conditions and verify proper error messages" (🟡)
+├── ✅ |Documentation| "Update documentation and add inline code documentation" (🔵) (100%)
+│   ├── ✅ |Inline documentation| "Add e/code style comments to all functions: intention comments before code blocks" (🟡)
+│   ├── ✅ |Update README| "Update README with CLI usage, configuration, examples" (🔵)
+│   └── ✅ |Update CLAUDE.md| "Update CLAUDE.md with implementation details and current status" (🔵)
+└── ⏸️ |Integration| "Manual testing and verification with Claude Code" (🟡) (0%)
+    ├── ⏸️ |Manual testing stdio| "Test server with MCP Inspector using stdio transport" (🟡)
+    ├── ⏸️ |Manual testing HTTP| "Test server with MCP Inspector using HTTP transport" (🟡)
+    └── ⏸️ |Claude Code integration| "Test with actual Claude Code instance via .mcp.json configuration" (🟡)

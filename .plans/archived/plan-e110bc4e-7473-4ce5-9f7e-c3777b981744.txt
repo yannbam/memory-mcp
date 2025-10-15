@@ -1,0 +1,26 @@
+🌳 "memory-mcp-setup"
+📝 Set up TypeScript project infrastructure for memory-mcp MCP server.
+This includes project initialization, dependencies, linting, testing, and CI configuration.
+📊 ██████████ 100% (21/21 tasks)
+
+├── ✅ |Initialize TypeScript project| "Create package.json, tsconfig.json, and basic project structure" (🔴) (100%)
+│   ├── ✅ |Create package.json| "Initialize npm package with proper metadata and scripts" (🔴)
+│   ├── ✅ |Create tsconfig.json| "Configure TypeScript compiler options for MCP server" (🔴)
+│   └── ✅ |Create src directory structure| "Set up src/, dist/, and other necessary directories" (🟡)
+├── ✅ |Add MCP SDK dependency| "Install @modelcontextprotocol/sdk and copy its README to docs/" (🔴) (100%)
+│   ├── ✅ |Install MCP SDK| "Add @modelcontextprotocol/sdk as dependency" (🔴)
+│   └── ✅ |Copy MCP README to docs/| "Fetch and save MCP SDK README.md to docs/ for reference" (🟡)
+├── ✅ |Configure linter| "Set up ESLint with TypeScript support and recommended rules" (🔴) (100%)
+│   ├── ✅ |Install ESLint dependencies| "Install eslint, @typescript-eslint/parser, @typescript-eslint/eslint-plugin" (🔴)
+│   ├── ✅ |Create ESLint config| "Create .eslintrc.json with TypeScript rules" (🔴)
+│   └── ✅ |Add lint scripts to package.json| "Add lint and lint:fix npm scripts" (🟡)
+├── ✅ |Configure testing| "Set up Jest with TypeScript support and coverage reporting" (🔴) (100%)
+│   ├── ✅ |Install Jest dependencies| "Install jest, ts-jest, @types/jest" (🔴)
+│   ├── ✅ |Create Jest config| "Create jest.config.js with coverage configuration" (🔴)
+│   └── ✅ |Add test scripts to package.json| "Add test, test:coverage, test:watch npm scripts" (🟡)
+├── ✅ |Configure CI/CD| "Set up GitHub Actions workflow for linting and testing with coverage" (🔴) (100%)
+│   ├── ✅ |Create .github/workflows directory| "Set up GitHub Actions directory structure" (🟡)
+│   └── ✅ |Create CI workflow| "Create ci.yml with lint, test, and coverage reporting" (🔴)
+└── ✅ |Add project documentation| "Create README.md, .gitignore, and other essential files" (🟡) (100%)
+    ├── ✅ |Create .gitignore| "Add Node.js, TypeScript, and IDE ignore patterns" (🔴)
+    └── ✅ |Create README.md| "Write project README with setup instructions" (🟡)

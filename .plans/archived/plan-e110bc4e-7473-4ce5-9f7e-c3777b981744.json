@@ -1,0 +1,216 @@
+{
+  "uuid": "e110bc4e-7473-4ce5-9f7e-c3777b981744",
+  "name": "memory-mcp-setup",
+  "details": "Set up TypeScript project infrastructure for memory-mcp MCP server.\nThis includes project initialization, dependencies, linting, testing, and CI configuration.",
+  "tasks": [
+    {
+      "name": "Initialize TypeScript project",
+      "details": "Create package.json, tsconfig.json, and basic project structure",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Create package.json",
+          "details": "Initialize npm package with proper metadata and scripts",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "ee382554-a552-475d-a9b9-3cae17ca1293",
+          "created_at": "2025-10-15T18:44:54.334Z",
+          "updated_at": "2025-10-15T18:45:14.388Z"
+        },
+        {
+          "name": "Create tsconfig.json",
+          "details": "Configure TypeScript compiler options for MCP server",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "60c070e3-998d-4247-a181-a44e95f193bc",
+          "created_at": "2025-10-15T18:44:54.334Z",
+          "updated_at": "2025-10-15T18:45:22.293Z"
+        },
+        {
+          "name": "Create src directory structure",
+          "details": "Set up src/, dist/, and other necessary directories",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "131dc0b4-a65c-4280-9ce6-4a95a203edeb",
+          "created_at": "2025-10-15T18:44:54.334Z",
+          "updated_at": "2025-10-15T18:45:30.351Z"
+        }
+      ],
+      "uuid": "dfe7686c-3838-463c-a6e1-64acf280e8e4",
+      "created_at": "2025-10-15T18:44:54.334Z",
+      "updated_at": "2025-10-15T18:44:54.334Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Add MCP SDK dependency",
+      "details": "Install @modelcontextprotocol/sdk and copy its README to docs/",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Install MCP SDK",
+          "details": "Add @modelcontextprotocol/sdk as dependency",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "417d3079-253a-4a24-a6c7-5914c504d6ab",
+          "created_at": "2025-10-15T18:44:54.334Z",
+          "updated_at": "2025-10-15T18:46:09.143Z"
+        },
+        {
+          "name": "Copy MCP README to docs/",
+          "details": "Fetch and save MCP SDK README.md to docs/ for reference",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "75f651e4-0aa8-4361-a28a-92ba9ee6889a",
+          "created_at": "2025-10-15T18:44:54.334Z",
+          "updated_at": "2025-10-15T18:46:32.130Z"
+        }
+      ],
+      "uuid": "d176798f-8cb9-4a9a-add5-e44be0b3af30",
+      "created_at": "2025-10-15T18:44:54.334Z",
+      "updated_at": "2025-10-15T18:44:54.334Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Configure linter",
+      "details": "Set up ESLint with TypeScript support and recommended rules",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Install ESLint dependencies",
+          "details": "Install eslint, @typescript-eslint/parser, @typescript-eslint/eslint-plugin",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "4f27eb83-014e-42bf-a4d3-b30ee40e9a72",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:46:43.702Z"
+        },
+        {
+          "name": "Create ESLint config",
+          "details": "Create .eslintrc.json with TypeScript rules",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "d5d375fa-414b-4342-9546-4f095ef9351b",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:46:51.093Z"
+        },
+        {
+          "name": "Add lint scripts to package.json",
+          "details": "Add lint and lint:fix npm scripts",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "cf7e742c-36ad-4fab-83dc-8083d9211416",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:47:44.013Z"
+        }
+      ],
+      "uuid": "e435ab43-fa97-4e7c-83f4-859c66a91cd9",
+      "created_at": "2025-10-15T18:44:54.334Z",
+      "updated_at": "2025-10-15T18:44:54.334Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Configure testing",
+      "details": "Set up Jest with TypeScript support and coverage reporting",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Install Jest dependencies",
+          "details": "Install jest, ts-jest, @types/jest",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "18e66506-5c8a-47c6-b9b9-389b4afed8d1",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:47:54.096Z"
+        },
+        {
+          "name": "Create Jest config",
+          "details": "Create jest.config.js with coverage configuration",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "7f203502-c503-4fc9-9ad9-7d414e2b4c2f",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:48:03.735Z"
+        },
+        {
+          "name": "Add test scripts to package.json",
+          "details": "Add test, test:coverage, test:watch npm scripts",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "5b92569c-d30a-4e8e-8095-855e511cd612",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:48:57.792Z"
+        }
+      ],
+      "uuid": "2698dc98-39c7-40c0-99fa-e50d447e4988",
+      "created_at": "2025-10-15T18:44:54.335Z",
+      "updated_at": "2025-10-15T18:44:54.335Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Configure CI/CD",
+      "details": "Set up GitHub Actions workflow for linting and testing with coverage",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Create .github/workflows directory",
+          "details": "Set up GitHub Actions directory structure",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "fd614b7f-a603-41a8-b175-8811ff69b8da",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:49:09.316Z"
+        },
+        {
+          "name": "Create CI workflow",
+          "details": "Create ci.yml with lint, test, and coverage reporting",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "7aff107f-9787-4e5e-bc0e-d433c9c4b4fd",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:49:18.292Z"
+        }
+      ],
+      "uuid": "ec289574-d9c3-4de5-9016-a11975d6c807",
+      "created_at": "2025-10-15T18:44:54.335Z",
+      "updated_at": "2025-10-15T18:44:54.335Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Add project documentation",
+      "details": "Create README.md, .gitignore, and other essential files",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Create .gitignore",
+          "details": "Add Node.js, TypeScript, and IDE ignore patterns",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "51564598-2466-4b40-b9ec-b171fcf0492b",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:49:39.036Z"
+        },
+        {
+          "name": "Create README.md",
+          "details": "Write project README with setup instructions",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "7be4018d-918b-457f-aeab-240e517c0ce7",
+          "created_at": "2025-10-15T18:44:54.335Z",
+          "updated_at": "2025-10-15T18:50:34.491Z"
+        }
+      ],
+      "uuid": "9df4bf8c-93cd-4771-9c6b-afdf6f336864",
+      "created_at": "2025-10-15T18:44:54.335Z",
+      "updated_at": "2025-10-15T18:44:54.335Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-10-15T18:44:54.335Z",
+  "updated_at": "2025-10-15T18:50:42.242Z"
+}
