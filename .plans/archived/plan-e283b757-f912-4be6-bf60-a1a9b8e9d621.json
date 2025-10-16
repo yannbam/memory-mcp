@@ -372,18 +372,18 @@
     {
       "name": "Integration",
       "details": "Manual testing and verification with Claude Code",
-      "status": "pending",
+      "status": "in_progress",
       "priority": "medium",
       "sub_tasks": [
         {
           "name": "Manual testing stdio",
           "details": "Test server with MCP Inspector using stdio transport",
-          "status": "pending",
+          "status": "completed",
           "priority": "medium",
           "sub_tasks": [],
           "uuid": "c5d85544-7e01-4c63-8fb3-de610241b3c7",
           "created_at": "2025-10-15T19:33:36.827Z",
-          "updated_at": "2025-10-15T19:33:36.827Z"
+          "updated_at": "2025-10-16T00:41:25.483Z"
         },
         {
           "name": "Manual testing HTTP",
@@ -398,20 +398,20 @@
         {
           "name": "Claude Code integration",
           "details": "Test with actual Claude Code instance via .mcp.json configuration",
-          "status": "pending",
+          "status": "completed",
           "priority": "medium",
           "sub_tasks": [],
           "uuid": "18f538c0-0b65-4708-8dac-4b46955e3704",
           "created_at": "2025-10-15T19:33:36.827Z",
-          "updated_at": "2025-10-15T19:33:36.827Z"
+          "updated_at": "2025-10-16T00:41:25.483Z"
         }
       ],
       "uuid": "4983ff3a-bbea-460a-abfc-96303b5f59d7",
       "created_at": "2025-10-15T19:33:36.827Z",
       "updated_at": "2025-10-15T19:33:36.827Z",
-      "completion_percentage": 0
+      "completion_percentage": 67
     }
   ],
   "created_at": "2025-10-15T19:33:36.827Z",
-  "updated_at": "2025-10-15T19:52:29.241Z"
+  "updated_at": "2025-10-16T00:41:25.483Z"
 }
