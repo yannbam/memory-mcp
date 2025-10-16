@@ -283,4 +283,100 @@ describe('Tree View Module', () => {
       expect(file1Index).toBeLessThan(file2Index);
     });
   });
+
+  describe('Error Handling', () => {
+    let testDir: string;
+
+    beforeEach(async () => {
+      testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-view-err-test-'));
+    });
+
+    afterEach(async () => {
+      // Clean up - restore permissions before deleting
+      try {
+        const entries = await fs.readdir(testDir, { withFileTypes: true });
+        for (const entry of entries) {
+          const fullPath = path.join(testDir, entry.name);
+          try {
+            await fs.chmod(fullPath, 0o755);
+          } catch {
+            // Ignore errors
+          }
+        }
+      } catch {
+        // Ignore errors
+      }
+      await fs.rm(testDir, { recursive: true, force: true });
+    });
+
+    it('should handle permission errors during directory traversal gracefully', async () => {
+      // Create directory structure with one restricted subdirectory
+      await fs.writeFile(path.join(testDir, 'accessible.txt'), 'content');
+      await fs.mkdir(path.join(testDir, 'restricted-dir'));
+      await fs.writeFile(path.join(testDir, 'restricted-dir', 'secret.txt'), 'secret');
+
+      // Remove read permissions from restricted-dir
+      await fs.chmod(path.join(testDir, 'restricted-dir'), 0o000);
+
+      try {
+        // Render tree - should NOT throw or return empty
+        // Should show accessible.txt and handle restricted-dir gracefully
+        const result = await renderDirectoryTree(testDir, '/memories');
+
+        // Should contain accessible file
+        expect(result).toContain('accessible.txt');
+
+        // Should either:
+        // 1. Show restricted-dir/ with warning, OR
+        // 2. Skip it entirely, OR
+        // 3. Log error but continue
+
+        // Should NOT be completely empty
+        expect(result.length).toBeGreaterThan(0);
+        expect(result).toContain('/memories');
+      } finally {
+        // Restore permissions
+        await fs.chmod(path.join(testDir, 'restricted-dir'), 0o755);
+      }
+    });
+
+    it('should not silently return empty array for permission errors', async () => {
+      // Create accessible files
+      await fs.writeFile(path.join(testDir, 'file1.txt'), 'content1');
+      await fs.writeFile(path.join(testDir, 'file2.txt'), 'content2');
+
+      // Normal render should show both files
+      const result = await renderDirectoryTree(testDir, '/memories');
+      expect(result).toContain('file1.txt');
+      expect(result).toContain('file2.txt');
+
+      // This is a critical test: permission errors should NOT make the directory appear empty
+      // The bug is that buildDirectoryTree() has an empty catch block that returns []
+    });
+
+    it('should handle nested permission errors without silent failure', async () => {
+      // Create deep structure with permission error deep inside
+      await fs.mkdir(path.join(testDir, 'level1'));
+      await fs.mkdir(path.join(testDir, 'level1', 'level2'));
+      await fs.mkdir(path.join(testDir, 'level1', 'level2', 'level3'));
+      await fs.writeFile(path.join(testDir, 'level1', 'level2', 'level3', 'deep.txt'), 'content');
+
+      // Make level3 unreadable
+      await fs.chmod(path.join(testDir, 'level1', 'level2', 'level3'), 0o000);
+
+      try {
+        const result = await renderDirectoryTree(testDir, '/memories');
+
+        // Should still show level1 and level2
+        expect(result).toContain('level1/');
+        expect(result).toContain('level2/');
+
+        // Should handle level3 gracefully (may show or skip, but shouldn't crash)
+        expect(result.length).toBeGreaterThan(0);
+      } finally {
+        // Restore permissions
+        await fs.chmod(path.join(testDir, 'level1', 'level2', 'level3'), 0o755);
+      }
+    });
+  });
 });

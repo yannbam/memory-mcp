@@ -65,13 +65,22 @@ export interface OperationsContext {
 
 /**
  * Helper: Check if path exists
+ *
+ * Only returns false for ENOENT (file not found).
+ * Propagates other errors (permission denied, I/O errors, etc.) to caller.
  */
 async function exists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
     return true;
-  } catch {
-    return false;
+  } catch (error: unknown) {
+    // Only return false for "file not found" errors
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+      return false;
+    }
+    // Propagate all other errors (EACCES, ELOOP, EIO, etc.) with context
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to access path: ${errorMessage}`);
   }
 }
 
@@ -148,10 +157,32 @@ async function viewDirectory(
 
     // Get item stats to determine if directory
     const itemPath = path.join(fullPath, item);
-    const itemStat = await fs.stat(itemPath);
 
-    // Append / to directories
-    items.push(itemStat.isDirectory() ? `${item}/` : item);
+    try {
+      const itemStat = await fs.stat(itemPath);
+
+      // Append / to directories
+      items.push(itemStat.isDirectory() ? `${item}/` : item);
+    } catch (error: unknown) {
+      // Handle per-file errors gracefully
+      // Log the error but continue processing other files
+      const errorCode = error && typeof error === 'object' && 'code' in error ? error.code : 'UNKNOWN';
+      await context.logger.debug('viewDirectory_stat_failed', {
+        path: memoryPath,
+        failed_item: item,
+        error_code: errorCode,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      // Skip this item if it's a race condition (file deleted)
+      if (errorCode === 'ENOENT') {
+        continue;
+      }
+
+      // For other errors (permission denied, etc.), still skip but log as warning
+      // This prevents one bad file from breaking the entire directory listing
+      continue;
+    }
   }
 
   // Format output

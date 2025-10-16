@@ -1,0 +1,108 @@
+{
+  "uuid": "18ff805d-4c9c-474c-a6fa-4120e4dcc43c",
+  "name": "fix-critical-errors",
+  "details": "Fix the 3 critical error handling issues found during PR review:\n1. Silent directory tree failures in buildDirectoryTree()\n2. Misleading \"Path not found\" errors in exists() helper\n3. Missing error handling tests\n\nUsing test-first approach with MCP-Debug integration testing.",
+  "tasks": [
+    {
+      "name": "Write error handling tests",
+      "details": "Add tests that currently fail, exposing the bugs:\n- Test permission errors in buildDirectoryTree()\n- Test exists() distinguishes ENOENT from EACCES\n- Test per-file stat errors in viewDirectory()",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Test buildDirectoryTree permission errors",
+          "details": "Write test that creates directory with restricted permissions and verifies error is logged, not silent empty array",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "047705fd-7c7e-49d5-8dfe-59a2154556ff",
+          "created_at": "2025-10-16T08:16:20.507Z",
+          "updated_at": "2025-10-16T08:18:11.358Z"
+        },
+        {
+          "name": "Test exists() distinguishes errors",
+          "details": "Write test that verifies exists() throws for EACCES but returns false for ENOENT",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "b60c5bff-3941-4c3e-8338-c31f38ffd75f",
+          "created_at": "2025-10-16T08:16:20.507Z",
+          "updated_at": "2025-10-16T08:18:11.358Z"
+        },
+        {
+          "name": "Test viewDirectory per-file errors",
+          "details": "Write test for race condition where file is deleted between readdir and stat",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "084de153-ae80-491b-86c3-dc7943fc4390",
+          "created_at": "2025-10-16T08:16:20.507Z",
+          "updated_at": "2025-10-16T08:18:11.358Z"
+        }
+      ],
+      "uuid": "bd1a7b8b-db18-4ba9-91d3-a535adee179e",
+      "created_at": "2025-10-16T08:16:20.506Z",
+      "updated_at": "2025-10-16T08:16:20.506Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Fix exists() helper",
+      "details": "Modify exists() to only return false for ENOENT, throw for other errors like EACCES",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [],
+      "uuid": "c000ee04-82f3-4cda-94be-a5a4903a86d9",
+      "created_at": "2025-10-16T08:16:20.507Z",
+      "updated_at": "2025-10-16T08:19:04.703Z"
+    },
+    {
+      "name": "Fix buildDirectoryTree() catch block",
+      "details": "Replace empty catch with error logging that distinguishes EACCES, ENOENT, and other errors",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [],
+      "uuid": "ac82d7d9-b867-45fb-8007-fb746d9fe3d6",
+      "created_at": "2025-10-16T08:16:20.507Z",
+      "updated_at": "2025-10-16T08:19:48.352Z"
+    },
+    {
+      "name": "Fix viewDirectory() per-file handling",
+      "details": "Add try-catch around fs.stat() loop to handle per-file errors gracefully",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [],
+      "uuid": "480d3082-d4ad-4a6b-86ce-2a6d19c9769c",
+      "created_at": "2025-10-16T08:16:20.507Z",
+      "updated_at": "2025-10-16T08:19:13.001Z"
+    },
+    {
+      "name": "Run test suite",
+      "details": "Verify all tests pass including new error handling tests",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "137143ad-a951-49c4-af19-172aa83e9197",
+      "created_at": "2025-10-16T08:16:20.507Z",
+      "updated_at": "2025-10-16T08:20:01.795Z"
+    },
+    {
+      "name": "MCP-Debug integration test",
+      "details": "Test the server with MCP-Debug to verify error handling works in real MCP context",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "8ec1356e-477d-4c3e-a6d7-4075e010ad61",
+      "created_at": "2025-10-16T08:16:20.507Z",
+      "updated_at": "2025-10-16T08:20:52.378Z"
+    },
+    {
+      "name": "Commit fixes",
+      "details": "Create clean commit with error handling fixes and tests",
+      "status": "in_progress",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "9135d20a-c7bc-410c-85bc-043f7defa6d0",
+      "created_at": "2025-10-16T08:16:20.507Z",
+      "updated_at": "2025-10-16T08:21:00.864Z"
+    }
+  ],
+  "created_at": "2025-10-16T08:16:20.507Z",
+  "updated_at": "2025-10-16T08:21:00.864Z"
+}

@@ -442,4 +442,86 @@ describe('Memory Operations', () => {
       ).rejects.toThrow('Destination already exists');
     });
   });
+
+  describe('Error Handling', () => {
+    describe('permission errors vs file-not-found', () => {
+      it('should distinguish ENOENT from EACCES in file operations', async () => {
+        // Create file with restricted permissions (no read access)
+        const restrictedFile = path.join(memoryRoot, 'restricted.txt');
+        await fs.writeFile(restrictedFile, 'secret content');
+        await fs.chmod(restrictedFile, 0o000); // Remove all permissions
+
+        try {
+          // Attempt to view restricted file
+          // Should throw with "Permission denied" or similar, NOT "Path not found"
+          await expect(operations.view({ path: '/memories/restricted.txt' }, context)).rejects.toThrow();
+
+          const error = await operations
+            .view({ path: '/memories/restricted.txt' }, context)
+            .catch((e) => e);
+
+          // Error message should NOT say "Path not found" for permission issues
+          expect(error.message).not.toContain('Path not found');
+          expect(error.message).not.toContain('not found');
+        } finally {
+          // Restore permissions for cleanup
+          await fs.chmod(restrictedFile, 0o644);
+        }
+      });
+
+      it('should properly report non-existent files as "Path not found"', async () => {
+        // Verify that truly non-existent files DO get "Path not found" error
+        await expect(operations.view({ path: '/memories/truly-missing.txt' }, context)).rejects.toThrow(
+          'Path not found',
+        );
+      });
+    });
+
+    describe('viewDirectory per-file errors', () => {
+      it('should handle per-file stat errors gracefully', async () => {
+        // Create directory with multiple files
+        await fs.writeFile(path.join(memoryRoot, 'file1.txt'), 'content1');
+        await fs.writeFile(path.join(memoryRoot, 'file2.txt'), 'content2');
+        await fs.writeFile(path.join(memoryRoot, 'file3.txt'), 'content3');
+
+        // Make one file unreadable
+        const restrictedFile = path.join(memoryRoot, 'file2.txt');
+        await fs.chmod(restrictedFile, 0o000);
+
+        try {
+          // View directory - should either:
+          // 1. Skip the unreadable file and show others, OR
+          // 2. Throw a clear error about which file failed
+          const result = await operations.view({ path: '/memories' }, context);
+
+          // Should show file1.txt and file3.txt
+          expect(result).toContain('file1.txt');
+          expect(result).toContain('file3.txt');
+
+          // May or may not show file2.txt depending on implementation
+          // But should NOT crash entirely
+        } finally {
+          // Restore permissions for cleanup
+          await fs.chmod(restrictedFile, 0o644);
+        }
+      });
+
+      it('should handle race conditions during directory traversal', async () => {
+        // Create a file
+        const tempFile = path.join(memoryRoot, 'temporary.txt');
+        await fs.writeFile(tempFile, 'content');
+
+        // This test simulates a file being deleted between readdir and stat
+        // In practice, this is hard to test reliably without mocking
+        // But we can at least ensure the code doesn't crash on ENOENT during stat
+
+        // For now, just verify that viewing a directory with a file works
+        const result = await operations.view({ path: '/memories' }, context);
+        expect(result).toContain('temporary.txt');
+
+        // In a real scenario with concurrent access, stat might fail with ENOENT
+        // The code should handle this gracefully
+      });
+    });
+  });
 });

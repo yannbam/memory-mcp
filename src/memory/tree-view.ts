@@ -139,37 +139,59 @@ async function buildDirectoryTree(dirPath: string, basePath: string): Promise<Tr
       const fullPath = path.join(dirPath, entry.name);
       const relativePath = path.relative(basePath, fullPath);
 
-      // Get stats for metadata
-      const stats = await fs.stat(fullPath);
+      try {
+        // Get stats for metadata
+        const stats = await fs.stat(fullPath);
 
-      if (entry.isDirectory()) {
-        // Create directory node
-        const dirNode: TreeNode = {
-          name: entry.name,
-          path: relativePath,
-          type: 'directory',
-          fileSize: null,
-          lineCount: null,
-          modificationTime: stats.mtime,
-          children: [],
-        };
+        if (entry.isDirectory()) {
+          // Create directory node
+          const dirNode: TreeNode = {
+            name: entry.name,
+            path: relativePath,
+            type: 'directory',
+            fileSize: null,
+            lineCount: null,
+            modificationTime: stats.mtime,
+            children: [],
+          };
 
-        // Recursively build children
-        dirNode.children = await buildDirectoryTree(fullPath, basePath);
+          // Recursively build children
+          dirNode.children = await buildDirectoryTree(fullPath, basePath);
 
-        nodes.push(dirNode);
-      } else if (entry.isFile()) {
-        // Create file node with size and line count
-        const fileNode: TreeNode = {
-          name: entry.name,
-          path: relativePath,
-          type: 'file',
-          fileSize: stats.size,
-          lineCount: await countFileLines(fullPath),
-          modificationTime: stats.mtime,
-        };
+          nodes.push(dirNode);
+        } else if (entry.isFile()) {
+          // Create file node with size and line count
+          const fileNode: TreeNode = {
+            name: entry.name,
+            path: relativePath,
+            type: 'file',
+            fileSize: stats.size,
+            lineCount: await countFileLines(fullPath),
+            modificationTime: stats.mtime,
+          };
 
-        nodes.push(fileNode);
+          nodes.push(fileNode);
+        }
+      } catch (entryError: unknown) {
+        // Handle per-file/per-directory errors gracefully
+        const errorCode =
+          entryError && typeof entryError === 'object' && 'code' in entryError
+            ? entryError.code
+            : 'UNKNOWN';
+
+        // Log per-entry errors for debugging
+        if (errorCode === 'EACCES') {
+          console.error(`Warning: Permission denied accessing ${fullPath}`);
+        } else if (errorCode === 'ENOENT') {
+          // Race condition - file/directory deleted between readdir and stat
+          // Skip silently as this is expected in concurrent scenarios
+        } else {
+          // Log unexpected errors
+          console.error(`Error processing ${fullPath}: ${entryError instanceof Error ? entryError.message : String(entryError)}`);
+        }
+
+        // Continue with other entries - don't let one bad entry break entire tree
+        continue;
       }
     }
 
@@ -182,8 +204,21 @@ async function buildDirectoryTree(dirPath: string, basePath: string): Promise<Tr
       // Alphabetical within each category
       return a.name.localeCompare(b.name);
     });
-  } catch {
-    // Return empty array on error
+  } catch (error: unknown) {
+    // Handle directory-level errors (readdir failure)
+    const errorCode = error && typeof error === 'object' && 'code' in error ? error.code : 'UNKNOWN';
+
+    if (errorCode === 'EACCES') {
+      console.error(`Warning: Permission denied reading directory ${dirPath}`);
+    } else if (errorCode === 'ENOENT') {
+      // Directory deleted during traversal - skip silently
+    } else {
+      // Log unexpected directory-level errors
+      console.error(`Error reading directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // Return empty array for graceful degradation
+    // But errors are logged so they're not completely silent
   }
 
   return nodes;
