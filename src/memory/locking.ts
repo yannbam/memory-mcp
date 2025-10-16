@@ -1,13 +1,20 @@
 /**
- * File Locking with Optimistic Concurrency Control
+ * File Locking with True Reader-Writer Locks
  *
  * Provides file locking for concurrent access from multiple Claude instances.
- * Uses proper-lockfile for cross-process file locking.
+ * Uses @esfx/async-readerwriterlock for true shared read locks and exclusive write locks.
  * Implements optimistic concurrency control using mtime (modification timestamp).
+ *
+ * Key Features:
+ * - Shared read locks: Multiple readers can access concurrently
+ * - Exclusive write locks: Only one writer at a time
+ * - Multi-path atomic locking: Lock multiple paths for rename operations
+ * - Optimistic concurrency: Detect modifications while waiting for locks
  */
 
 import * as fs from 'fs/promises';
-import * as lockfile from 'proper-lockfile';
+import * as path from 'path';
+import { AsyncReaderWriterLock } from '@esfx/async-readerwriterlock';
 
 /**
  * Lock release function
@@ -23,89 +30,222 @@ export interface LockResult {
 }
 
 /**
- * Acquire an exclusive write lock on a file or directory.
+ * LockManager manages a pool of reader-writer locks, one per path.
  *
- * For operations that modify files (create, str_replace, insert, delete, rename).
- * Blocks until lock is acquired (retries forever).
- * Optionally captures mtime before locking for optimistic concurrency control.
+ * Provides coordinated access to filesystem paths with:
+ * - Shared read locks (multiple concurrent readers)
+ * - Exclusive write locks
+ * - Multi-path atomic locking (for rename operations)
  *
- * @param filePath - Absolute filesystem path to lock
- * @param captureMtime - Whether to capture mtime before acquiring lock
- * @returns Lock release function and mtime (if captured)
+ * Lock instances are cached and reused for the same path.
+ * Lock cleanup happens automatically when no operations are pending.
  */
-export async function acquireWriteLock(
-  filePath: string,
-  captureMtime: boolean = false,
-): Promise<LockResult> {
-  // Capture mtime before locking if requested
-  let mtimeBefore: number | null = null;
-  if (captureMtime) {
-    try {
-      const stat = await fs.stat(filePath);
-      mtimeBefore = stat.mtime.getTime();
-    } catch {
-      // File doesn't exist yet - that's ok for create operations
-      mtimeBefore = null;
+export class LockManager {
+  // Map: normalized path → RW lock instance
+  private locks: Map<string, AsyncReaderWriterLock>;
+
+  // Map: normalized path → reference count (for cleanup)
+  private refCounts: Map<string, number>;
+
+  constructor() {
+    this.locks = new Map();
+    this.refCounts = new Map();
+  }
+
+  /**
+   * Get or create lock for a path
+   * Increments reference count
+   */
+  private getLock(filePath: string): AsyncReaderWriterLock {
+    // Normalize path to canonical form (resolve symlinks, . and ..)
+    const normalizedPath = path.resolve(filePath);
+
+    // Get existing lock or create new one
+    let lock = this.locks.get(normalizedPath);
+    if (!lock) {
+      lock = new AsyncReaderWriterLock();
+      this.locks.set(normalizedPath, lock);
+      this.refCounts.set(normalizedPath, 0);
+    }
+
+    // Increment reference count
+    const refCount = this.refCounts.get(normalizedPath)!;
+    this.refCounts.set(normalizedPath, refCount + 1);
+
+    return lock;
+  }
+
+  /**
+   * Release lock for a path
+   * Decrements reference count, cleans up if zero
+   */
+  private releaseLock(filePath: string): void {
+    // Normalize path
+    const normalizedPath = path.resolve(filePath);
+
+    // Decrement reference count
+    const refCount = this.refCounts.get(normalizedPath);
+    if (refCount === undefined) {
+      throw new Error(`Release called on non-existent lock: ${normalizedPath}`);
+    }
+
+    const newRefCount = refCount - 1;
+    this.refCounts.set(normalizedPath, newRefCount);
+
+    // Clean up if no more references
+    if (newRefCount === 0) {
+      this.locks.delete(normalizedPath);
+      this.refCounts.delete(normalizedPath);
     }
   }
 
-  // Determine what to lock
-  // If file doesn't exist, lock the parent directory instead
-  let lockPath = filePath;
-  try {
-    await fs.stat(filePath);
-    // File exists, lock it directly
-  } catch {
-    // File doesn't exist, lock parent directory
-    const path = await import('path');
-    lockPath = path.dirname(filePath);
+  /**
+   * Acquire read lock for a path
+   * Multiple readers can hold locks simultaneously
+   *
+   * @param filePath - Absolute filesystem path to lock
+   * @returns Lock release function
+   */
+  async acquireReadLock(filePath: string): Promise<LockRelease> {
+    // Get lock instance for this path
+    const lock = this.getLock(filePath);
 
-    // Ensure parent directory exists
-    try {
-      await fs.mkdir(lockPath, { recursive: true });
-    } catch {
-      // Directory already exists or creation failed, continue anyway
-    }
+    // Acquire shared read lock
+    const lockHandle = await lock.read();
+
+    // Return release function
+    return (): Promise<void> => {
+      lockHandle.unlock();
+      this.releaseLock(filePath);
+      return Promise.resolve();
+    };
   }
 
-  // Acquire exclusive lock
-  // Retry forever - wait for lock to become available
-  const release = await lockfile.lock(lockPath, {
-    retries: {
-      forever: true, // Wait indefinitely
-      minTimeout: 100, // Minimum wait between retries: 100ms
-      maxTimeout: 1000, // Maximum wait between retries: 1s
-    },
-    stale: 30000, // Consider lock stale after 30 seconds
-  });
+  /**
+   * Acquire write lock for a path
+   * Exclusive - only one writer at a time
+   * Optionally captures mtime before locking for optimistic concurrency control
+   *
+   * @param filePath - Absolute filesystem path to lock
+   * @param captureMtime - Whether to capture mtime before acquiring lock
+   * @returns Lock release function and mtime (if captured)
+   */
+  async acquireWriteLock(
+    filePath: string,
+    captureMtime: boolean = false,
+  ): Promise<LockResult> {
+    // Capture mtime BEFORE acquiring lock (for optimistic concurrency)
+    let mtimeBefore: number | null = null;
+    if (captureMtime) {
+      try {
+        const stats = await fs.stat(filePath);
+        mtimeBefore = stats.mtimeMs;
+      } catch (err) {
+        const fsError = err as { code?: string };
+        if (fsError.code !== 'ENOENT') throw err;
+        // File doesn't exist yet - that's ok for create operations
+      }
+    }
 
-  return { release, mtimeBefore };
+    // Get lock instance for this path
+    const lock = this.getLock(filePath);
+
+    // Acquire exclusive write lock
+    const lockHandle = await lock.write();
+
+    // Return release function with captured mtime
+    const release = (): Promise<void> => {
+      lockHandle.unlock();
+      this.releaseLock(filePath);
+      return Promise.resolve();
+    };
+
+    return { release, mtimeBefore };
+  }
+
+  /**
+   * Acquire write locks for multiple paths atomically
+   *
+   * Acquires locks in sorted order to prevent deadlock:
+   * - Process A: lock ["/a", "/b"]
+   * - Process B: lock ["/b", "/a"]
+   * - Both processes sort paths → both try ["/a", "/b"]
+   * - No circular wait → no deadlock
+   *
+   * @param filePaths - Array of absolute filesystem paths to lock
+   * @returns Lock release function that releases all locks
+   */
+  async acquireMultipleWriteLocks(filePaths: string[]): Promise<LockRelease> {
+    // Deduplicate and sort paths to prevent deadlock
+    const uniquePaths = [...new Set(filePaths)];
+    const sortedPaths = uniquePaths.map(p => path.resolve(p)).sort();
+
+    // Acquire locks in order
+    const lockHandles: Array<{ unlock: () => void }> = [];
+    const acquiredPaths: string[] = [];
+
+    try {
+      for (const filePath of sortedPaths) {
+        const lock = this.getLock(filePath);
+        const lockHandle = await lock.write();
+        lockHandles.push(lockHandle);
+        acquiredPaths.push(filePath);
+      }
+    } catch (error) {
+      // If acquisition fails, release all acquired locks
+      for (let i = lockHandles.length - 1; i >= 0; i--) {
+        lockHandles[i].unlock();
+      }
+      for (const filePath of acquiredPaths) {
+        this.releaseLock(filePath);
+      }
+      throw error;
+    }
+
+    // Return release function that unlocks in reverse order
+    return (): Promise<void> => {
+      for (let i = lockHandles.length - 1; i >= 0; i--) {
+        lockHandles[i].unlock();
+      }
+      for (const filePath of sortedPaths) {
+        this.releaseLock(filePath);
+      }
+      return Promise.resolve();
+    };
+  }
 }
 
-/**
- * Acquire a shared read lock on a file or directory.
- *
- * For operations that only read files (view).
- * Multiple readers can hold the lock simultaneously.
- * Blocks until lock is acquired.
- *
- * @param filePath - Absolute filesystem path to lock
- * @returns Lock release function
- */
-export async function acquireReadLock(filePath: string): Promise<LockRelease> {
-  // Acquire shared lock
-  // proper-lockfile doesn't natively support shared locks,
-  // so we use exclusive locks but with shorter stale timeout
-  const release = await lockfile.lock(filePath, {
-    retries: {
-      forever: true, // Wait indefinitely
-      minTimeout: 100,
-      maxTimeout: 1000,
-    },
-    stale: 10000, // Shorter stale timeout for reads: 10 seconds
-  });
+// Singleton lock manager instance
+const lockManager = new LockManager();
 
-  return release;
+/**
+ * Determine which path to lock
+ * If file doesn't exist, lock parent directory instead
+ *
+ * @param filePath - Absolute filesystem path
+ * @returns Path to lock (file if exists, parent directory otherwise)
+ */
+async function determinePathToLock(filePath: string): Promise<string> {
+  try {
+    await fs.access(filePath);
+    return filePath; // File exists, lock it directly
+  } catch (err) {
+    const fsError = err as { code?: string };
+    if (fsError.code === 'ENOENT') {
+      // File doesn't exist, lock parent directory
+      const parentDir = path.dirname(filePath);
+
+      // Ensure parent directory exists
+      try {
+        await fs.mkdir(parentDir, { recursive: true });
+      } catch {
+        // Directory already exists or creation failed, continue anyway
+      }
+
+      return parentDir;
+    }
+    throw err; // Other errors (permission denied, etc.)
+  }
 }
 
 /**
@@ -117,7 +257,6 @@ export async function acquireReadLock(filePath: string): Promise<LockRelease> {
  * @param filePath - Absolute filesystem path
  * @param mtimeBefore - Mtime captured before lock acquisition
  * @returns true if file was modified, false otherwise
- * @throws Error if mtime check is requested but mtimeBefore is null
  */
 export async function wasFileModified(
   filePath: string,
@@ -130,8 +269,8 @@ export async function wasFileModified(
 
   // Get current mtime
   try {
-    const stat = await fs.stat(filePath);
-    const mtimeAfter = stat.mtime.getTime();
+    const stats = await fs.stat(filePath);
+    const mtimeAfter = stats.mtimeMs;
 
     // Compare timestamps
     return mtimeAfter !== mtimeBefore;
@@ -142,7 +281,34 @@ export async function wasFileModified(
 }
 
 /**
- * Execute an operation with write lock and optimistic concurrency control.
+ * Execute an operation with read lock
+ * Multiple concurrent readers allowed
+ *
+ * @param filePath - Absolute filesystem path to lock
+ * @param operation - Async operation to execute while holding lock
+ * @returns Result from operation
+ */
+export async function withReadLock<T>(
+  filePath: string,
+  operation: () => Promise<T>,
+): Promise<T> {
+  // Determine what to lock
+  const pathToLock = await determinePathToLock(filePath);
+
+  // Acquire read lock
+  const release = await lockManager.acquireReadLock(pathToLock);
+
+  try {
+    // Execute operation while holding lock
+    return await operation();
+  } finally {
+    // Always release lock
+    await release();
+  }
+}
+
+/**
+ * Execute an operation with write lock and optimistic concurrency control
  *
  * Acquires write lock, checks for concurrent modifications, executes operation.
  * Throws error if file was modified while waiting for lock.
@@ -158,8 +324,24 @@ export async function withWriteLock<T>(
   checkConcurrency: boolean,
   operation: () => Promise<T>,
 ): Promise<T> {
-  // Acquire lock and capture mtime if checking concurrency
-  const { release, mtimeBefore } = await acquireWriteLock(filePath, checkConcurrency);
+  // Capture mtime BEFORE determining path to lock (for original filePath)
+  let mtimeBefore: number | null = null;
+  if (checkConcurrency) {
+    try {
+      const stats = await fs.stat(filePath);
+      mtimeBefore = stats.mtimeMs;
+    } catch (err) {
+      const fsError = err as { code?: string };
+      if (fsError.code !== 'ENOENT') throw err;
+      // File doesn't exist yet - that's ok for create operations
+    }
+  }
+
+  // Determine what to lock (parent directory if file doesn't exist)
+  const pathToLock = await determinePathToLock(filePath);
+
+  // Acquire lock (no mtime capture needed - already done above)
+  const { release } = await lockManager.acquireWriteLock(pathToLock, false);
 
   try {
     // Check if file was modified while waiting for lock
@@ -179,27 +361,35 @@ export async function withWriteLock<T>(
 }
 
 /**
- * Execute an operation with read lock.
+ * Execute an operation with write locks on multiple paths atomically
  *
- * Acquires read lock, executes operation.
- * No concurrency checking needed for reads.
+ * NEW FUNCTION for rename operations that need to lock both source and destination.
+ * Acquires all locks atomically (in sorted order to prevent deadlock).
  *
- * @param filePath - Absolute filesystem path to lock
- * @param operation - Async operation to execute while holding lock
+ * @param filePaths - Array of absolute filesystem paths to lock
+ * @param operation - Async operation to execute while holding all locks
  * @returns Result from operation
  */
-export async function withReadLock<T>(
-  filePath: string,
+export async function withMultipleWriteLocks<T>(
+  filePaths: string[],
   operation: () => Promise<T>,
 ): Promise<T> {
-  // Acquire read lock
-  const release = await acquireReadLock(filePath);
+  // Determine what to lock for each path
+  const pathsToLock = await Promise.all(
+    filePaths.map(fp => determinePathToLock(fp)),
+  );
+
+  // Acquire locks atomically (sorted order prevents deadlock)
+  const release = await lockManager.acquireMultipleWriteLocks(pathsToLock);
 
   try {
-    // Execute operation while holding lock
+    // Execute operation while holding all locks
     return await operation();
   } finally {
-    // Always release lock
+    // Always release all locks
     await release();
   }
 }
+
+// Export LockManager for testing
+export { lockManager };

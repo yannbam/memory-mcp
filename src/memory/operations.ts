@@ -14,7 +14,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { withReadLock, withWriteLock } from './locking.js';
+import { withReadLock, withWriteLock, withMultipleWriteLocks } from './locking.js';
 import { validatePath } from './path-security.js';
 import { renderDirectoryTree } from './tree-view.js';
 import type { Logger } from '../utils/logger.js';
@@ -65,13 +65,34 @@ export interface OperationsContext {
 
 /**
  * Helper: Check if path exists
+ * Only catches ENOENT (file not found) - rethrows other errors
  */
 async function exists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
     return true;
-  } catch {
-    return false;
+  } catch (err) {
+    const fsError = err as { code?: string; message?: string };
+
+    // File not found - expected case
+    if (fsError.code === 'ENOENT') {
+      return false;
+    }
+
+    // Permission denied - helpful error message
+    if (fsError.code === 'EACCES') {
+      throw new Error(
+        `Permission denied accessing path: ${filePath}\n` +
+          `Check filesystem permissions for the memory-mcp process.`,
+      );
+    }
+
+    // Other filesystem errors - rethrow with context
+    throw new Error(
+      `Filesystem error checking path: ${filePath}\n` +
+        `Error code: ${fsError.code ?? 'UNKNOWN'}\n` +
+        `Message: ${fsError.message ?? 'Unknown error'}`,
+    );
   }
 }
 
@@ -414,8 +435,8 @@ export async function rename(command: RenameCommand, context: OperationsContext)
   const oldFullPath = validatePath(command.old_path, context.memoryRoot);
   const newFullPath = validatePath(command.new_path, context.memoryRoot);
 
-  // Execute with write lock on source path (no concurrency check needed for rename)
-  await withWriteLock(oldFullPath, false, async () => {
+  // Execute with write locks on BOTH source and destination (prevents race conditions)
+  await withMultipleWriteLocks([oldFullPath, newFullPath], async () => {
     // Check if source path exists
     if (!(await exists(oldFullPath))) {
       throw new Error(`Source path not found: ${command.old_path}`);

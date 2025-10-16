@@ -1,0 +1,54 @@
+{
+  "uuid": "61bf46c6-7a6a-489e-b6cc-1eb308613f83",
+  "name": "Simplify-Error-Handling",
+  "details": "Revert to simple error handling pattern from reference implementation.\n\nRemove over-engineered error-utils.ts and use simple .catch(() => false) pattern.",
+  "tasks": [
+    {
+      "name": "Simplify exists() helper",
+      "details": "Change from complex error code checking to simple .catch(() => false) pattern",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "f229bfc7-88b6-4fe1-8dd3-855682fc1f34",
+      "created_at": "2025-10-16T09:51:46.539Z",
+      "updated_at": "2025-10-16T09:54:11.317Z"
+    },
+    {
+      "name": "Simplify viewDirectory()",
+      "details": "Remove per-file error handling complexity, let errors bubble",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "1de730eb-d93d-477f-8df7-2e4c91c95ff2",
+      "created_at": "2025-10-16T09:51:46.539Z",
+      "updated_at": "2025-10-16T09:54:11.317Z"
+    },
+    {
+      "name": "Remove error-utils.ts",
+      "details": "Delete the now-unnecessary error-utils.ts file",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "c5a68fd3-20cb-4f29-8be3-22ee14633ff7",
+      "created_at": "2025-10-16T09:51:46.539Z",
+      "updated_at": "2025-10-16T09:54:11.318Z"
+    },
+    {
+      "name": "Test locally",
+      "details": "Run lint and tests to verify",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "e3256ea5-8c80-401d-8e37-79d0582c6e0e",
+      "created_at": "2025-10-16T09:51:46.539Z",
+      "updated_at": "2025-10-16T09:54:11.318Z"
+    },
+    {
+      "name": "Create PR",
+      "details": "Commit and create PR: 'refactor: Simplify error handling to match reference implementation'",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "63291d07-bd99-46a4-b2d2-e9e6e1613cca",
+      "created_at": "2025-10-16T09:51:46.539Z",
+      "updated_at": "2025-10-16T10:12:07.333Z"
+    }
+  ],
+  "created_at": "2025-10-16T09:51:46.539Z",
+  "updated_at": "2025-10-16T10:12:07.333Z"
+}

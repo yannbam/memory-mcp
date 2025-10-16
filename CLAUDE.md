@@ -217,6 +217,97 @@ memory({ command: "str_replace", path: "/memories/file.txt", old_str: "...", new
 - ⚠️ Manual testing with actual Claude Code instance not done
 - ⚠️ Locking unit tests not written (locking is tested indirectly through operations tests)
 
+### ⚠️ **CRITICAL CONCURRENCY ISSUES FOUND IN PR REVIEW** ⚠️
+
+**PR Review Date**: 2025-10-16 (Session: 1c890f75-b8d0-425b-926b-90e71dc52c18)
+
+**Status**: Blocking issues found. DO NOT merge to main until fixed.
+
+#### Critical Issues (Must Fix Before Merge):
+
+**1. Read Locks Are Actually Exclusive (Critical - Performance)**
+- **Location**: `src/memory/locking.ts:86-109`
+- **Issue**: Code claims "concurrent reads" but `acquireReadLock()` uses exclusive locks
+- **Impact**: Multiple Claude instances viewing `/memories` will serialize unnecessarily
+- **Root Cause**: proper-lockfile doesn't support shared read locks
+- **Decision**: ☞ **Migrate to @esfx/async-readerwriterlock** for true RW locks
+
+**2. Rename Destination Not Locked (Critical - Race Condition)**
+- **Location**: `src/memory/operations.ts:410-475`
+- **Issue**: Only locks source path, not destination - allows concurrent operations on dest
+- **Impact**: Data corruption, race conditions, unpredictable behavior
+- **Solution**: Lock BOTH source and destination in sorted order (prevents deadlock)
+- **Implementation**: Create `withMultipleWriteLocks()` helper for atomic multi-path locking
+
+**3. exists() Helper Swallows Errors (Correctness Bug)**
+- **Location**: `src/memory/operations.ts:69-76`
+- **Issue**: Permission denied reported as "file not found" - empty catch block
+- **Impact**: Misleading error messages, hard to debug permission issues
+- **Solution**: Only catch ENOENT, rethrow other errors with helpful messages
+
+#### Library Decision: @esfx/async-readerwriterlock
+
+**Chosen**: `@esfx/async-readerwriterlock` v1.0.0
+
+**Why**:
+- ✅ Purpose-built for read-writer locks (not a general mutex)
+- ✅ True shared read locks - multiple concurrent readers
+- ✅ Exclusive write locks
+- ✅ Upgradeable read locks (read → write atomically)
+- ✅ TypeScript-first design
+- ✅ Actively maintained - repo updated 2025-10-16
+- ✅ By Ron Buckton (Microsoft TypeScript team)
+- ✅ Apache-2.0 license, 234 GitHub stars
+
+**API Preview**:
+```typescript
+import { AsyncReaderWriterLock } from '@esfx/async-readerwriterlock';
+
+const rwlock = new AsyncReaderWriterLock();
+
+// Shared read lock (multiple concurrent readers)
+const readLock = await rwlock.read();
+try {
+  // ... read operation
+} finally {
+  readLock.unlock();
+}
+
+// Exclusive write lock
+const writeLock = await rwlock.write();
+try {
+  // ... write operation
+} finally {
+  writeLock.unlock();
+}
+```
+
+#### Next Session Plan: Concurrency Hardening
+
+**Priority 1: Fix Critical Locking Issues**
+1. Install `@esfx/async-readerwriterlock`
+2. Rewrite `src/memory/locking.ts` to use true RW locks
+3. Add `withMultipleWriteLocks()` helper for atomic multi-path locking
+4. Update `rename()` operation to lock both source and destination
+
+**Priority 2: Fix Error Handling**
+1. Fix `exists()` helper to only catch ENOENT
+2. Review all empty catch blocks (9 instances found)
+3. Ensure filesystem errors surface to users
+
+**Priority 3: Testing & Validation**
+1. Update locking tests for new RW lock behavior
+2. Add multi-process concurrency tests
+3. Verify all 85 tests still pass
+4. Update documentation
+
+**Files to Modify**:
+- `src/memory/locking.ts` - complete rewrite for RW locks
+- `src/memory/operations.ts` - fix rename() and exists()
+- `test/memory-operations.test.ts` - update for new locking
+- `package.json` - add @esfx/async-readerwriterlock dependency
+- `docs/ARCHITECTURE.md` - document RW lock architecture
+
 ### Quick Start for Next Session
 
 ```bash
@@ -284,5 +375,6 @@ node dist/index.js --transport http --port 3000
 
 ---
 
-**Last Updated**: 2025-10-16 (Session: tree-view-feature)
-**Status**: ✅ Core Complete + Tree View Feature, Ready for Integration Testing
+**Last Updated**: 2025-10-16 (Session: pr-review-1c890f75)
+**Status**: ⚠️ **PR BLOCKED** - Critical concurrency issues found, must fix before merge
+**Next Session**: Concurrency hardening - migrate to @esfx/async-readerwriterlock
