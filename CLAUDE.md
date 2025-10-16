@@ -174,110 +174,97 @@ GitHub Actions workflow runs on `push` and `pull_request` to `main` and `dev` br
 
 ### Current Implementation Status
 
-**✅ PRODUCTION READY** - All critical error handling issues fixed, 92/92 tests passing, ready for merge to main.
+**⚠️ CI INVESTIGATION NEEDED** - All fixes complete locally (92/92 tests pass), but CI failing. Likely ESLint config difference.
 
-**Project State**: Complete MCP server implementation with robust error handling, unified tool interface, and optional tree view mode.
+**Project State**: Complete implementation, all local tests pass, awaiting CI resolution.
 
 ### Recent Changes (This Session)
-- 🔧 **Critical Error Handling Fixes** (PR review findings):
-  - Fixed exists() helper to distinguish ENOENT from EACCES (no more misleading "Path not found" for permission errors)
-  - Fixed viewDirectory() per-file stat errors (graceful handling with logging, continues on errors)
-  - Fixed buildDirectoryTree() silent failures (proper error logging, distinguishes EACCES/ENOENT/other)
-- ✅ **Error Handling Tests**: Added 7 new tests for permission errors, race conditions, per-file errors
-- ✅ **All tests passing**: 92/92 tests (27 security + 41 operations + 24 tree view)
-- ✅ **MCP-Debug tested**: Verified error handling works correctly in real MCP context
-- 📝 **Test coverage analysis**: Documented in TEST-COVERAGE-ANALYSIS.md
 
-### What Works
-- ✅ **Unified memory tool** with command-based dispatch (view, create, str_replace, insert, delete, rename)
-- ✅ **Robust error handling**: Permission errors logged and propagated, race conditions handled gracefully
-- ✅ **Tree view mode**: Hierarchical directory view with sizes, line counts, modification times
-- ✅ **Discriminated union validation**: Each command has only its relevant parameters
-- ✅ **Path security**: 27 comprehensive tests (directory traversal protection)
-- ✅ **File locking**: Optimistic concurrency control
-- ✅ **Multiple transports**: stdio and streamable HTTP
-- ✅ **CLI arguments**: --memory-root-path, --transport, --port, --tree-view, --debug, --version, --help
-- ✅ **Debug logging**: /tmp/memory-mcp/<instance-id>.log
-- ✅ **92/92 tests passing**: All unit and error handling tests
-- ✅ **Clean build**: TypeScript compiles without errors, ESLint clean
+**PR Review & Critical Fixes:**
+- ✅ Comprehensive PR review using specialized agents (code-reviewer, silent-failure-hunter, pr-test-analyzer, comment-analyzer)
+- ✅ Fixed 3 critical error handling bugs with test-first approach
+- ✅ All 92 tests passing locally
+- ✅ Linter passing locally
+- ⚠️ CI failing with ESLint errors (local/CI environment mismatch)
 
-### Error Handling Improvements (Session focus)
+**Fixes Applied:**
+1. **exists() helper** - Now distinguishes ENOENT from EACCES (permission vs not-found)
+2. **viewDirectory()** - Per-file error handling, graceful continuation  
+3. **buildDirectoryTree()** - Proper error logging, no silent failures
+4. **error-utils.ts** - Created shared error handling utilities to fix circular dependency
+5. **Fixed .gitignore** - Changed `memory/` to `/memory/` to not block `src/memory/`
 
-**1. exists() Helper** (src/memory/operations.ts:72-85)
-- ❌ Before: Returned false for ALL errors (EACCES looked like ENOENT)
-- ✅ After: Only returns false for ENOENT, throws for permission/IO errors with context
+### CI Issue Details
 
-**2. viewDirectory() Per-File Errors** (src/memory/operations.ts:161-186)
-- ❌ Before: No error handling around fs.stat() - one bad file crashed entire listing
-- ✅ After: Try-catch per file, logs errors, continues processing other files
+**Local Environment:** ✅ All passing
+- `npm run build` - Success
+- `npm run lint` - 0 errors
+- `npm test` - 92/92 passing
 
-**3. buildDirectoryTree() Silent Failures** (src/memory/tree-view.ts:142-222)
-- ❌ Before: Empty catch block returned empty array for ANY error (permission → looks empty)
-- ✅ After: Per-entry AND directory-level error handling with console.error() logging
+**CI Environment:** ❌ Failing
+- ESLint reporting unsafe error handling on lines that use helper functions
+- Possible causes:
+  1. ESLint version difference
+  2. TypeScript version difference  
+  3. Node version difference (testing 18.x, 20.x, 22.x)
+  4. GitHub CDN caching (tried workarounds)
 
-**Impact**: Users now see clear error messages, permission issues don't appear as "file not found", directory listings don't silently fail, race conditions are handled gracefully.
+**Current PR:** #2 https://github.com/yannbam/memory-mcp/pull/2
+- Clean branch: `fix-error-handling-v2`
+- Old PR #1 closed due to potential caching issues
 
-### Tool Interface
-**Single unified `memory` tool** with command discriminated union:
-```typescript
-memory({ command: "view", path: "/memories" })
-memory({ command: "create", path: "/memories/file.txt", file_text: "..." })
-memory({ command: "str_replace", path: "/memories/file.txt", old_str: "...", new_str: "..." })
-// etc.
-```
+### Files Modified
+
+**New Files:**
+- `src/memory/error-utils.ts` - Type-safe error handling helpers
+- `test/memory-operations.test.ts` - Added 7 error handling tests
+- `test/tree-view.test.ts` - Added 3 permission error tests
+- `TEST-COVERAGE-ANALYSIS.md` - PR review test coverage analysis
+
+**Modified Files:**
+- `src/memory/operations.ts` - Uses error-utils helpers
+- `src/memory/tree-view.ts` - Uses error-utils helpers
+- `.gitignore` - Fixed pattern to not block src/memory/
+- `package-lock.json` - Now committed for CI
+- `CLAUDE.md` - This handoff section
+
+### Next Steps (Priority Order)
+
+1. **INVESTIGATE CI FAILURE** - Local passes, CI fails
+   - Check ESLint/TypeScript/Node version differences
+   - Compare package.json versions with CI environment
+   - May need to adjust ESLint rules or update dependencies
+   - Check if error-utils.ts is actually being used in CI build
+
+2. **After CI passes:**
+   - Merge PR #2 to main
+   - Real-world testing with Claude Code instance
 
 ### Quick Start for Next Session
 
 ```bash
-# Build and test
-npm run build
-npm test  # Should show 92/92 passing
+# Current branch
+git checkout fix-error-handling-v2
 
-# Test CLI
-node dist/index.js --help
-node dist/index.js --version
+# Verify local state
+npm run build  # Should pass
+npm run lint   # Should pass  
+npm test       # 92/92 should pass
 
-# Test stdio transport
-node dist/index.js --tree-view --debug
+# Check CI
+gh pr checks 2
 
-# Test with MCP-Debug
-# (MCP-Debug server configured in .mcp.json)
+# Debug CI vs local difference
+# Compare versions, check what CI actually builds
 ```
-
-### Key Files to Know
-- `src/memory/operations.ts` - All 6 memory commands + **fixed error handling**
-- `src/memory/tree-view.ts` - Tree view rendering + **fixed silent failures**
-- `src/index.ts` - CLI entry point and main setup
-- `src/memory/locking.ts` - File locking with optimistic concurrency
-- `src/memory/path-security.ts` - Path validation (security critical!)
-- `src/server/mcp-server.ts` - Unified tool registration with discriminated union
-- `src/server/transports.ts` - stdio and HTTP transport initialization
-- `test/memory-operations.test.ts` - 41 operations tests + **new error handling tests**
-- `test/tree-view.test.ts` - 24 tree view tests + **new permission error tests**
-- `test/path-security.test.ts` - 27 security tests
-- `TEST-COVERAGE-ANALYSIS.md` - **Detailed test coverage analysis from PR review**
-
-### Next Steps (Priority Order)
-1. **Merge to main** - All critical issues fixed, ready for production
-2. **Real-world testing** - Test with actual Claude Code instance
-3. **Integration Testing** (optional) - MCP Inspector testing
-4. **Future enhancements** - Multi-process concurrency tests, dedicated locking tests
 
 ### Test Coverage
 - Path Security: 27/27 passing
 - Memory Operations: 41/41 passing (includes 7 new error handling tests)
-- Tree View: 24/24 passing (includes 3 new permission error tests)
-- **Total: 92/92 tests passing** ✅
-- Coverage: Est. 80%+ (untested: multi-process scenarios)
-
-### Files Modified (This Session)
-- src/memory/operations.ts - Fixed exists() and viewDirectory()
-- src/memory/tree-view.ts - Fixed buildDirectoryTree() catch blocks
-- test/memory-operations.test.ts - Added error handling tests
-- test/tree-view.test.ts - Added permission error tests
-- TEST-COVERAGE-ANALYSIS.md - PR review test coverage analysis
+- Tree View: 24/24 passing (includes 3 new permission error tests)  
+- **Total: 92/92 tests passing** ✅ (locally)
 
 ---
 
-**Last Updated**: 2025-10-16 (Session: critical-error-handling-fixes)
-**Status**: ✅ Production Ready - All Critical Issues Fixed
+**Last Updated**: 2025-10-16 (Session: ci-debugging-investigation-needed)
+**Status**: ⚠️ Awaiting CI Investigation - Local Perfect, CI Failing
