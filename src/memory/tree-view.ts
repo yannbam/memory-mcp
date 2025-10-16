@@ -199,7 +199,14 @@ async function buildDirectoryTree(dirPath: string, basePath: string): Promise<Tr
 function printTreeNodes(nodes: TreeNode[], prefix: string = ''): string {
   let result = '';
 
-  for (const node of nodes) {
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    const isLast = i === nodes.length - 1;
+
+    // Determine tree connector symbols
+    const connector = isLast ? '└── ' : '├── ';
+    const childPrefix = isLast ? '    ' : '│   ';
+
     // Build display name
     let displayName = node.name;
 
@@ -236,12 +243,12 @@ function printTreeNodes(nodes: TreeNode[], prefix: string = ''): string {
       }
     }
 
-    // Add current node to result
-    result += `${prefix}- ${displayName}${fileInfo}${modTimeInfo}\n`;
+    // Add current node to result with tree symbols
+    result += `${prefix}${connector}${displayName}${fileInfo}${modTimeInfo}\n`;
 
-    // Recursively print children with increased indentation
+    // Recursively print children with tree-style indentation
     if (node.children && node.children.length > 0) {
-      result += printTreeNodes(node.children, `${prefix}  `);
+      result += printTreeNodes(node.children, `${prefix}${childPrefix}`);
     }
   }
 

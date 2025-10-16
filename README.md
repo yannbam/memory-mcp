@@ -152,10 +152,12 @@ await memory({
 // → "Showing contents of: /memories
 // → Modification dates shown in [YYYY/MM/DD - HH:MM:SS] format (UTC timezone)
 // →
-// → - notes.txt	(2.3KB / 45 lines)	[2025/10/15 - 14:23:17]
-// → - projects/		[2025/10/15 - 15:01:42]
-// →   - backend/		[2025/10/14 - 09:15:33]
-// →     - api.md	(5.1KB / 128 lines)	[2025/10/14 - 09:15:33]"
+// → ├── notes.txt	(2.3KB / 45 lines)	[2025/10/15 - 14:23:17]
+// → └── projects/		[2025/10/15 - 15:01:42]
+// →     ├── backend/		[2025/10/14 - 09:15:33]
+// →     │   └── api.md	(5.1KB / 128 lines)	[2025/10/14 - 09:15:33]
+// →     └── frontend/		[2025/10/15 - 15:01:42]
+// →         └── ui.md	(1.8KB / 42 lines)	[2025/10/15 - 15:01:42]"
 
 // View file
 await memory({

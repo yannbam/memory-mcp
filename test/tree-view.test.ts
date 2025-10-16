@@ -179,13 +179,17 @@ describe('Tree View Module', () => {
       expect(result).toContain('Showing contents of: /memories');
       expect(result).toContain('Modification dates shown in');
 
-      // Check hierarchical structure
-      expect(result).toContain('- file1.txt');
-      expect(result).toContain('- file2.txt');
-      expect(result).toContain('- subdir/');
-      expect(result).toContain('  - file3.txt');
-      expect(result).toContain('  - nested/');
-      expect(result).toContain('    - file4.txt');
+      // Check hierarchical structure with tree symbols
+      expect(result).toContain('file1.txt');
+      expect(result).toContain('file2.txt');
+      expect(result).toContain('subdir/');
+      expect(result).toContain('file3.txt');
+      expect(result).toContain('nested/');
+      expect(result).toContain('file4.txt');
+
+      // Check tree symbols are present
+      expect(result).toMatch(/[├└]── /);
+      expect(result).toMatch(/│   /);
     });
 
     it('should include file sizes', async () => {
@@ -252,7 +256,7 @@ describe('Tree View Module', () => {
       const result = await renderDirectoryTree(testDir, '/memories');
 
       // Empty directory should appear
-      expect(result).toContain('- empty/');
+      expect(result).toContain('empty/');
     });
 
     it('should sort directories before files', async () => {

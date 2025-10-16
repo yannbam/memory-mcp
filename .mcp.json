@@ -2,7 +2,7 @@
   "mcpServers": {
     "memory": {
       "command": "node",
-      "args": ["/home/jan/projects/memory-mcp/dist/index.js"],
+      "args": ["/home/jan/projects/memory-mcp/dist/index.js", "--tree-view"],
       "env": {}
     },
     "MCP-Debug": {
