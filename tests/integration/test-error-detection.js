@@ -91,11 +91,13 @@ async function runErrorDetectionTests() {
     }, true));
 
     console.log('\n--- CREATE Command ---');
-    results.push(await testCommand(client, 'create in non-existent directory', {
+    // Note: Create auto-creates parent dirs (like mkdir -p) - more user-friendly
+    // than reference implementation which creates dir then throws error
+    results.push(await testCommand(client, 'create auto-creates parent directory', {
       command: 'create',
-      path: '/memories/does-not-exist/file.txt',
+      path: '/memories/auto-created-parent/file.txt',
       file_text: 'content'
-    }, true));
+    }, false)); // Should SUCCEED
 
     console.log('\n--- STR_REPLACE Command ---');
     results.push(await testCommand(client, 'str_replace text not found', {
