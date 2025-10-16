@@ -1,0 +1,72 @@
+{
+  "uuid": "12332687-a228-411f-8b5c-309602dedb00",
+  "name": "integration-testing",
+  "details": "Comprehensive manual integration testing of all memory commands with the unified tool interface. Test all parameter variations, nested directories, and edge cases.",
+  "tasks": [
+    {
+      "name": "Create integration test script",
+      "details": "Write a comprehensive test script that exercises all commands with all parameter variations",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "07f9350f-0de9-4f1f-96e3-59aa7bf6905e",
+      "created_at": "2025-10-16T00:27:51.291Z",
+      "updated_at": "2025-10-16T00:32:39.692Z"
+    },
+    {
+      "name": "Test view command",
+      "details": "Test: empty dir, dir with files, dir with subdirs, file content, file with line range, file with EOF range",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "9d79f6f4-8f15-45da-b307-b657cec53a30",
+      "created_at": "2025-10-16T00:27:51.292Z",
+      "updated_at": "2025-10-16T00:34:09.945Z"
+    },
+    {
+      "name": "Test create command",
+      "details": "Test: simple file, file in subdir, file with parent dir creation, overwrite existing file",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "ccaa4fa7-a312-4db6-8df5-576eef557e53",
+      "created_at": "2025-10-16T00:27:51.292Z",
+      "updated_at": "2025-10-16T00:34:09.945Z"
+    },
+    {
+      "name": "Test str_replace command",
+      "details": "Test: simple replace, replace in nested file, error on non-unique text, error on text not found",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "5597f7f4-2216-48a5-8452-ae1799adb61c",
+      "created_at": "2025-10-16T00:27:51.292Z",
+      "updated_at": "2025-10-16T00:35:18.814Z"
+    },
+    {
+      "name": "Test insert command",
+      "details": "Test: insert at beginning, middle, end of file, insert in nested file",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "fb56bb73-166b-4461-9497-52ffb1f14e4b",
+      "created_at": "2025-10-16T00:27:51.292Z",
+      "updated_at": "2025-10-16T00:35:18.814Z"
+    },
+    {
+      "name": "Test delete command",
+      "details": "Test: delete file, delete empty dir, delete dir with contents, delete nested files",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "052fb1af-0b61-4ff4-989b-fd19c89c4a32",
+      "created_at": "2025-10-16T00:27:51.292Z",
+      "updated_at": "2025-10-16T00:36:03.816Z"
+    },
+    {
+      "name": "Test rename command",
+      "details": "Test: rename file, move file to subdir, rename dir, move to non-existent parent (should create)",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "05bffe7f-7bdc-4373-9fe4-523f2f6ffc8c",
+      "created_at": "2025-10-16T00:27:51.292Z",
+      "updated_at": "2025-10-16T00:37:01.915Z"
+    }
+  ],
+  "created_at": "2025-10-16T00:27:51.292Z",
+  "updated_at": "2025-10-16T00:37:01.915Z"
+}

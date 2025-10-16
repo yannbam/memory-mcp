@@ -1,0 +1,11 @@
+🌳 "integration-testing"
+📝 Comprehensive manual integration testing of all memory commands with the unified tool interface. Test all parameter variations, nested directories, and edge cases.
+📊 ██████████ 100% (7/7 tasks)
+
+├── ✅ |Create integration test script| "Write a comprehensive test script that exercises all commands with all parameter variations" (🚨)
+├── ✅ |Test view command| "Test: empty dir, dir with files, dir with subdirs, file content, file with line range, file with EOF range" (🔴)
+├── ✅ |Test create command| "Test: simple file, file in subdir, file with parent dir creation, overwrite existing file" (🔴)
+├── ✅ |Test str_replace command| "Test: simple replace, replace in nested file, error on non-unique text, error on text not found" (🔴)
+├── ✅ |Test insert command| "Test: insert at beginning, middle, end of file, insert in nested file" (🔴)
+├── ✅ |Test delete command| "Test: delete file, delete empty dir, delete dir with contents, delete nested files" (🔴)
+└── ✅ |Test rename command| "Test: rename file, move file to subdir, rename dir, move to non-existent parent (should create)" (🔴)
