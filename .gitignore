@@ -43,8 +43,5 @@ temp/
 .notes/
 
 # Memory storage (actual memory data, not the code)
-.memory/
-memory/
-
-# Debug logs
-/tmp/memory-mcp/
+/.memory/
+/memory/
