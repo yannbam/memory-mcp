@@ -1,0 +1,117 @@
+{
+  "uuid": "560d8154-c7ba-41ae-8673-41f0f9ba86f0",
+  "name": "CI-Investigation",
+  "details": "Systematic investigation of CI/local ESLint divergence.\n\n**Mystery**: Local lint passes (0 errors), CI lint fails.\n**Goal**: Identify root cause and determine fix strategy.\n\n**Approach**: Empirical investigation through logs, versions, and reproduction attempts.",
+  "tasks": [
+    {
+      "name": "CI Logs",
+      "details": "Check actual CI failure output to see:\n- Which ESLint rules are failing\n- Which files/lines are flagged\n- Exact error messages",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Get PR checks",
+          "details": "Use gh CLI to get PR #2 check status and logs",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "2c6970ce-4d85-414f-a6ec-0d3feaee07f6",
+          "created_at": "2025-10-16T09:35:56.757Z",
+          "updated_at": "2025-10-16T09:38:28.654Z"
+        },
+        {
+          "name": "Analyze errors",
+          "details": "Parse the actual ESLint errors from CI output",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "7a67566e-5aa4-4f70-9c44-2b8b8ec640de",
+          "created_at": "2025-10-16T09:35:56.758Z",
+          "updated_at": "2025-10-16T09:38:28.654Z"
+        }
+      ],
+      "uuid": "54d6cf72-c9d2-45c8-b020-e305e47925a2",
+      "created_at": "2025-10-16T09:35:56.753Z",
+      "updated_at": "2025-10-16T09:35:56.753Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Version Audit",
+      "details": "Compare versions between local and CI:\n- Node version\n- npm version\n- ESLint version\n- TypeScript version\n- All eslint plugins",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Check local versions",
+          "details": "Get actual installed versions (node, npm, eslint, typescript)",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "4e999ad4-53fe-4e01-963f-f40aa61133f3",
+          "created_at": "2025-10-16T09:35:56.758Z",
+          "updated_at": "2025-10-16T09:42:22.694Z"
+        },
+        {
+          "name": "Check CI config",
+          "details": "Review .github/workflows to see what versions CI uses",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "3b4d2c6c-9c09-4687-8ea2-8d50e76424f1",
+          "created_at": "2025-10-16T09:35:56.758Z",
+          "updated_at": "2025-10-16T09:42:22.694Z"
+        },
+        {
+          "name": "Compare package-lock",
+          "details": "Verify package-lock.json matches local node_modules",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "6e34c6be-968f-4b3a-a698-11a5cb793f25",
+          "created_at": "2025-10-16T09:35:56.758Z",
+          "updated_at": "2025-10-16T09:42:22.694Z"
+        }
+      ],
+      "uuid": "0914dbcc-a351-4299-9c9b-1599c8c398a6",
+      "created_at": "2025-10-16T09:35:56.758Z",
+      "updated_at": "2025-10-16T09:35:56.758Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Reproduce CI Environment",
+      "details": "Try to reproduce the CI failure locally by matching CI environment:\n- Test with Node 18.x, 20.x, 22.x\n- Use CI's exact npm/eslint versions\n- See if any version causes local failure",
+      "status": "pending",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Test Node 18.x",
+          "details": "Switch to Node 18 and run lint",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "10e30dc9-3f96-482a-8956-6fc68504902a",
+          "created_at": "2025-10-16T09:35:56.758Z",
+          "updated_at": "2025-10-16T09:35:56.758Z"
+        },
+        {
+          "name": "Test Node 20.x",
+          "details": "Switch to Node 20 and run lint",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "adde14e2-d62f-4abd-aba4-9c09bef16d0e",
+          "created_at": "2025-10-16T09:35:56.758Z",
+          "updated_at": "2025-10-16T09:35:56.758Z"
+        },
+        {
+          "name": "Test Node 22.x",
+          "details": "Switch to Node 22 and run lint",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "8f5b181e-f70c-4c22-a063-5941c7feda53",
+          "created_at": "2025-10-16T09:35:56.758Z",
+          "updated_at": "2025-10-16T09:35:56.758Z"
+        }
+      ],
+      "uuid": "f21445f8-2bfa-444a-9a9b-678a8d40766b",
+      "created_at": "2025-10-16T09:35:56.758Z",
+      "updated_at": "2025-10-16T09:35:56.758Z",
+      "completion_percentage": 0
+    }
+  ],
+  "created_at": "2025-10-16T09:35:56.759Z",
+  "updated_at": "2025-10-16T09:42:22.714Z"
+}

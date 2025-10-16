@@ -1,0 +1,89 @@
+{
+  "uuid": "2ad26959-1f56-42f2-a93a-de39a5359890",
+  "name": "memory-mcp-e2e-testing",
+  "details": "Comprehensive end-to-end testing of the memory-mcp server with actual Claude Code instance.\n\nThis plan tests all 6 memory commands (view, create, str_replace, insert, delete, rename) plus edge cases, error handling, and security features.",
+  "tasks": [
+    {
+      "name": "Test view command",
+      "details": "Test viewing directory listings and file contents with various scenarios:\n- View root directory\n- View non-existent directory\n- Create and view a file\n- View file with line range\n- View file with invalid line range",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [],
+      "uuid": "66cf70b8-a871-4167-8c43-710cff316acf",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:35:15.674Z"
+    },
+    {
+      "name": "Test create command",
+      "details": "Test file creation:\n- Create simple text file\n- Create file in subdirectory (auto-create parent dirs)\n- Overwrite existing file\n- Create file with special characters in content\n- Create file with unicode content",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [],
+      "uuid": "675c88f9-5ec3-4d1c-8d9a-d980749a68e4",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:35:39.024Z"
+    },
+    {
+      "name": "Test str_replace command",
+      "details": "Test string replacement:\n- Replace unique string\n- Attempt to replace non-unique string (should fail)\n- Replace string not found (should fail)\n- Replace with multiline strings\n- Replace with special characters",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "313c1a5b-e108-490d-89d2-8219dab356a9",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:36:09.034Z"
+    },
+    {
+      "name": "Test insert command",
+      "details": "Test line insertion:\n- Insert at beginning (line 1)\n- Insert in middle\n- Insert at end\n- Insert at invalid line number (should fail)\n- Insert multiline text",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "03341037-e6be-4d88-80ce-612f3b7f09e7",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:36:40.596Z"
+    },
+    {
+      "name": "Test delete command",
+      "details": "Test deletion:\n- Delete a file\n- Delete non-existent file (should fail gracefully)\n- Delete a directory\n- Delete non-empty directory",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "a3e13fd9-e2e6-4c94-9a6d-79ac0089d27d",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:37:14.396Z"
+    },
+    {
+      "name": "Test rename command",
+      "details": "Test move/rename:\n- Rename a file\n- Move file to subdirectory\n- Rename directory\n- Rename to existing file (should fail)\n- Rename non-existent file (should fail)",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "b0034b3a-eb52-4eb2-a3cf-5d5b118276bf",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:37:30.236Z"
+    },
+    {
+      "name": "Test path security",
+      "details": "Test path traversal protection:\n- Attempt ../ traversal\n- Attempt absolute path outside /memories\n- Attempt URL-encoded traversal\n- Verify all operations reject invalid paths",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [],
+      "uuid": "d47fe0d6-99b9-4cfb-b4ef-706441a5ca1c",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:37:52.863Z"
+    },
+    {
+      "name": "Test error handling",
+      "details": "Verify proper error messages for:\n- Missing required parameters\n- Invalid command\n- File not found\n- Path validation failures\n- Operation-specific errors",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "d5970399-2950-4bad-a858-a4d3328626c9",
+      "created_at": "2025-10-16T13:34:32.229Z",
+      "updated_at": "2025-10-16T13:38:06.758Z"
+    }
+  ],
+  "created_at": "2025-10-16T13:34:32.230Z",
+  "updated_at": "2025-10-16T13:38:12.204Z"
+}

@@ -66,9 +66,10 @@ export type MemoryCommand = z.infer<typeof MemoryCommandSchema>;
  *
  * @param memoryRoot - Absolute filesystem path to memory root directory
  * @param logger - Debug logger instance
+ * @param treeView - Enable tree view for directory listings
  * @returns Configured McpServer instance
  */
-export function createMemoryServer(memoryRoot: string, logger: Logger): McpServer {
+export function createMemoryServer(memoryRoot: string, logger: Logger, treeView: boolean): McpServer {
   // Create MCP server instance
   const server = new McpServer({
     name: 'memory-mcp',
@@ -79,6 +80,7 @@ export function createMemoryServer(memoryRoot: string, logger: Logger): McpServe
   const context: operations.OperationsContext = {
     memoryRoot,
     logger,
+    treeView,
   };
 
   // Register unified memory tool with discriminated union schema
@@ -108,42 +110,52 @@ export function createMemoryServer(memoryRoot: string, logger: Logger): McpServe
       },
     },
     async (params) => {
-      // Validate input using discriminated union schema for proper type safety
-      // This ensures only relevant parameters are provided for each command
-      const command = MemoryCommandSchema.parse(params);
+      try {
+        // Validate input using discriminated union schema for proper type safety
+        // This ensures only relevant parameters are provided for each command
+        const command = MemoryCommandSchema.parse(params);
 
-      // Dispatch to appropriate operation based on command field
-      let result: string;
-      switch (command.command) {
-        case 'view':
-          result = await operations.view(command, context);
-          break;
-        case 'create':
-          result = await operations.create(command, context);
-          break;
-        case 'str_replace':
-          result = await operations.str_replace(command, context);
-          break;
-        case 'insert':
-          result = await operations.insert(command, context);
-          break;
-        case 'delete':
-          result = await operations.deleteOp(command, context);
-          break;
-        case 'rename':
-          result = await operations.rename(command, context);
-          break;
-        default: {
-          // TypeScript exhaustiveness check ensures all cases are handled
-          const exhaustiveCheck: never = command;
-          throw new Error(`Unknown command: ${JSON.stringify(exhaustiveCheck)}`);
+        // Dispatch to appropriate operation based on command field
+        let result: string;
+        switch (command.command) {
+          case 'view':
+            result = await operations.view(command, context);
+            break;
+          case 'create':
+            result = await operations.create(command, context);
+            break;
+          case 'str_replace':
+            result = await operations.str_replace(command, context);
+            break;
+          case 'insert':
+            result = await operations.insert(command, context);
+            break;
+          case 'delete':
+            result = await operations.deleteOp(command, context);
+            break;
+          case 'rename':
+            result = await operations.rename(command, context);
+            break;
+          default: {
+            // TypeScript exhaustiveness check ensures all cases are handled
+            const exhaustiveCheck: never = command;
+            throw new Error(`Unknown command: ${JSON.stringify(exhaustiveCheck)}`);
+          }
         }
-      }
 
-      // Return MCP tool response
-      return {
-        content: [{ type: 'text', text: result }],
-      };
+        // Return MCP tool response for success
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      } catch (error) {
+        // Return MCP tool response for error
+        // Set isError flag so clients can detect failures
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: errorMessage }],
+          isError: true,
+        };
+      }
     },
   );
 

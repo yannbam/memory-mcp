@@ -1,0 +1,19 @@
+🌳 "Fix-CI-Experiments"
+📝 Systematic experiments to fix CI ESLint failures.
+
+Each experiment gets its own PR. Stop after first success.
+📊 █░░░░░░░░░ 15% (2/13 tasks)
+
+├── 🔄 |Experiment A: Clean Build| "Test if build artifacts are interfering:\n1. Remove dist/ and node_modules/\n2. Fresh npm install\n3. Run lint\n4. If passes, create PR with any discovered issue" (🚨) (50%)
+│   ├── ✅ |Remove artifacts| "rm -rf dist/ node_modules/" (🚨)
+│   ├── ✅ |Fresh install| "npm install" (🚨)
+│   ├── 🔄 |Test lint| "npm run lint" (🚨)
+│   └── ⏸️ |Create PR if needed| "If test reveals issue, create PR with fix" (🚨)
+├── ⏸️ |Experiment B: Explicit Type Annotations| "Add explicit return type annotations to error-utils.ts exports:\n- Make types more explicit\n- Help TypeScript inference\n- Create PR and test in CI" (🔴) (0%)
+│   ├── ⏸️ |Add annotations| "Explicitly annotate return types in error-utils.ts" (🔴)
+│   ├── ⏸️ |Test locally| "Verify lint still passes" (🔴)
+│   └── ⏸️ |Create PR| "Commit and create PR for CI test" (🔴)
+└── ⏸️ |Experiment C: Check .d.ts Interference| "Investigate if declaration files are causing issues:\n- Check for stale .d.ts files\n- Verify dist/ build output\n- Check tsconfig declaration settings" (🟡) (0%)
+    ├── ⏸️ |Find .d.ts files| "Search for declaration files that might interfere" (🟡)
+    ├── ⏸️ |Check dist output| "Verify what's in dist/ after build" (🟡)
+    └── ⏸️ |Fix if found| "Remove/fix interfering files, create PR" (🟡)

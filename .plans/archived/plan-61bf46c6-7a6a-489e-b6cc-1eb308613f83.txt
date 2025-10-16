@@ -1,0 +1,11 @@
+🌳 "Simplify-Error-Handling"
+📝 Revert to simple error handling pattern from reference implementation.
+
+Remove over-engineered error-utils.ts and use simple .catch(() => false) pattern.
+📊 ██████████ 100% (5/5 tasks)
+
+├── ✅ |Simplify exists() helper| "Change from complex error code checking to simple .catch(() => false) pattern" (🚨)
+├── ✅ |Simplify viewDirectory()| "Remove per-file error handling complexity, let errors bubble" (🚨)
+├── ✅ |Remove error-utils.ts| "Delete the now-unnecessary error-utils.ts file" (🔴)
+├── ✅ |Test locally| "Run lint and tests to verify" (🚨)
+└── ✅ |Create PR| "Commit and create PR: 'refactor: Simplify error handling to match reference implementation'" (🚨)

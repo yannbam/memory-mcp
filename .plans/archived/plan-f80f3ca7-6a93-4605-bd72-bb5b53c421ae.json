@@ -1,0 +1,165 @@
+{
+  "uuid": "f80f3ca7-6a93-4605-bd72-bb5b53c421ae",
+  "name": "RW-Lock-Refactor",
+  "details": "Session plan for refactoring locking system to use true reader-writer locks with @esfx/async-readerwriterlock. This addresses three critical issues found in PR review:\n1. Read locks are actually exclusive (should be shared)\n2. Rename doesn't lock destination (race condition)\n3. exists() swallows all errors (should only catch ENOENT)",
+  "tasks": [
+    {
+      "name": "Architecture Design",
+      "details": "Design new LockManager with RW locks and multi-path locking",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Design LockManager class",
+          "details": "Design class structure, lock map, lifecycle management",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "e3690b93-4953-4f02-a9fe-14f4955331c4",
+          "created_at": "2025-10-16T12:17:37.456Z",
+          "updated_at": "2025-10-16T12:19:17.461Z"
+        },
+        {
+          "name": "Design multi-path locking",
+          "details": "Design withMultipleWriteLocks() for atomic operations on multiple paths",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "247bc151-a46b-4f9d-8d25-a8604c7fcfdc",
+          "created_at": "2025-10-16T12:17:37.456Z",
+          "updated_at": "2025-10-16T12:19:17.461Z"
+        },
+        {
+          "name": "Design exists() fix",
+          "details": "Plan how to fix error handling in exists() helper",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "ed9c1a11-0898-48f8-afdd-11911eea33ff",
+          "created_at": "2025-10-16T12:17:37.456Z",
+          "updated_at": "2025-10-16T12:19:17.461Z"
+        }
+      ],
+      "uuid": "f0a75910-cf37-4229-894e-3efab0afde42",
+      "created_at": "2025-10-16T12:17:37.456Z",
+      "updated_at": "2025-10-16T12:17:37.456Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Implementation",
+      "details": "Implement the new locking system",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Install dependencies",
+          "details": "npm install @esfx/async-readerwriterlock",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "929a406d-f3f8-4ed6-ab2e-05612b4a7e7f",
+          "created_at": "2025-10-16T12:17:37.456Z",
+          "updated_at": "2025-10-16T12:19:43.282Z"
+        },
+        {
+          "name": "Rewrite locking.ts",
+          "details": "Complete rewrite with LockManager and RW locks",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "2111ea1d-f71e-45f7-93e3-250d076de787",
+          "created_at": "2025-10-16T12:17:37.456Z",
+          "updated_at": "2025-10-16T12:20:41.566Z"
+        },
+        {
+          "name": "Update rename() operation",
+          "details": "Use withMultipleWriteLocks() to lock both source and destination",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "6c140fac-2091-4305-984f-31cab740c7a7",
+          "created_at": "2025-10-16T12:17:37.456Z",
+          "updated_at": "2025-10-16T12:21:10.216Z"
+        },
+        {
+          "name": "Fix exists() helper",
+          "details": "Only catch ENOENT, rethrow other errors with helpful messages",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "ce4b4bb6-d953-4b55-a590-d68e0b1a1a92",
+          "created_at": "2025-10-16T12:17:37.457Z",
+          "updated_at": "2025-10-16T12:21:10.216Z"
+        }
+      ],
+      "uuid": "fbf2a132-25c6-41ce-b2a7-a23a7ba1aa2e",
+      "created_at": "2025-10-16T12:17:37.456Z",
+      "updated_at": "2025-10-16T12:17:37.456Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Testing",
+      "details": "Update and run all tests",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Update locking tests",
+          "details": "Update tests for new RW lock behavior",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "3b96f729-d047-4c98-8521-de7279dc9ac7",
+          "created_at": "2025-10-16T12:17:37.457Z",
+          "updated_at": "2025-10-16T12:22:37.644Z"
+        },
+        {
+          "name": "Run all tests",
+          "details": "Verify all 85 tests still pass",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "5ca45188-a494-4ed4-a431-54135dcc7e42",
+          "created_at": "2025-10-16T12:17:37.457Z",
+          "updated_at": "2025-10-16T12:22:37.644Z"
+        },
+        {
+          "name": "Test concurrent reads",
+          "details": "Manually verify multiple readers can run concurrently",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "a8d73cb8-020c-40de-8602-3f808cad0533",
+          "created_at": "2025-10-16T12:17:37.457Z",
+          "updated_at": "2025-10-16T12:24:39.151Z"
+        }
+      ],
+      "uuid": "c5d10067-708a-416d-a775-f053aeacb575",
+      "created_at": "2025-10-16T12:17:37.457Z",
+      "updated_at": "2025-10-16T12:17:37.457Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Documentation",
+      "details": "Update documentation with new architecture",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Update ARCHITECTURE.md",
+          "details": "Document new RW lock design and LockManager",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "7bcd1740-6d92-4e7f-b4fc-828840e5f5ac",
+          "created_at": "2025-10-16T12:17:37.457Z",
+          "updated_at": "2025-10-16T12:25:09.483Z"
+        },
+        {
+          "name": "Update CLAUDE.md",
+          "details": "Update session handoff with implementation status",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "202d113c-4d34-4c26-b7df-cf61541203fb",
+          "created_at": "2025-10-16T12:17:37.457Z",
+          "updated_at": "2025-10-16T12:25:09.483Z"
+        }
+      ],
+      "uuid": "5fda0b6b-5a2c-40ae-a8d5-de3f7e2eb7b5",
+      "created_at": "2025-10-16T12:17:37.457Z",
+      "updated_at": "2025-10-16T12:17:37.457Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-10-16T12:17:37.457Z",
+  "updated_at": "2025-10-16T12:25:09.630Z"
+}

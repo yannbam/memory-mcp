@@ -1,0 +1,135 @@
+{
+  "uuid": "f6e1166c-8c2a-4c1b-8cc2-9b1cfb81b4f7",
+  "name": "Fix-CI-Experiments",
+  "details": "Systematic experiments to fix CI ESLint failures.\n\nEach experiment gets its own PR. Stop after first success.",
+  "tasks": [
+    {
+      "name": "Experiment A: Clean Build",
+      "details": "Test if build artifacts are interfering:\n1. Remove dist/ and node_modules/\n2. Fresh npm install\n3. Run lint\n4. If passes, create PR with any discovered issue",
+      "status": "in_progress",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Remove artifacts",
+          "details": "rm -rf dist/ node_modules/",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "9fad4ac6-7e98-4470-89c8-e811f6975a52",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:57.685Z"
+        },
+        {
+          "name": "Fresh install",
+          "details": "npm install",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "52733732-4cbc-447b-babf-427057c26c6b",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:43:17.639Z"
+        },
+        {
+          "name": "Test lint",
+          "details": "npm run lint",
+          "status": "in_progress",
+          "priority": "urgent",
+          "uuid": "b065921c-5b78-4085-9ddc-4f3f2939b058",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:43:17.639Z"
+        },
+        {
+          "name": "Create PR if needed",
+          "details": "If test reveals issue, create PR with fix",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "795b86e5-cdd1-4a25-81a5-503b1035e35e",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:38.245Z"
+        }
+      ],
+      "uuid": "42343cd8-373b-40e8-9ebe-14c2a6f92b3c",
+      "created_at": "2025-10-16T09:42:38.245Z",
+      "updated_at": "2025-10-16T09:42:38.245Z",
+      "completion_percentage": 50
+    },
+    {
+      "name": "Experiment B: Explicit Type Annotations",
+      "details": "Add explicit return type annotations to error-utils.ts exports:\n- Make types more explicit\n- Help TypeScript inference\n- Create PR and test in CI",
+      "status": "pending",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Add annotations",
+          "details": "Explicitly annotate return types in error-utils.ts",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "5b42ee71-6208-4ce9-8bba-9ddb6787eef1",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:38.245Z"
+        },
+        {
+          "name": "Test locally",
+          "details": "Verify lint still passes",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "cd297c38-0afb-4b12-9c97-d49f9f083400",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:38.245Z"
+        },
+        {
+          "name": "Create PR",
+          "details": "Commit and create PR for CI test",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "83170ad6-77b4-4451-9c67-e96a53d89673",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:38.245Z"
+        }
+      ],
+      "uuid": "69179c94-4a97-4f97-8fab-51730879a8fa",
+      "created_at": "2025-10-16T09:42:38.245Z",
+      "updated_at": "2025-10-16T09:42:38.245Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Experiment C: Check .d.ts Interference",
+      "details": "Investigate if declaration files are causing issues:\n- Check for stale .d.ts files\n- Verify dist/ build output\n- Check tsconfig declaration settings",
+      "status": "pending",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Find .d.ts files",
+          "details": "Search for declaration files that might interfere",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "95fc2e0a-b14f-4d9e-b26a-63c8bc960fa5",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:38.245Z"
+        },
+        {
+          "name": "Check dist output",
+          "details": "Verify what's in dist/ after build",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "9872ba6a-1798-4c58-aca3-55c3a9c45f33",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:38.245Z"
+        },
+        {
+          "name": "Fix if found",
+          "details": "Remove/fix interfering files, create PR",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "ecd79497-1281-4de2-920e-99b14d335694",
+          "created_at": "2025-10-16T09:42:38.245Z",
+          "updated_at": "2025-10-16T09:42:38.245Z"
+        }
+      ],
+      "uuid": "09c71f28-c96b-47d0-b10d-5bf270adeef5",
+      "created_at": "2025-10-16T09:42:38.245Z",
+      "updated_at": "2025-10-16T09:42:38.245Z",
+      "completion_percentage": 0
+    }
+  ],
+  "created_at": "2025-10-16T09:42:38.245Z",
+  "updated_at": "2025-10-16T09:43:17.639Z"
+}

@@ -1,0 +1,20 @@
+🌳 "CI-Investigation"
+📝 Systematic investigation of CI/local ESLint divergence.
+
+**Mystery**: Local lint passes (0 errors), CI lint fails.
+**Goal**: Identify root cause and determine fix strategy.
+
+**Approach**: Empirical investigation through logs, versions, and reproduction attempts.
+📊 ██████░░░░ 64% (7/11 tasks)
+
+├── ✅ |CI Logs| "Check actual CI failure output to see:\n- Which ESLint rules are failing\n- Which files/lines are flagged\n- Exact error messages" (🚨) (100%)
+│   ├── ✅ |Get PR checks| "Use gh CLI to get PR #2 check status and logs" (🚨)
+│   └── ✅ |Analyze errors| "Parse the actual ESLint errors from CI output" (🚨)
+├── ✅ |Version Audit| "Compare versions between local and CI:\n- Node version\n- npm version\n- ESLint version\n- TypeScript version\n- All eslint plugins" (🔴) (100%)
+│   ├── ✅ |Check local versions| "Get actual installed versions (node, npm, eslint, typescript)" (🔴)
+│   ├── ✅ |Check CI config| "Review .github/workflows to see what versions CI uses" (🔴)
+│   └── ✅ |Compare package-lock| "Verify package-lock.json matches local node_modules" (🔴)
+└── ⏸️ |Reproduce CI Environment| "Try to reproduce the CI failure locally by matching CI environment:\n- Test with Node 18.x, 20.x, 22.x\n- Use CI's exact npm/eslint versions\n- See if any version causes local failure" (🟡) (0%)
+    ├── ⏸️ |Test Node 18.x| "Switch to Node 18 and run lint" (🟡)
+    ├── ⏸️ |Test Node 20.x| "Switch to Node 20 and run lint" (🟡)
+    └── ⏸️ |Test Node 22.x| "Switch to Node 22 and run lint" (🟡)
