@@ -1,0 +1,14 @@
+🌳 "memory-mcp-e2e-testing"
+📝 Comprehensive end-to-end testing of the memory-mcp server with actual Claude Code instance.
+
+This plan tests all 6 memory commands (view, create, str_replace, insert, delete, rename) plus edge cases, error handling, and security features.
+📊 ██████████ 100% (8/8 tasks)
+
+├── ✅ |Test view command| "Test viewing directory listings and file contents with various scenarios:\n- View root directory\n- View non-existent directory\n- Create and view a file\n- View file with line range\n- View file with invalid line range" (🚨)
+├── ✅ |Test create command| "Test file creation:\n- Create simple text file\n- Create file in subdirectory (auto-create parent dirs)\n- Overwrite existing file\n- Create file with special characters in content\n- Create file with unicode content" (🚨)
+├── ✅ |Test str_replace command| "Test string replacement:\n- Replace unique string\n- Attempt to replace non-unique string (should fail)\n- Replace string not found (should fail)\n- Replace with multiline strings\n- Replace with special characters" (🔴)
+├── ✅ |Test insert command| "Test line insertion:\n- Insert at beginning (line 1)\n- Insert in middle\n- Insert at end\n- Insert at invalid line number (should fail)\n- Insert multiline text" (🔴)
+├── ✅ |Test delete command| "Test deletion:\n- Delete a file\n- Delete non-existent file (should fail gracefully)\n- Delete a directory\n- Delete non-empty directory" (🔴)
+├── ✅ |Test rename command| "Test move/rename:\n- Rename a file\n- Move file to subdirectory\n- Rename directory\n- Rename to existing file (should fail)\n- Rename non-existent file (should fail)" (🔴)
+├── ✅ |Test path security| "Test path traversal protection:\n- Attempt ../ traversal\n- Attempt absolute path outside /memories\n- Attempt URL-encoded traversal\n- Verify all operations reject invalid paths" (🚨)
+└── ✅ |Test error handling| "Verify proper error messages for:\n- Missing required parameters\n- Invalid command\n- File not found\n- Path validation failures\n- Operation-specific errors" (🟡)
