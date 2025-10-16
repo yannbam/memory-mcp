@@ -17,6 +17,7 @@ import * as path from 'path';
 import { withReadLock, withWriteLock } from './locking.js';
 import { validatePath } from './path-security.js';
 import { renderDirectoryTree } from './tree-view.js';
+import { getErrorCode, getErrorMessage } from './error-utils.js';
 import type { Logger } from '../utils/logger.js';
 
 /**
@@ -75,12 +76,11 @@ async function exists(filePath: string): Promise<boolean> {
     return true;
   } catch (error: unknown) {
     // Only return false for "file not found" errors
-    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+    if (getErrorCode(error) === 'ENOENT') {
       return false;
     }
     // Propagate all other errors (EACCES, ELOOP, EIO, etc.) with context
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to access path: ${errorMessage}`);
+    throw new Error(`Failed to access path: ${getErrorMessage(error)}`);
   }
 }
 
@@ -166,12 +166,12 @@ async function viewDirectory(
     } catch (error: unknown) {
       // Handle per-file errors gracefully
       // Log the error but continue processing other files
-      const errorCode = error && typeof error === 'object' && 'code' in error ? error.code : 'UNKNOWN';
+      const errorCode = getErrorCode(error) ?? 'UNKNOWN';
       await context.logger.debug('viewDirectory_stat_failed', {
         path: memoryPath,
         failed_item: item,
         error_code: errorCode,
-        error: error instanceof Error ? error.message : String(error),
+        error: getErrorMessage(error),
       });
 
       // Skip this item if it's a race condition (file deleted)

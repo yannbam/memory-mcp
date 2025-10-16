@@ -20,6 +20,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { getErrorCode, getErrorMessage } from './error-utils.js';
 
 /**
  * Tree node structure representing a file or directory
@@ -174,10 +175,7 @@ async function buildDirectoryTree(dirPath: string, basePath: string): Promise<Tr
         }
       } catch (entryError: unknown) {
         // Handle per-file/per-directory errors gracefully
-        const errorCode =
-          entryError && typeof entryError === 'object' && 'code' in entryError
-            ? entryError.code
-            : 'UNKNOWN';
+        const errorCode = getErrorCode(entryError) ?? 'UNKNOWN';
 
         // Log per-entry errors for debugging
         if (errorCode === 'EACCES') {
@@ -187,7 +185,7 @@ async function buildDirectoryTree(dirPath: string, basePath: string): Promise<Tr
           // Skip silently as this is expected in concurrent scenarios
         } else {
           // Log unexpected errors
-          console.error(`Error processing ${fullPath}: ${entryError instanceof Error ? entryError.message : String(entryError)}`);
+          console.error(`Error processing ${fullPath}: ${getErrorMessage(entryError)}`);
         }
 
         // Continue with other entries - don't let one bad entry break entire tree
@@ -206,7 +204,7 @@ async function buildDirectoryTree(dirPath: string, basePath: string): Promise<Tr
     });
   } catch (error: unknown) {
     // Handle directory-level errors (readdir failure)
-    const errorCode = error && typeof error === 'object' && 'code' in error ? error.code : 'UNKNOWN';
+    const errorCode = getErrorCode(error) ?? 'UNKNOWN';
 
     if (errorCode === 'EACCES') {
       console.error(`Warning: Permission denied reading directory ${dirPath}`);
@@ -214,7 +212,7 @@ async function buildDirectoryTree(dirPath: string, basePath: string): Promise<Tr
       // Directory deleted during traversal - skip silently
     } else {
       // Log unexpected directory-level errors
-      console.error(`Error reading directory ${dirPath}: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`Error reading directory ${dirPath}: ${getErrorMessage(error)}`);
     }
 
     // Return empty array for graceful degradation

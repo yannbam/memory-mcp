@@ -43,8 +43,9 @@ temp/
 .notes/
 
 # Memory storage (actual memory data, not the code)
+# Use leading slash to only match in root, not src/memory/
 .memory/
-memory/
+/memory/
 
 # Debug logs
 /tmp/memory-mcp/
