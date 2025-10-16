@@ -1,0 +1,420 @@
+{
+  "uuid": "0a93810c-c362-417c-a309-d6ea055362cd",
+  "name": "tree-view-feature",
+  "details": "Add optional tree view to memory tool's view command for directories, enabled via --tree-view CLI flag. Shows hierarchical structure with modification times, file sizes, and line counts - optimized for Claude instances viewing /memories at session start.",
+  "tasks": [
+    {
+      "name": "Create tree-view module",
+      "details": "Create src/memory/tree-view.ts with simplified functions extracted from ls.js",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Extract formatFileSize",
+          "details": "Extract formatFileSize() from ls.js (lines 728-736) - converts bytes to human-readable format (B, KB, MB, GB)",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "e0a51594-ba9c-4bb8-8ccd-9c7d57914a3d",
+          "created_at": "2025-10-16T01:09:35.003Z",
+          "updated_at": "2025-10-16T01:10:06.108Z"
+        },
+        {
+          "name": "Extract formatModificationDate",
+          "details": "Extract formatModificationDate() from ls.js (lines 743-762) - [YYYY/MM/DD - HH:MM:SS] format in local timezone",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "18cfa142-6c53-484c-b9a0-deca8afcad45",
+          "created_at": "2025-10-16T01:09:35.003Z",
+          "updated_at": "2025-10-16T01:10:39.124Z"
+        },
+        {
+          "name": "Simplify countFileLines",
+          "details": "Extract and simplify countFileLines() from ls.js (lines 769-783) - remove isTextFile() check since all files in /memories are text",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "4ce368a3-14eb-4db1-8914-38d805927144",
+          "created_at": "2025-10-16T01:09:35.003Z",
+          "updated_at": "2025-10-16T01:10:39.124Z"
+        },
+        {
+          "name": "Simplify createFileTree",
+          "details": "Extract and simplify createFileTree() from ls.js (lines 383-448) - remove symlinks, executables, skipped, and error handling. Keep path structure, directory detection, add fileSize, lineCount, modificationTime",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "ea4e90d9-a753-43a3-92f1-3c415b899a77",
+          "created_at": "2025-10-16T01:09:35.003Z",
+          "updated_at": "2025-10-16T01:10:56.290Z"
+        },
+        {
+          "name": "Simplify printTree",
+          "details": "Extract and simplify printTree() from ls.js (lines 450-529) - remove symlink, executable, skipped, error indicators. Keep tree structure with proper indentation",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "1ffe5f45-5faf-4677-84e2-f4c8f07f0bb7",
+          "created_at": "2025-10-16T01:09:35.003Z",
+          "updated_at": "2025-10-16T01:11:11.689Z"
+        },
+        {
+          "name": "Implement renderDirectoryTree",
+          "details": "Main function that ties everything together: recursively scan directory, get stats, count lines, build tree, format output",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "17ada216-502d-4faa-af98-e6f15317e6b2",
+          "created_at": "2025-10-16T01:09:35.003Z",
+          "updated_at": "2025-10-16T01:11:21.506Z"
+        },
+        {
+          "name": "Add TypeScript types and docs",
+          "details": "Add proper TypeScript interfaces, types, and e/code documentation comments for all functions",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "3b960f1b-6f3d-4b3a-99a9-e136b10ad47c",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:11:21.506Z"
+        }
+      ],
+      "uuid": "5a0d7e9a-49ad-4155-b4c8-63896508cfde",
+      "created_at": "2025-10-16T01:09:35.003Z",
+      "updated_at": "2025-10-16T01:09:35.003Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Update CLI interface",
+      "details": "Add --tree-view flag to src/index.ts and propagate through the system",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Add treeView to CliConfig",
+          "details": "Add treeView: boolean field to CliConfig interface",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "b1417110-48a9-4c7a-8134-ebe28d0045b5",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:11:43.636Z"
+        },
+        {
+          "name": "Parse tree-view flag",
+          "details": "Add case for --tree-view in parseArgs() function",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "0af68ad9-b81b-436e-9a74-bd13f1095107",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:11:56.597Z"
+        },
+        {
+          "name": "Update help text",
+          "details": "Add --tree-view to showHelp() output with description",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "ee143e8c-2734-43e2-a508-a96aac26ede4",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:12:06.004Z"
+        },
+        {
+          "name": "Pass to server creation",
+          "details": "Update createMemoryServer() call to pass config.treeView parameter",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "7167d3ae-14bd-4b7f-80d8-b44edbcd7bd9",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:12:13.836Z"
+        }
+      ],
+      "uuid": "ccd7d72a-5c84-424b-be08-8f38adf0b0aa",
+      "created_at": "2025-10-16T01:09:35.004Z",
+      "updated_at": "2025-10-16T01:09:35.004Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Update MCP server",
+      "details": "Update src/server/mcp-server.ts to accept and propagate treeView flag",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Update createMemoryServer signature",
+          "details": "Add treeView: boolean parameter to createMemoryServer() function",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "5c4b07de-2265-4897-bdb9-9081cf40692b",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:12:38.556Z"
+        },
+        {
+          "name": "Add to OperationsContext",
+          "details": "Include treeView in the context object passed to operations",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "a8c7a6b5-a055-4129-9b36-6b891b035336",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:12:38.556Z"
+        }
+      ],
+      "uuid": "267573f8-1f5a-495e-967a-289c932e17f4",
+      "created_at": "2025-10-16T01:09:35.004Z",
+      "updated_at": "2025-10-16T01:09:35.004Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Update memory operations",
+      "details": "Update src/memory/operations.ts to support tree view mode",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Update OperationsContext interface",
+          "details": "Add treeView: boolean field to OperationsContext interface",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "bf14eb5d-15d2-4f84-b364-aa58c55a544f",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:12:58.137Z"
+        },
+        {
+          "name": "Update viewDirectory signature",
+          "details": "Add context: OperationsContext parameter to viewDirectory() function",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "f6c75df7-5b52-4f8e-b72c-65c5ec1052e2",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:13:10.464Z"
+        },
+        {
+          "name": "Add conditional tree view logic",
+          "details": "Add if (context.treeView) branch that calls renderDirectoryTree(), keep existing simple listing as else branch",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "bd185739-5c03-4a7e-beea-490dc1c54ec8",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:13:10.464Z"
+        },
+        {
+          "name": "Update view function call",
+          "details": "Update viewDirectory() call in view() function to pass context parameter",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "692d8625-6742-4f49-af8e-6001871889f3",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:13:10.464Z"
+        }
+      ],
+      "uuid": "3e4dd0fe-2587-4d33-844f-e71bb1276357",
+      "created_at": "2025-10-16T01:09:35.004Z",
+      "updated_at": "2025-10-16T01:09:35.004Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Create tree-view tests",
+      "details": "Create test/tree-view.test.ts with comprehensive unit tests",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Test formatFileSize",
+          "details": "Test B, KB, MB, GB conversions with various byte values",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "eda6f44c-b92e-4c79-833b-6ad6380cd532",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        },
+        {
+          "name": "Test formatModificationDate",
+          "details": "Verify [YYYY/MM/DD - HH:MM:SS] format with Date objects and timestamps",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "b1871f2c-ceee-486c-a510-a04349f696cf",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        },
+        {
+          "name": "Test countFileLines",
+          "details": "Test line counting with various line endings (\\n, \\r\\n), empty files, single line files",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "e2770a85-1a4b-42ca-ab63-b95e9acaed19",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        },
+        {
+          "name": "Test createFileTree",
+          "details": "Test nested directory structure building with multiple levels",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "50b218c6-c5d3-4cc1-8276-c5c160bd4e87",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        },
+        {
+          "name": "Test printTree",
+          "details": "Test proper indentation, formatting, and output structure",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "764fbcc0-81f3-4b06-8f13-c26fd2920430",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        },
+        {
+          "name": "Test renderDirectoryTree integration",
+          "details": "Full integration test with real directory structure",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "e1eccf06-f8c9-4e77-98e9-894cd390f2df",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        },
+        {
+          "name": "Test deep nesting",
+          "details": "Verify no depth limits with deeply nested directories",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "73e2448e-07e6-462e-b26a-bf7144234d5a",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        },
+        {
+          "name": "Test hidden file skipping",
+          "details": "Verify files starting with . are skipped",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "bfe2d36e-ad78-4fff-8493-08616a8d0add",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:39.040Z"
+        }
+      ],
+      "uuid": "fdc0f1d5-2b93-4c43-9624-a8a4a3da06c0",
+      "created_at": "2025-10-16T01:09:35.004Z",
+      "updated_at": "2025-10-16T01:09:35.004Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Update operations tests",
+      "details": "Update test/memory-operations.test.ts to test both view modes",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Test simple mode",
+          "details": "Test view command with treeView=false to verify existing behavior unchanged",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "ad85cdf3-72d7-4a69-8c0a-31bc74b37f0b",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:52.412Z"
+        },
+        {
+          "name": "Test tree mode",
+          "details": "Test view command with treeView=true to verify tree rendering works",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "0881d361-bb6f-475b-8123-7d16182d0fc6",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:52.412Z"
+        },
+        {
+          "name": "Mock context properly",
+          "details": "Create mock OperationsContext with both flag states for testing",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "5665ac58-84d8-4f4b-a1f6-2973cfb233eb",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:14:52.412Z"
+        }
+      ],
+      "uuid": "9b37d888-178e-4ec5-9a14-369a15bd03da",
+      "created_at": "2025-10-16T01:09:35.004Z",
+      "updated_at": "2025-10-16T01:09:35.004Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Update documentation",
+      "details": "Update README.md, ARCHITECTURE.md, and CLAUDE.md with tree view feature",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Update README.md",
+          "details": "Add --tree-view to CLI options table, add usage example, add sample output",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "3434d582-671e-47ac-a3fd-d8950ae6c5a6",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:18:07.622Z"
+        },
+        {
+          "name": "Update ARCHITECTURE.md",
+          "details": "Add tree view design section explaining rationale and trade-offs",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "06aecd3d-1f94-4703-bceb-d5c3259e7414",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:19:01.401Z"
+        },
+        {
+          "name": "Update CLAUDE.md",
+          "details": "Add tree view to What Works section in Session Handoff",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "8cf32afa-98c6-4cd5-863b-a20c8bd9ba77",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:22:29.663Z"
+        }
+      ],
+      "uuid": "23212f6f-7169-46bc-a2d2-b26e2495a2d4",
+      "created_at": "2025-10-16T01:09:35.004Z",
+      "updated_at": "2025-10-16T01:09:35.004Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Quality assurance",
+      "details": "Linting, testing, and manual verification",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Run linter",
+          "details": "Run npm run lint:fix to ensure code style compliance",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "6618d8e6-bd8d-4c6e-bf3f-f96ffd413d38",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:16:03.495Z"
+        },
+        {
+          "name": "Run all tests",
+          "details": "Run npm test to verify all tests pass",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "c19c79a5-b2fc-469f-aa00-9ce9b88caca1",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:16:18.164Z"
+        },
+        {
+          "name": "Manual testing simple mode",
+          "details": "Test without --tree-view flag to verify no regression in simple mode",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "d19298d8-afe3-4896-8a6f-75ad28888316",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:17:03.892Z"
+        },
+        {
+          "name": "Manual testing tree mode",
+          "details": "Test with --tree-view flag, create test memory directory, verify output format and token count",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "dfdf32af-dba1-4083-9a14-4b83ccf3cfb4",
+          "created_at": "2025-10-16T01:09:35.004Z",
+          "updated_at": "2025-10-16T01:17:03.892Z"
+        }
+      ],
+      "uuid": "a776d91b-dccd-46f0-8e0b-d797efb91c80",
+      "created_at": "2025-10-16T01:09:35.004Z",
+      "updated_at": "2025-10-16T01:09:35.004Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-10-16T01:09:35.004Z",
+  "updated_at": "2025-10-16T01:22:29.829Z"
+}

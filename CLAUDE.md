@@ -174,26 +174,30 @@ GitHub Actions workflow runs on `push` and `pull_request` to `main` and `dev` br
 
 ### Current Implementation Status
 
-**✅ CORE IMPLEMENTATION COMPLETE + INTERFACE REFACTORED** - All tests passing, spec-compliant, ready for integration testing.
+**✅ CORE IMPLEMENTATION COMPLETE + TREE VIEW FEATURE** - All tests passing, spec-compliant, tree view optional feature added.
 
-**Project State**: Complete implementation with unified tool interface matching official Anthropic spec. All unit tests pass.
+**Project State**: Complete implementation with unified tool interface + optional tree view mode for enhanced directory navigation.
 
 ### Recent Changes (This Session)
-- 🔧 **Refactored to unified tool interface**: Changed from 6 separate tools to single `memory` tool with `command` parameter
-- ✅ **Discriminated union schema**: Type-safe command dispatch using Zod
-- ✅ **Spec compliance**: Now matches official [Anthropic Memory tool specification](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool) exactly
-- ✅ **Documentation updated**: README, ARCHITECTURE.md reflect new interface
-- ✅ **All tests still pass**: 61/61 tests (27 security + 34 operations)
+- 🌳 **Tree View Feature Added**: Optional `--tree-view` CLI flag enables hierarchical directory view
+- ✅ **Tree view module**: New `src/memory/tree-view.ts` with formatting and rendering functions
+- ✅ **CLI integration**: Added `--tree-view` flag parsing and propagation through system
+- ✅ **Context propagation**: treeView flag passed through CLI → MCP server → operations
+- ✅ **Conditional rendering**: viewDirectory() checks context.treeView flag
+- ✅ **Comprehensive testing**: 24 new tree view tests added (85 total tests now)
+- ✅ **Documentation updated**: README, ARCHITECTURE.md, CLAUDE.md reflect tree view feature
+- ✅ **Manual testing complete**: Both simple and tree modes verified working
 
 ### What Works
 - ✅ **Unified memory tool** with command-based dispatch (view, create, str_replace, insert, delete, rename)
+- ✅ **Tree view mode**: Hierarchical directory view with sizes, line counts, modification times
 - ✅ **Discriminated union validation**: Each command has only its relevant parameters
 - ✅ Path security with 27 comprehensive tests (directory traversal protection)
 - ✅ File locking with optimistic concurrency control
 - ✅ stdio and streamable HTTP transports
-- ✅ CLI argument parsing (--memory-root-path, --transport, --port, --debug, --version, --help)
+- ✅ CLI argument parsing (--memory-root-path, --transport, --port, --tree-view, --debug, --version, --help)
 - ✅ Debug logging to /tmp/memory-mcp/<instance-id>.log
-- ✅ 61/61 tests passing (27 security + 34 operations)
+- ✅ 85/85 tests passing (27 security + 34 operations + 24 tree view)
 - ✅ Project compiles and lints successfully
 - ✅ Comprehensive documentation (README.md, docs/ARCHITECTURE.md)
 
@@ -218,7 +222,7 @@ memory({ command: "str_replace", path: "/memories/file.txt", old_str: "...", new
 ```bash
 # Build and test
 npm run build
-npm test  # Should show 61/61 passing
+npm test  # Should show 85/85 passing
 
 # Test CLI
 node dist/index.js --help
@@ -226,6 +230,7 @@ node dist/index.js --version
 
 # Test stdio transport (MCP Inspector needed)
 node dist/index.js
+node dist/index.js --tree-view  # With tree view mode
 
 # Test HTTP transport
 node dist/index.js --transport http --port 3000
@@ -235,13 +240,15 @@ node dist/index.js --transport http --port 3000
 ### Key Files to Know
 - `src/index.ts` - CLI entry point and main setup
 - `src/memory/operations.ts` - All 6 memory commands
+- `src/memory/tree-view.ts` - **Tree view rendering** (optional feature)
 - `src/memory/locking.ts` - File locking with optimistic concurrency
 - `src/memory/path-security.ts` - Path validation (security critical!)
 - `src/server/mcp-server.ts` - **Unified tool registration** with discriminated union schema
 - `src/server/transports.ts` - stdio and HTTP transport initialization
 - `test/path-security.test.ts` - 27 security tests
 - `test/memory-operations.test.ts` - 34 operations tests
-- `docs/ARCHITECTURE.md` - **Includes unified tool interface design section**
+- `test/tree-view.test.ts` - **24 tree view tests**
+- `docs/ARCHITECTURE.md` - **Includes unified tool interface + tree view design**
 
 ### Architecture Highlights
 1. **Unified Tool Interface**: Single `memory` tool with discriminated union for type-safe dispatch
@@ -271,10 +278,11 @@ node dist/index.js --transport http --port 3000
 ### Test Coverage
 - Path Security: 27/27 passing
 - Memory Operations: 34/34 passing
-- Total: 61/61 tests passing
+- Tree View: 24/24 passing
+- Total: 85/85 tests passing
 - Coverage: Est. 80%+ (untested: multi-process scenarios)
 
 ---
 
-**Last Updated**: 2025-10-15 (Session: memory-tool-interface-refactor)
-**Status**: ✅ Spec-Compliant - Unified Tool Interface, Ready for Integration Testing
+**Last Updated**: 2025-10-16 (Session: tree-view-feature)
+**Status**: ✅ Core Complete + Tree View Feature, Ready for Integration Testing

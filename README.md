@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/janbam/memory-mcp/workflows/CI/badge.svg)](https://github.com/janbam/memory-mcp/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-61%20passing-success)](./test)
+[![Tests](https://img.shields.io/badge/tests-85%20passing-success)](./test)
 
 MCP server implementation of Claude's native memory tool for persistent storage across conversations.
 
@@ -13,6 +13,7 @@ This project implements Claude's [memory tool](https://docs.claude.com/en/docs/a
 ## Features
 
 - ✅ **All 6 Memory Commands**: view, create, str_replace, insert, delete, rename
+- ✅ **Tree View Mode**: Optional hierarchical directory view with metadata (sizes, lines, timestamps)
 - ✅ **Concurrent Access Safe**: File locking with optimistic concurrency control for multiple Claude instances
 - ✅ **Path Security**: Comprehensive directory traversal protection (27 security tests)
 - ✅ **Dual Transport**: stdio (default) and streamable HTTP
@@ -97,6 +98,7 @@ Options:
   --memory-root-path PATH, -m PATH   Memory storage root (default: ./.memory)
   --transport TYPE, -t TYPE          Transport: stdio | http (default: stdio)
   --port PORT, -p PORT               HTTP port (default: 3000)
+  --tree-view                        Enable tree view for directory listings (default: false)
   --debug, -d                        Enable debug logging
   --version, -v                      Show version
   --help, -h                         Show help
@@ -117,8 +119,11 @@ memory-mcp -t http -p 8080
 # With debug logging
 memory-mcp --debug
 
+# With tree view for directory listings
+memory-mcp --tree-view
+
 # Full configuration
-memory-mcp -m /var/memories -t http -p 3000 -d
+memory-mcp -m /var/memories -t http -p 3000 --tree-view -d
 ```
 
 ## Memory Tool
@@ -130,13 +135,27 @@ This matches the [official Anthropic Memory tool specification](https://docs.cla
 ### view
 Show directory contents or file contents with optional line ranges.
 
+**Directory View Modes:**
+- **Simple mode** (default): Flat list of files and directories
+- **Tree view mode** (with `--tree-view` flag): Hierarchical structure with metadata
+
 ```typescript
-// View directory
+// View directory (simple mode - default)
 await memory({
   command: "view",
   path: "/memories"
 })
 // → "Directory: /memories\n- notes.txt\n- ideas/"
+
+// View directory (tree view mode - with --tree-view flag)
+// Shows hierarchical structure, file sizes, line counts, and modification times
+// → "Showing contents of: /memories
+// → Modification dates shown in [YYYY/MM/DD - HH:MM:SS] format (UTC timezone)
+// →
+// → - notes.txt	(2.3KB / 45 lines)	[2025/10/15 - 14:23:17]
+// → - projects/		[2025/10/15 - 15:01:42]
+// →   - backend/		[2025/10/14 - 09:15:33]
+// →     - api.md	(5.1KB / 128 lines)	[2025/10/14 - 09:15:33]"
 
 // View file
 await memory({
@@ -286,7 +305,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                 # Run all tests (61 passing)
+npm test                 # Run all tests (85 passing)
 npm run test:coverage    # Run with coverage report (80%+ target)
 npm run test:watch       # Watch mode
 ```
@@ -294,6 +313,7 @@ npm run test:watch       # Watch mode
 **Test Coverage**:
 - 27 path security tests (directory traversal attacks)
 - 34 memory operations tests (all 6 commands + edge cases)
+- 24 tree view tests (formatting, rendering, integration)
 
 ### Linting
 
@@ -384,8 +404,9 @@ Contributions welcome! Please:
 
 ---
 
-**Status**: ⚠️ Core Implementation Complete - Needs Integration Testing
+**Status**: ✅ Core Implementation Complete + Tree View Feature
 **Version**: 0.1.0
-**Tests**: 61/61 passing (unit tests only)
+**Tests**: 85/85 passing (unit tests + integration tests)
 **Interface**: Unified `memory` tool matching official Anthropic spec
+**Features**: All 6 commands + optional tree view mode
 **Next Step**: Manual testing with MCP Inspector and Claude Code

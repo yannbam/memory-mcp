@@ -66,9 +66,10 @@ export type MemoryCommand = z.infer<typeof MemoryCommandSchema>;
  *
  * @param memoryRoot - Absolute filesystem path to memory root directory
  * @param logger - Debug logger instance
+ * @param treeView - Enable tree view for directory listings
  * @returns Configured McpServer instance
  */
-export function createMemoryServer(memoryRoot: string, logger: Logger): McpServer {
+export function createMemoryServer(memoryRoot: string, logger: Logger, treeView: boolean): McpServer {
   // Create MCP server instance
   const server = new McpServer({
     name: 'memory-mcp',
@@ -79,6 +80,7 @@ export function createMemoryServer(memoryRoot: string, logger: Logger): McpServe
   const context: operations.OperationsContext = {
     memoryRoot,
     logger,
+    treeView,
   };
 
   // Register unified memory tool with discriminated union schema

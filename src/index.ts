@@ -27,6 +27,7 @@ interface CliConfig {
   transport: 'stdio' | 'http';
   port: number;
   debug: boolean;
+  treeView: boolean;
 }
 
 /**
@@ -42,6 +43,7 @@ function parseArgs(args: string[]): CliConfig {
     transport: 'stdio',
     port: 3000,
     debug: false,
+    treeView: false,
   };
 
   // Parse arguments
@@ -96,6 +98,11 @@ function parseArgs(args: string[]): CliConfig {
         config.debug = true;
         break;
 
+      case '--tree-view':
+        // Enable tree view for directory listings
+        config.treeView = true;
+        break;
+
       case '--version':
       case '-v':
         // Show version and exit
@@ -137,6 +144,7 @@ OPTIONS:
   --memory-root-path PATH, -m PATH   Memory storage root path (default: ./.memory)
   --transport TYPE, -t TYPE          Transport type: stdio | http (default: stdio)
   --port PORT, -p PORT               HTTP server port (default: 3000, http transport only)
+  --tree-view                        Enable tree view for directory listings (default: false)
   --debug, -d                        Enable debug logging to /tmp/memory-mcp/<instance-id>.log
   --version, -v                      Show version
   --help, -h                         Show this help message
@@ -153,6 +161,9 @@ EXAMPLES:
 
   # With debug logging
   memory-mcp --debug --transport http
+
+  # With tree view for directory listings
+  memory-mcp --tree-view
 
 For more information, visit: https://github.com/janbam/memory-mcp
   `);
@@ -185,7 +196,7 @@ async function main(): Promise<void> {
     }
 
     // Create MCP server
-    const server = createMemoryServer(path.join(memoryRoot, 'memories'), logger);
+    const server = createMemoryServer(path.join(memoryRoot, 'memories'), logger, config.treeView);
 
     // Initialize transport
     if (config.transport === 'stdio') {

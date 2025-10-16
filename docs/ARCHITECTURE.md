@@ -201,6 +201,57 @@ switch (command.command) {
 
 **Trade-off**: MCP SDK's `inputSchema` expects `ZodRawShape` (object), not discriminated union. Solution: Pass all parameters as optional in `inputSchema`, but validate strictly with discriminated union in handler.
 
+### 7. Tree View Feature
+
+**Problem**: Directory listing with `memory:view "/memories"` provides minimal navigation context - just a flat list of items.
+
+**Use Case**: Claude instances ALWAYS call `memory:view "/memories"` at the start of EVERY session (per official spec). This is the first thing Claude sees, and it's shared across all Claude instances (Code, claude.ai, etc.).
+
+**Solution**: Optional tree view mode enabled via `--tree-view` CLI flag.
+
+**Tree View Shows**:
+- Hierarchical directory structure with unlimited depth
+- File sizes in human-readable format (B, KB, MB, GB, TB)
+- Line counts for all files (all assumed to be text since Claude writes them)
+- Modification times in `[YYYY/MM/DD - HH:MM:SS]` format with timezone
+- Directories marked with `/` suffix
+
+**Design Rationale**:
+1. **Optional**: Default simple mode preserves backward compatibility and minimal token usage
+2. **Metadata-rich**: Helps Claude decide what to read without reading everything
+3. **Recency signals**: Modification times show which files are active/recent
+4. **No arbitrary limits**: No depth limits or file count truncation (memory directories expected to be reasonable)
+5. **Clean implementation**: Separate module (`tree-view.ts`) with no external dependencies
+
+**Example Output**:
+```
+Showing contents of: /memories
+Modification dates shown in [YYYY/MM/DD - HH:MM:SS] format (UTC timezone)
+
+- notes.txt	(2.3KB / 45 lines)	[2025/10/15 - 14:23:17]
+- projects/		[2025/10/15 - 15:01:42]
+  - backend/		[2025/10/14 - 09:15:33]
+    - api.md	(5.1KB / 128 lines)	[2025/10/14 - 09:15:33]
+  - frontend/		[2025/10/15 - 15:01:42]
+    - ui.md	(1.8KB / 42 lines)	[2025/10/15 - 15:01:42]
+```
+
+**Implementation**:
+- Recursive directory traversal (no depth limit)
+- File metadata via `fs.stat()` (sizes, modification times)
+- Line counting by reading files and counting newlines
+- Hidden files (starting with `.`) are automatically skipped
+- Directories sorted before files, both sorted alphabetically
+
+**Performance**: O(n) where n = total number of files/directories (must read all files to count lines). Acceptable for session start since this is a one-time operation that provides valuable context for the entire session.
+
+**Not Included** (stripped from reference implementation):
+- Symlink handling (won't exist in /memories)
+- Executable markers (memory files are data, not programs)
+- Clutter filtering (memory storage should be clean)
+- Truncation limits (reasonable sizes expected)
+- Text file detection (all files assumed to be text)
+
 ## File Structure
 
 ```
@@ -208,6 +259,7 @@ src/
 ├── index.ts                 # CLI entry, transport initialization
 ├── memory/
 │   ├── operations.ts        # 6 memory commands implementation
+│   ├── tree-view.ts         # Tree view rendering (optional feature)
 │   ├── locking.ts           # File locking + optimistic concurrency
 │   └── path-security.ts     # Path validation & security
 ├── server/
@@ -218,7 +270,8 @@ src/
 
 test/
 ├── path-security.test.ts    # 27 security tests
-└── memory-operations.test.ts # 34 functional tests
+├── memory-operations.test.ts # 34 functional tests
+└── tree-view.test.ts        # 24 tree view tests
 ```
 
 ## Testing Strategy
@@ -235,6 +288,15 @@ test/
 - ✅ Edge cases (empty files, nested dirs)
 - ✅ Error conditions (not found, not unique)
 - ✅ Concurrent access patterns
+
+### Tree View Tests (24 tests)
+- ✅ File size formatting (B, KB, MB, GB, TB)
+- ✅ Modification date formatting ([YYYY/MM/DD - HH:MM:SS])
+- ✅ Line counting (Unix/Windows line endings, edge cases)
+- ✅ Tree structure rendering (hierarchy, indentation)
+- ✅ Deep nesting support (no limits)
+- ✅ Hidden file skipping (files starting with `.`)
+- ✅ Alphabetical sorting (directories first, then files)
 
 ### Not Yet Tested
 - Multi-process concurrency (needs integration tests)
