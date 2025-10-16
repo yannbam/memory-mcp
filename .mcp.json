@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "node",
+      "args": ["/home/jan/projects/memory-mcp/dist/index.js"],
+      "env": {}
+    },
+    "MCP-Debug": {
+      "command": "node",
+      "args": [
+        "/home/jan/projects/mcp-debug-mcp/mcp-debug-server-client-server.js"
+      ]
+    }
+  }
+}

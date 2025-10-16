@@ -152,6 +152,55 @@ All 27 security tests pass, covering known attack patterns.
 
 **Default Root**: `./.memory` (hidden directory, relative to CWD)
 
+### 6. Unified Tool Interface
+
+**Problem**: How to expose 6 memory commands through the MCP protocol?
+
+**Initial Approach** (incorrect): Register 6 separate tools (`memory_view`, `memory_create`, etc.)
+
+**Correct Approach**: Single unified `memory` tool matching [Anthropic's spec](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool).
+
+**Implementation**:
+- Use Zod discriminated union for type-safe command dispatch
+- The `command` field determines which operation runs
+- Each command variant has only its relevant parameters
+
+**Example Schema**:
+```typescript
+const MemoryCommandSchema = z.discriminatedUnion('command', [
+  z.object({
+    command: z.literal('view'),
+    path: z.string(),
+    view_range: z.tuple([z.number(), z.number()]).optional(),
+  }),
+  z.object({
+    command: z.literal('create'),
+    path: z.string(),
+    file_text: z.string(),
+  }),
+  // ... other commands
+]);
+```
+
+**Dispatch Pattern**:
+```typescript
+switch (command.command) {
+  case 'view':
+    return await operations.view(command, context);
+  case 'create':
+    return await operations.create(command, context);
+  // ...
+}
+```
+
+**Benefits**:
+- ✅ Matches official specification exactly
+- ✅ Type-safe command dispatch (TypeScript knows which fields exist)
+- ✅ Clear validation errors (wrong parameters for a command are rejected)
+- ✅ Single tool registration simplifies MCP client integration
+
+**Trade-off**: MCP SDK's `inputSchema` expects `ZodRawShape` (object), not discriminated union. Solution: Pass all parameters as optional in `inputSchema`, but validate strictly with discriminated union in handler.
+
 ## File Structure
 
 ```
@@ -169,7 +218,7 @@ src/
 
 test/
 ├── path-security.test.ts    # 27 security tests
-└── memory-operations.test.ts # 32 functional tests
+└── memory-operations.test.ts # 34 functional tests
 ```
 
 ## Testing Strategy
@@ -181,7 +230,7 @@ test/
 - ✅ URL-encoded attacks blocked
 - ✅ Edge cases handled
 
-### Memory Operations Tests (32 tests)
+### Memory Operations Tests (34 tests)
 - ✅ Each operation tested in isolation
 - ✅ Edge cases (empty files, nested dirs)
 - ✅ Error conditions (not found, not unique)
@@ -281,6 +330,7 @@ Claude can parse these messages and take appropriate action (retry, read file, a
 3. **Stateless HTTP is simpler**: Avoided session management complexity
 4. **Tests drive design**: Security tests caught edge cases early
 5. **E/code works**: Intention comments made implementation clearer
+6. **Read the spec first**: Initial implementation had 6 separate tools instead of 1 unified tool. Refactored to match official spec using discriminated unions.
 
 ## Contributors
 

@@ -1,0 +1,28 @@
+🌳 "memory-tool-refactor"
+📝 Refactor MCP server from 6 separate tools to single "memory" tool with discriminated union schema.
+
+This addresses the critical design error where the server was exposing 6 tools (memory_view, memory_create, etc.) instead of one unified "memory" tool matching the official Anthropic Memory tool specification.
+
+The refactor uses Zod discriminatedUnion to provide type-safe command dispatch with clear parameter requirements for each command variant.
+📊 ██████████ 100% (20/20 tasks)
+
+├── ✅ |Schema Refactoring| "Create unified schema using Zod discriminatedUnion for all 6 memory commands" (🚨) (100%)
+│   ├── ✅ |Create discriminated union schema| "In src/server/mcp-server.ts, create MemoryCommandSchema using z.discriminatedUnion('command', [...]) with all 6 command variants (view, create, str_replace, insert, delete, rename). Each variant should have z.literal('command_name') for the command field and only the relevant parameters for that command." (🚨)
+│   ├── ✅ |Export command type| "Export TypeScript type from the schema: export type MemoryCommand = z.infer<typeof MemoryCommandSchema>. This provides type safety for the dispatcher and operations." (🔴)
+│   └── ✅ |Keep individual schemas for validation| "Keep the existing individual command schemas (ViewCommandSchema, CreateCommandSchema, etc.) as they may be useful for internal validation and testing. These can be private or exported as needed." (🟡)
+├── ✅ |MCP Tool Registration| "Replace 6 tool registrations with single unified memory tool" (🚨) (100%)
+│   ├── ✅ |Remove old tool registrations| "Delete all 6 existing server.registerTool() calls (memory_view, memory_create, memory_str_replace, memory_insert, memory_delete, memory_rename) from createMemoryServer function." (🔴)
+│   ├── ✅ |Register single memory tool| "Add single server.registerTool('memory', {...}) call with the discriminated union schema as inputSchema. The tool name must be exactly 'memory' to match the spec." (🚨)
+│   └── ✅ |Implement command dispatcher| "Create tool handler function that: 1) validates params with MemoryCommandSchema.parse(), 2) uses switch/case on command.command field to dispatch to appropriate operations function, 3) returns MCP tool response with text content." (🚨)
+├── ✅ |Test Updates| "Update all tests to use new unified memory tool interface" (🔴) (100%)
+│   ├── ✅ |Update memory-operations tests| "In test/memory-operations.test.ts, change all tool calls from individual tools (memory_view, memory_create, etc.) to single 'memory' tool with command parameter. E.g., {tool: 'memory', params: {command: 'view', path: '/memories'}}" (🔴)
+│   ├── ✅ |Verify discriminated union validation| "Add tests that verify: 1) invalid command values are rejected, 2) wrong parameters for a command are rejected (e.g., passing file_text to view command), 3) correct parameters for each command work as expected." (🟡)
+│   └── ✅ |Run test suite| "Run npm test to verify all tests pass with the new interface. All 59 tests should still pass." (🔴)
+├── ✅ |Documentation Updates| "Update project documentation to reflect new unified tool interface" (🟡) (100%)
+│   ├── ✅ |Update README.md| "Update README.md examples to show single 'memory' tool with command parameter. Update tool usage examples and API documentation." (🟡)
+│   ├── ✅ |Update ARCHITECTURE.md| "Update docs/ARCHITECTURE.md to explain the discriminated union schema design and how command dispatch works." (🟡)
+│   └── ✅ |Update CLAUDE.md handoff| "Update SESSION HANDOFF section in /home/jan/projects/memory-mcp/CLAUDE.md to note the interface change and mark this refactor as complete." (🔵)
+└── ✅ |Build and Verify| "Compile, test, and verify the refactored implementation works correctly" (🔴) (100%)
+    ├── ✅ |Run TypeScript compiler| "Run npm run build to verify TypeScript compilation succeeds with the new types and schema." (🔴)
+    ├── ✅ |Run linter| "Run npm run lint to check for any code quality issues introduced by the refactor." (🟡)
+    └── ✅ |Manual smoke test| "Optionally test with MCP Inspector or Claude Code to verify the tool works correctly with the new interface. Check that command dispatch works and parameters are validated correctly." (🔵)

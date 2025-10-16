@@ -1,0 +1,204 @@
+{
+  "uuid": "e218af4b-b270-44d6-a3e8-0f821e0b7449",
+  "name": "memory-tool-refactor",
+  "details": "Refactor MCP server from 6 separate tools to single \"memory\" tool with discriminated union schema.\n\nThis addresses the critical design error where the server was exposing 6 tools (memory_view, memory_create, etc.) instead of one unified \"memory\" tool matching the official Anthropic Memory tool specification.\n\nThe refactor uses Zod discriminatedUnion to provide type-safe command dispatch with clear parameter requirements for each command variant.",
+  "tasks": [
+    {
+      "name": "Schema Refactoring",
+      "details": "Create unified schema using Zod discriminatedUnion for all 6 memory commands",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Create discriminated union schema",
+          "details": "In src/server/mcp-server.ts, create MemoryCommandSchema using z.discriminatedUnion('command', [...]) with all 6 command variants (view, create, str_replace, insert, delete, rename). Each variant should have z.literal('command_name') for the command field and only the relevant parameters for that command.",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "16f59327-1f56-427a-b8c0-49a9c936f2ab",
+          "created_at": "2025-10-15T20:53:08.886Z",
+          "updated_at": "2025-10-15T21:00:53.420Z"
+        },
+        {
+          "name": "Export command type",
+          "details": "Export TypeScript type from the schema: export type MemoryCommand = z.infer<typeof MemoryCommandSchema>. This provides type safety for the dispatcher and operations.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "d62c2ead-96d5-4bcb-86ba-8b7f420eea79",
+          "created_at": "2025-10-15T20:53:08.886Z",
+          "updated_at": "2025-10-15T21:00:53.420Z"
+        },
+        {
+          "name": "Keep individual schemas for validation",
+          "details": "Keep the existing individual command schemas (ViewCommandSchema, CreateCommandSchema, etc.) as they may be useful for internal validation and testing. These can be private or exported as needed.",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "8c23708b-acf5-4c5a-a303-d7412a993ab9",
+          "created_at": "2025-10-15T20:53:08.886Z",
+          "updated_at": "2025-10-15T21:00:53.420Z"
+        }
+      ],
+      "uuid": "87a5aa48-8098-41a0-84aa-ea854e83af5a",
+      "created_at": "2025-10-15T20:53:08.886Z",
+      "updated_at": "2025-10-15T20:53:08.886Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "MCP Tool Registration",
+      "details": "Replace 6 tool registrations with single unified memory tool",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Remove old tool registrations",
+          "details": "Delete all 6 existing server.registerTool() calls (memory_view, memory_create, memory_str_replace, memory_insert, memory_delete, memory_rename) from createMemoryServer function.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "027e572e-0918-411d-b7e3-d778e0baf833",
+          "created_at": "2025-10-15T20:53:08.886Z",
+          "updated_at": "2025-10-15T21:01:29.511Z"
+        },
+        {
+          "name": "Register single memory tool",
+          "details": "Add single server.registerTool('memory', {...}) call with the discriminated union schema as inputSchema. The tool name must be exactly 'memory' to match the spec.",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "8f7b7f2a-1c54-4ad6-8985-de5821da9745",
+          "created_at": "2025-10-15T20:53:08.886Z",
+          "updated_at": "2025-10-15T21:01:29.511Z"
+        },
+        {
+          "name": "Implement command dispatcher",
+          "details": "Create tool handler function that: 1) validates params with MemoryCommandSchema.parse(), 2) uses switch/case on command.command field to dispatch to appropriate operations function, 3) returns MCP tool response with text content.",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "039dcd2a-12ab-4e4d-a8d8-1038cde6b8b4",
+          "created_at": "2025-10-15T20:53:08.886Z",
+          "updated_at": "2025-10-15T21:01:29.511Z"
+        }
+      ],
+      "uuid": "fb0b3d59-5d5b-4d1d-ad63-d54db64f1d5b",
+      "created_at": "2025-10-15T20:53:08.886Z",
+      "updated_at": "2025-10-15T20:53:08.886Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Test Updates",
+      "details": "Update all tests to use new unified memory tool interface",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Update memory-operations tests",
+          "details": "In test/memory-operations.test.ts, change all tool calls from individual tools (memory_view, memory_create, etc.) to single 'memory' tool with command parameter. E.g., {tool: 'memory', params: {command: 'view', path: '/memories'}}",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "b608c586-0986-4f6c-a54f-923c74e2a317",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:02:43.898Z"
+        },
+        {
+          "name": "Verify discriminated union validation",
+          "details": "Add tests that verify: 1) invalid command values are rejected, 2) wrong parameters for a command are rejected (e.g., passing file_text to view command), 3) correct parameters for each command work as expected.",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "9e1babef-5b3f-4dd7-a953-b2ddf8d834ca",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:02:43.898Z"
+        },
+        {
+          "name": "Run test suite",
+          "details": "Run npm test to verify all tests pass with the new interface. All 59 tests should still pass.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "e0803dc9-e79b-4b77-a28a-cccc1344f9fc",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:03:29.704Z"
+        }
+      ],
+      "uuid": "64bd2a2c-9201-4354-ad04-e183ccb35f5e",
+      "created_at": "2025-10-15T20:53:08.887Z",
+      "updated_at": "2025-10-15T20:53:08.887Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Documentation Updates",
+      "details": "Update project documentation to reflect new unified tool interface",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Update README.md",
+          "details": "Update README.md examples to show single 'memory' tool with command parameter. Update tool usage examples and API documentation.",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "d02307ee-4f4b-413f-9ae3-8218e62cffb8",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:05:32.220Z"
+        },
+        {
+          "name": "Update ARCHITECTURE.md",
+          "details": "Update docs/ARCHITECTURE.md to explain the discriminated union schema design and how command dispatch works.",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "da686941-d157-430a-8247-425c757b8a49",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:07:10.204Z"
+        },
+        {
+          "name": "Update CLAUDE.md handoff",
+          "details": "Update SESSION HANDOFF section in /home/jan/projects/memory-mcp/CLAUDE.md to note the interface change and mark this refactor as complete.",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "e544a1ef-e78e-4027-9b68-4c44cab9899b",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:07:10.204Z"
+        }
+      ],
+      "uuid": "077ef256-0228-484c-93cb-1af140f2d91c",
+      "created_at": "2025-10-15T20:53:08.887Z",
+      "updated_at": "2025-10-15T20:53:08.887Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Build and Verify",
+      "details": "Compile, test, and verify the refactored implementation works correctly",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Run TypeScript compiler",
+          "details": "Run npm run build to verify TypeScript compilation succeeds with the new types and schema.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "f2a18002-de41-4a25-9602-a85263f5cb80",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:03:29.704Z"
+        },
+        {
+          "name": "Run linter",
+          "details": "Run npm run lint to check for any code quality issues introduced by the refactor.",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "3e7f0ee2-6142-4218-9d4e-5149ec4e02f8",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:05:32.220Z"
+        },
+        {
+          "name": "Manual smoke test",
+          "details": "Optionally test with MCP Inspector or Claude Code to verify the tool works correctly with the new interface. Check that command dispatch works and parameters are validated correctly.",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "52df246c-f043-4305-82fe-589b19c8cbd1",
+          "created_at": "2025-10-15T20:53:08.887Z",
+          "updated_at": "2025-10-15T21:07:57.274Z"
+        }
+      ],
+      "uuid": "aebf0e2a-b455-4f87-bc25-8a39f550cc37",
+      "created_at": "2025-10-15T20:53:08.887Z",
+      "updated_at": "2025-10-15T20:53:08.887Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-10-15T20:53:08.887Z",
+  "updated_at": "2025-10-15T21:08:03.368Z"
+}

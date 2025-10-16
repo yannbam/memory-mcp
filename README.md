@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/janbam/memory-mcp/workflows/CI/badge.svg)](https://github.com/janbam/memory-mcp/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-59%20passing-success)](./test)
+[![Tests](https://img.shields.io/badge/tests-61%20passing-success)](./test)
 
 MCP server implementation of Claude's native memory tool for persistent storage across conversations.
 
@@ -121,22 +121,33 @@ memory-mcp --debug
 memory-mcp -m /var/memories -t http -p 3000 -d
 ```
 
-## Memory Commands
+## Memory Tool
+
+The server exposes a single unified **`memory`** tool with a `command` parameter that determines the operation.
+
+This matches the [official Anthropic Memory tool specification](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool).
 
 ### view
 Show directory contents or file contents with optional line ranges.
 
 ```typescript
 // View directory
-await memory_view({ path: "/memories" })
+await memory({
+  command: "view",
+  path: "/memories"
+})
 // → "Directory: /memories\n- notes.txt\n- ideas/"
 
 // View file
-await memory_view({ path: "/memories/notes.txt" })
+await memory({
+  command: "view",
+  path: "/memories/notes.txt"
+})
 // → "   1: First note\n   2: Second note"
 
 // View specific lines
-await memory_view({
+await memory({
+  command: "view",
   path: "/memories/notes.txt",
   view_range: [2, 5]
 })
@@ -147,7 +158,8 @@ await memory_view({
 Create or overwrite files (creates parent directories as needed).
 
 ```typescript
-await memory_create({
+await memory({
+  command: "create",
   path: "/memories/todo.txt",
   file_text: "- Task 1\n- Task 2"
 })
@@ -158,7 +170,8 @@ await memory_create({
 Replace unique text in a file (text must appear exactly once).
 
 ```typescript
-await memory_str_replace({
+await memory({
+  command: "str_replace",
   path: "/memories/notes.txt",
   old_str: "old value",
   new_str: "new value"
@@ -170,7 +183,8 @@ await memory_str_replace({
 Insert text at a specific line number.
 
 ```typescript
-await memory_insert({
+await memory({
+  command: "insert",
   path: "/memories/todo.txt",
   insert_line: 2,
   insert_text: "- Urgent task"
@@ -182,10 +196,16 @@ await memory_insert({
 Delete files or directories (recursive for directories).
 
 ```typescript
-await memory_delete({ path: "/memories/old-notes.txt" })
+await memory({
+  command: "delete",
+  path: "/memories/old-notes.txt"
+})
 // → "File deleted: /memories/old-notes.txt"
 
-await memory_delete({ path: "/memories/archive" })
+await memory({
+  command: "delete",
+  path: "/memories/archive"
+})
 // → "Directory deleted: /memories/archive"
 ```
 
@@ -193,7 +213,8 @@ await memory_delete({ path: "/memories/archive" })
 Rename or move files/directories (creates parent directories as needed).
 
 ```typescript
-await memory_rename({
+await memory({
+  command: "rename",
   old_path: "/memories/draft.txt",
   new_path: "/memories/final.txt"
 })
@@ -265,14 +286,14 @@ npm run build
 ### Testing
 
 ```bash
-npm test                 # Run all tests (59 passing)
+npm test                 # Run all tests (61 passing)
 npm run test:coverage    # Run with coverage report (80%+ target)
 npm run test:watch       # Watch mode
 ```
 
 **Test Coverage**:
 - 27 path security tests (directory traversal attacks)
-- 32 memory operations tests (all 6 commands + edge cases)
+- 34 memory operations tests (all 6 commands + edge cases)
 
 ### Linting
 
@@ -365,5 +386,6 @@ Contributions welcome! Please:
 
 **Status**: ⚠️ Core Implementation Complete - Needs Integration Testing
 **Version**: 0.1.0
-**Tests**: 59/59 passing (unit tests only)
+**Tests**: 61/61 passing (unit tests only)
+**Interface**: Unified `memory` tool matching official Anthropic spec
 **Next Step**: Manual testing with MCP Inspector and Claude Code
