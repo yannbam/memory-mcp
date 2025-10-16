@@ -1,0 +1,372 @@
+{
+  "uuid": "76b79158-7841-426d-a09a-a52b810573ed",
+  "name": "memory-mcp-integration-testing",
+  "details": "Comprehensive integration testing of memory-mcp server using MCP-Debug tool. Testing all 6 memory commands (view, create, str_replace, insert, delete, rename) with both success and failure cases, verifying concurrency behavior with RW locks, and validating security measures.",
+  "tasks": [
+    {
+      "name": "Setup",
+      "details": "Build project, verify MCP-Debug tool is available, prepare test environment",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Build project",
+          "details": "Run npm run build to ensure latest code is compiled",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "d63d1fe1-846d-42ef-9f39-3bc2ae03130c",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:41:04.694Z"
+        },
+        {
+          "name": "Check MCP-Debug availability",
+          "details": "Verify mcp__MCP-Debug tools are accessible",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "d2236438-5227-4b1f-b562-feb616d7217c",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:41:12.299Z"
+        }
+      ],
+      "uuid": "2881ec53-2457-4bf4-bae4-94cca65cfa30",
+      "created_at": "2025-10-16T12:40:45.276Z",
+      "updated_at": "2025-10-16T12:40:45.276Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Connection Testing",
+      "details": "Test connection to memory-mcp server via stdio transport",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Connect to server",
+          "details": "Use MCP-Debug connect tool to spawn memory-mcp process",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "411f6d7b-52a7-491d-9cba-d1babe5db87f",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:41:19.429Z"
+        },
+        {
+          "name": "Initialize connection",
+          "details": "Send initialize request and verify handshake",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "284a2a8f-7e33-49f0-b901-4c941b086a1b",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:41:26.747Z"
+        },
+        {
+          "name": "List tools",
+          "details": "Verify memory tool is available with correct schema",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "c6882208-4d64-482d-99ec-9c7f312c8286",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:04:45.089Z"
+        }
+      ],
+      "uuid": "05fb7d53-404b-4701-a317-4394a117de9a",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "View Command Testing",
+      "details": "Test view command for directories and files, with and without line ranges",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Test directory view",
+          "details": "View root /memories directory",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "56d64a5f-b58e-4896-9cf3-bdf9f13f328a",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Test file view",
+          "details": "View a file with optional line range",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "6c3551cc-520f-4773-89c1-e1139106c36c",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Test non-existent path",
+          "details": "Verify appropriate error for non-existent paths",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "e448d95f-b7c0-41e7-b3bb-14c69ed5817e",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        }
+      ],
+      "uuid": "dcaa597d-d331-45be-ba4c-180ca38ca6dc",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 67
+    },
+    {
+      "name": "Create Command Testing",
+      "details": "Test file creation and overwriting",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Create new file",
+          "details": "Create a test file in /memories",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "7c1db4da-fafb-4d00-b1cc-f388fe3f1eca",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Overwrite existing file",
+          "details": "Verify create overwrites existing content",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "ecf37b23-34fe-4b71-b2f7-651d6e4671fc",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        },
+        {
+          "name": "Create in subdirectory",
+          "details": "Test creating files in nested paths",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "d35ae8be-f80b-490d-a5e9-8e23736771f2",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        }
+      ],
+      "uuid": "ee1a5f04-55d7-4118-99a5-e0bb6fd90b8b",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 33
+    },
+    {
+      "name": "String Replace Testing",
+      "details": "Test str_replace command for unique and non-unique text",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Replace unique text",
+          "details": "Test replacing text that appears once",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "95aa39d8-8dfb-491a-8393-5782433d07a6",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Test non-unique error",
+          "details": "Verify error when text appears multiple times",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "0509c517-7f78-410d-a67d-6469b249687c",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Test text not found",
+          "details": "Verify error when old_str doesn't exist",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "aa777b8a-6503-466c-95a9-918eb3f033d8",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        }
+      ],
+      "uuid": "91234a59-6190-44b9-b6b9-c2570eae699a",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 67
+    },
+    {
+      "name": "Insert Command Testing",
+      "details": "Test insert command at various line positions",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Insert at beginning",
+          "details": "Insert text at line 0",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "aef3f2c4-908c-431f-baa8-31c34999db3c",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        },
+        {
+          "name": "Insert in middle",
+          "details": "Insert text at a middle line",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "cda5ec75-b361-4ee6-822e-408c392c6556",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Insert at end",
+          "details": "Insert beyond last line",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "faa30890-9eae-4701-bdd5-8651cfda6ed6",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        }
+      ],
+      "uuid": "4e32e745-98a0-4671-94b7-68da5260e306",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 33
+    },
+    {
+      "name": "Delete Command Testing",
+      "details": "Test deleting files and directories",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Delete file",
+          "details": "Delete a test file",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "572790c8-4094-47ed-b99a-c8809b79e2ab",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Delete directory",
+          "details": "Delete an empty directory",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "4003366c-72ce-46c3-99ab-8c841078d34a",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        },
+        {
+          "name": "Delete non-empty directory",
+          "details": "Delete directory with contents (recursive)",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "4b933ffa-7b0f-4387-a83f-1b7cf648d76e",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        }
+      ],
+      "uuid": "a2b752a1-e116-4cdd-8c7d-839d892fa9fa",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 33
+    },
+    {
+      "name": "Rename Command Testing",
+      "details": "Test rename command for files and directories, including atomic locking",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Rename file",
+          "details": "Rename a test file",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "51b34e05-1405-4ed0-86b7-d292c029fb2c",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Rename directory",
+          "details": "Rename a directory",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "a8d7d84a-d2e9-4504-bd20-20a4fe31b542",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        },
+        {
+          "name": "Test destination exists error",
+          "details": "Verify error when destination already exists",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "de5268a3-0a64-490a-bd6a-c5e9172ad7c6",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        }
+      ],
+      "uuid": "26fa44a2-c903-4fd0-a8a2-cd460ca573b1",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 67
+    },
+    {
+      "name": "Security Testing",
+      "details": "Verify path traversal protection",
+      "status": "in_progress",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Test directory traversal",
+          "details": "Attempt to access paths outside /memories",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "a83f489a-50c7-486e-b705-f2b07fa5065b",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:09:12.189Z"
+        },
+        {
+          "name": "Test encoded traversal",
+          "details": "Test URL-encoded path traversal attempts",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "a0503520-fd6b-49e1-b1ac-cc066006ce19",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        }
+      ],
+      "uuid": "9bba9756-083c-44ad-8012-566eed1dd73c",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 50
+    },
+    {
+      "name": "Documentation",
+      "details": "Document test results and findings",
+      "status": "in_progress",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Document findings",
+          "details": "Create summary of integration test results",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "c8aed636-e24c-46a9-ba86-52ff803a40c4",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T13:14:07.785Z"
+        },
+        {
+          "name": "Update handoff",
+          "details": "Update CLAUDE.md with integration test status",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "3740bc2d-bf71-4257-88e7-8aefda8cf0fd",
+          "created_at": "2025-10-16T12:40:45.277Z",
+          "updated_at": "2025-10-16T12:40:45.277Z"
+        }
+      ],
+      "uuid": "4344095c-e8cb-459f-8297-0379aa8a842e",
+      "created_at": "2025-10-16T12:40:45.277Z",
+      "updated_at": "2025-10-16T12:40:45.277Z",
+      "completion_percentage": 50
+    }
+  ],
+  "created_at": "2025-10-16T12:40:45.277Z",
+  "updated_at": "2025-10-16T13:25:24.862Z"
+}
