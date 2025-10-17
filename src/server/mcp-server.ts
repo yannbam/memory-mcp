@@ -89,13 +89,17 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
   server.registerTool(
     'memory',
     {
-      title: 'Memory Operations',
+      title: 'memory',
       description:
+        'File-based memory storage tool' +
         'Perform memory operations with command parameter: ' +
         'view (show directory/file contents), create (create/overwrite file), ' +
         'str_replace (replace unique text in file), insert (insert text at line), ' +
         'delete (remove file/directory), rename (move/rename file/directory). ' +
-        'The command field determines which parameters are required.',
+        'The command field determines which parameters are required.' +
+        'Path must start with /memories/' +
+        'Claude MUST call memory(command: "view", path: "/memories") at the VERY BEGINNING of EVERY conversation' +
+        'Claude MUST use the memory tool *proactively* and *regularly* to read and write important facts and insights into persistent memory shared across all conversations!',
       inputSchema: {
         command: z.enum(['view', 'create', 'str_replace', 'insert', 'delete', 'rename']),
         path: z.string().optional(),
