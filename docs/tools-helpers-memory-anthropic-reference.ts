@@ -1,3 +1,15 @@
+/**
+ * Reference Implementation from Anthropic
+ *
+ * Source: Anthropic's internal memory tool implementation
+ * GitHub: https://github.com/anthropics/anthropic-sdk-typescript
+ *
+ * This is the original TypeScript reference implementation that
+ * inspired this MCP server. Kept for reference and comparison.
+ *
+ * Original file: tools/helpers/memory.ts (Anthropic codebase)
+ */
+
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import Anthropic from '@anthropic-ai/sdk';

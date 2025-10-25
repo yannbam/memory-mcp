@@ -1,6 +1,6 @@
 # Memory MCP Server
 
-[![CI](https://github.com/janbam/memory-mcp/workflows/CI/badge.svg)](https://github.com/janbam/memory-mcp/actions)
+[![CI](https://github.com/yannbam/memory-mcp/workflows/CI/badge.svg)](https://github.com/yannbam/memory-mcp/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-85%20passing-success)](./test)
 
@@ -44,37 +44,42 @@ node dist/index.js --memory-root-path ~/my-memories --debug
 
 ### As MCP Server for Claude Code
 
-Add to your Claude Code `.mcp.json` configuration:
+Add to your Claude Code `.mcp.json` configuration. Two common setups:
 
+**1. Local Project Memory** (for a specific project):
 ```json
 {
   "mcpServers": {
-    "memory": {
+    "project_memory": {
       "command": "node",
-      "args": ["/absolute/path/to/memory-mcp/dist/index.js"],
+      "args": ["./dist/index.js", "--tree-view"],
       "env": {}
     }
   }
 }
 ```
+Uses relative path, stores memory in `./.memory/memories/` within the project. Great for project-specific documentation.
 
-With custom memory root:
-
+**2. Global System Memory** (shared across all projects):
 ```json
 {
   "mcpServers": {
-    "memory": {
+    "system_memory": {
       "command": "node",
       "args": [
         "/absolute/path/to/memory-mcp/dist/index.js",
         "--memory-root-path",
-        "/home/user/.my-memories"
+        "/home/user/.memories",
+        "--tree-view"
       ],
       "env": {}
     }
   }
 }
 ```
+Uses absolute path with custom memory root. Shared memory accessible from any Claude Code session.
+
+**Note**: This repository includes a working `.mcp.json` and `.memory/` directory as examples of dogfooding the memory system.
 
 ### As Standalone HTTP Server
 
@@ -306,7 +311,7 @@ Filesystem paths: `<memory-root>/memories/notes.txt`
 ### Setup
 
 ```bash
-git clone https://github.com/janbam/memory-mcp.git
+git clone https://github.com/yannbam/memory-mcp.git
 cd memory-mcp
 npm install
 npm run build
@@ -405,17 +410,31 @@ Each server instance gets a unique log file for multi-instance debugging.
 - Actual with RW locks: 85ms
 - Speedup: 38x
 
+## Future npm Package
+
+This package is configured for npm publication as **`@yannbam/memory-mcp`** but is not yet published. Currently distributed via GitHub.
+
+To prepare for future npm installation:
+```bash
+npm install @yannbam/memory-mcp
+```
+
+Stay tuned for the official npm release!
+
 ## License
 
-MIT
+MIT - See [LICENSE](./LICENSE) for details
 
 ## Contributing
 
 Contributions welcome! Please:
-1. Follow existing code style (e/code conventions)
-2. Add tests for new features
-3. Update documentation
-4. Ensure all tests pass
+1. Fork the repository and create a feature branch
+2. Follow existing code style (e/code conventions from CLAUDE.md)
+3. Add tests for new features (maintain 80%+ coverage)
+4. Update documentation as needed
+5. Ensure all tests pass (`npm test`)
+6. Run linting (`npm run lint`)
+7. Submit a pull request with clear description
 
 ## Acknowledgments
 
@@ -425,9 +444,8 @@ Contributions welcome! Please:
 
 ---
 
-**Status**: ✅ Production Ready (E2E Tested)
-**Version**: 0.1.0
+**Status**: 🚀 Public Beta (v0.1.0) - Production Ready
 **Tests**: 85/85 unit tests + integration tests + E2E validation with Claude Code
 **Interface**: Unified `memory` tool matching official Anthropic spec
 **Features**: All 6 commands + tree view + true RW locks (38x speedup)
-**Next Step**: Merge to main, publish to npm
+**Repository**: https://github.com/yannbam/memory-mcp

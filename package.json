@@ -1,11 +1,25 @@
 {
-  "name": "memory-mcp",
+  "name": "@yannbam/memory-mcp",
   "version": "0.1.0",
   "description": "MCP server implementation of Claude's native memory tool for persistent storage across conversations",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
     "memory-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yannbam/memory-mcp.git"
+  },
+  "homepage": "https://github.com/yannbam/memory-mcp",
+  "bugs": {
+    "url": "https://github.com/yannbam/memory-mcp/issues"
   },
   "scripts": {
     "build": "tsc",

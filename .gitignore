@@ -41,6 +41,7 @@ temp/
 # .plans/
 .notes/
 
-# Memory storage (actual memory data, not the code)
-/.memory/
+# Memory storage
+# Note: .memory/ is committed as example of our own memory system (dogfooding)
+# /memory/ prevents accidental commits of user memory when testing
 /memory/
