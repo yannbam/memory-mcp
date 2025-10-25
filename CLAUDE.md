@@ -358,3 +358,85 @@ node dist/index.js --transport http --port 3000
    - Stop updating CLAUDE.md every session (only when static content changes)
 
 **Philosophy Change**: CLAUDE.md becomes stable reference, memory system handles session-to-session info.
+
+---
+[the whole memory section needs to be improved!!]
+
+## Memory 
+
+**Use project memory PROACTIVELY throughout development!**
+
+### Memory Philosophy
+
+Memory is numbered and **line-based** for easy editing - each line is an independent fact.
+Use memory("cmd": "add") [cont...]
+
+
+Memory captures **evolving reality** discovered during development - NOT static documentation (that's in docs/).
+
+### What Goes Where
+
+[needs to be corrected! this is backwards]
+**short-term.md** - Session context and handoff:
+- Current session info, what was done, what's next
+- Active tasks and immediate blockers
+- Quick freeform notes
+- Updated at **END of session**
+
+**long-term.md** - Cross-session wisdom:
+- Architecture insights (design discoveries, validation results)
+- Performance measurements (actual vs expected)
+- Runtime behavior (execution quirks, edge cases)
+- MCP SDK quirks and workarounds
+- Common mistakes (what NOT to try again!)
+- Proven patterns (what WORKS)
+- Testing insights, workflow commands
+- Updated **DURING session** when discovering important things
+
+### Critical Rules
+
+**PRESERVE structure**:
+- Never modify or delete section headers (lines starting with `##`)
+- Never modify or delete italic descriptions (lines with `_text_`)
+- These are template instructions that persist across sessions
+
+**ADD sections when needed**:
+- You CAN add new sections if discoveries don't fit existing ones
+- New sections must have: header (`## Name`) + italic description (`_what goes here_`)
+
+**Edit content effectively**:
+- Use `str_replace` for updating specific lines
+- Each line is an independent fact
+- Be specific: include file paths, function names, exact errors, numbers
+- Remove outdated information when reality changes
+
+**Avoid duplication**:
+- Don't duplicate README.md or docs/ content
+- Memory is for **discovered reality**, not planned architecture
+
+### When to Update
+
+**During work**:
+- Use short-term.md as scratchpad for active session
+
+- Add discoveries to long-term.md immediately
+
+**End of session**:
+- Review short-term discoveries - what's worth keeping forever?
+- Transfer important findings to long-term.md
+- Update short-term.md handoff for next session
+- Clean up outdated entries in both files
+
+---
+
+## Project Memory
+
+**Session handoff and current context**: See `short-term.md` below
+**Evolving development discoveries**: See `long-term.md` below
+
+DO NOT EDIT MEMORY IN THIS FILE - USE THE project_memory TOOL INSTEAD.
+
+## <project_memory>
+@.memory/memories/short-term.md
+@.memory/memories/long-term.md
+</project_memory>
