@@ -323,6 +323,38 @@ node dist/index.js --transport http --port 3000
 
 ---
 
-**Last Updated**: 2025-10-16 (Session: 874e17d6-aa8b-4234-9f5b-004fddb4cbb6)
-**Status**: ✅ **PRODUCTION READY** - E2E tested, PR created, ready for merge
-**Next Session**: Merge PR #3 to main, publish to npm
+**Last Updated**: 2025-10-25 (Session: 36ff98ba-97e8-4c1b-a9b2-92918fbe0395)
+**Status**: 🔄 **PREPARING PUBLIC BETA RELEASE** - v0.1.0
+
+## 🔄 Session Handoff
+
+**Current Task**: Preparing repository for public beta release
+
+**Plan**: View plan "public-release-beta" (39 tasks, 8 phases)
+- Phase 1: Adopt Memory System (URGENT - dogfood our own tool!)
+- Phase 2: Configure MCP for Project
+- Phase 3: Repository Cleanup
+- Phase 4: Documentation Updates
+- Phase 5: Prepare for npm (@yannbam/memory-mcp - don't publish yet)
+- Phase 6: Optional Professional Touches
+- Phase 7: Pre-Release Verification
+- Phase 8: Comprehensive Code Review
+
+**Key Decisions Made**:
+- ✅ Actually USE memory-mcp to document memory-mcp (dogfooding)
+- ✅ Commit .memory/ and .mcp.json as living examples
+- ✅ Add .mcp.example.json for users to copy
+- ✅ Public beta (v0.1.0) without npm publish yet
+- ✅ Scoped package: @yannbam/memory-mcp
+- ✅ Rename reference file to tools-helpers-memory-anthropic-reference.ts
+
+**Next Session TODO**:
+1. Start Phase 1: Study ~/projects/mcp-ts-api/.memory/ structure
+2. Create our own .memory/memories/ with architecture/, development/, releases/
+3. Restructure this CLAUDE.md:
+   - Remove README.md duplications
+   - Split into: Static section + Memory @ references
+   - Move handoff to .memory/memories/short-term/
+   - Stop updating CLAUDE.md every session (only when static content changes)
+
+**Philosophy Change**: CLAUDE.md becomes stable reference, memory system handles session-to-session info.

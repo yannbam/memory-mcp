@@ -1,0 +1,327 @@
+{
+  "uuid": "3c183d3f-7b65-44a7-b4b6-f40c2caaee16",
+  "name": "public-release-prep",
+  "details": "Comprehensive plan for preparing memory-mcp repository for clean public release. This includes setting up proper memory system, cleanup, documentation updates, licensing, and final review.\n\nThe repo will serve dual purposes:\n1. Production-ready MCP server for public use\n2. Example of best practices for using memory-mcp in Claude Code projects\n\nTarget: Ready for npm publish and GitHub release",
+  "tasks": [
+    {
+      "name": "Setup Project Memory System",
+      "details": "Transform this repo into an example of memory-mcp usage. Create ./.project_memory/ with organized structure demonstrating best practices. Document architecture decisions, development patterns, and project knowledge.\n\nReference: ~/projects/mcp-ts-api/ as template for structure and organization.",
+      "status": "pending",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Create memory directory structure",
+          "details": "Set up ./.project_memory/memories/ with logical hierarchy:\n- architecture/ - Design decisions, patterns\n- development/ - Dev workflow, conventions\n- testing/ - Test strategies, results\n- releases/ - Version history, milestones",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "b1d86723-dcfb-471f-8855-de8f531bced3",
+          "created_at": "2025-10-25T15:54:39.128Z",
+          "updated_at": "2025-10-25T15:54:39.128Z"
+        },
+        {
+          "name": "Document architecture decisions",
+          "details": "Create architecture/*.md files documenting:\n- RW lock design rationale\n- Unified tool interface decision\n- Path security approach\n- Transport choices (stdio vs HTTP)",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "b7660b16-47da-4485-9165-3bd97c160da0",
+          "created_at": "2025-10-25T15:54:39.128Z",
+          "updated_at": "2025-10-25T15:54:39.128Z"
+        },
+        {
+          "name": "Document development patterns",
+          "details": "Create development/*.md files covering:\n- TypeScript + ESM setup\n- Testing strategy (unit + integration + E2E)\n- e/code commenting conventions used\n- Linting and code quality standards",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "f7513458-9aee-4d2c-a57a-71940889b800",
+          "created_at": "2025-10-25T15:54:39.128Z",
+          "updated_at": "2025-10-25T15:54:39.128Z"
+        },
+        {
+          "name": "Update project .mcp.json",
+          "details": "Configure project to use its own memory system:\n- Add project_memory instance pointing to ./.project_memory\n- Keep as example in README\n- Document in CLAUDE.md",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "f515d31c-c245-450c-b3b5-55212d063ebd",
+          "created_at": "2025-10-25T15:54:39.128Z",
+          "updated_at": "2025-10-25T15:54:39.128Z"
+        }
+      ],
+      "uuid": "076fd31b-2644-42ee-a7b9-ba799430de43",
+      "created_at": "2025-10-25T15:54:39.128Z",
+      "updated_at": "2025-10-25T15:54:39.128Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Repository Cleanup",
+      "details": "Remove test artifacts, temporary files, and development clutter. Ensure only production-relevant files remain while keeping important development infrastructure (tests, CI, docs).",
+      "status": "pending",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Clean test artifacts",
+          "details": "Remove/clean:\n- .memory/ directory (test data from E2E)\n- .notes/ directory (empty)\n- .state/ directory (empty)\n- Move INTEGRATION-TEST-RESULTS.md to docs/ or remove\n- coverage/ already gitignored",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "cb13754a-653f-4c1a-b8df-6b3e2919fcd1",
+          "created_at": "2025-10-25T15:54:39.128Z",
+          "updated_at": "2025-10-25T15:54:39.128Z"
+        },
+        {
+          "name": "Audit .gitignore completeness",
+          "details": "Ensure .gitignore covers:\n- ✅ node_modules, dist, coverage (already covered)\n- ✅ .notes, .state (already listed as .notes/)\n- Verify .project_memory should be gitignored\n- Add any missing patterns",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "9aa9d914-079c-4cf6-819c-f2ff26c9d2d3",
+          "created_at": "2025-10-25T15:54:39.128Z",
+          "updated_at": "2025-10-25T15:54:39.128Z"
+        },
+        {
+          "name": "Clean .plans directory",
+          "details": "Review archived plans:\n- Keep archived/ structure (shows development history)\n- Ensure no sensitive info in plan files\n- Current plan will be archived at session end",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "80aa0dd4-8b30-4913-9dbd-75f62bfa844e",
+          "created_at": "2025-10-25T15:54:39.128Z",
+          "updated_at": "2025-10-25T15:54:39.128Z"
+        }
+      ],
+      "uuid": "aa93ebc6-c809-4b83-84f7-4c262e057cc8",
+      "created_at": "2025-10-25T15:54:39.128Z",
+      "updated_at": "2025-10-25T15:54:39.128Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Fix System-Specific Hardcoding",
+      "details": "Audit codebase for machine-specific paths, user names, or configurations. Ensure everything uses relative paths or environment variables.",
+      "status": "pending",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Audit source code paths",
+          "details": "Search for hardcoded paths in src/:\n- ✅ Already verified: no /home/ paths\n- ✅ Default memoryRoot already relative: ./.memory\n- Verify debug log path /tmp/memory-mcp/ is acceptable\n- Check for any username references",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "479563e3-33d8-49b9-969c-c34d4a910dfa",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Audit configuration files",
+          "details": "Check:\n- .mcp.json has /home/jan/ paths - update to relative example\n- package.json metadata - looks good\n- tsconfig.json - check for absolute paths",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "680f74aa-0ff7-4a71-8493-55c4db10ce4c",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Audit documentation",
+          "details": "Search docs and README for:\n- /home/user/ examples (already present - verify they're generic)\n- System-specific instructions\n- Machine-specific assumptions",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "9ff5eee6-d36c-46a1-af0c-8d9a7397d4a3",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        }
+      ],
+      "uuid": "0a1b38e3-874a-4537-88c2-3b2716db721c",
+      "created_at": "2025-10-25T15:54:39.129Z",
+      "updated_at": "2025-10-25T15:54:39.129Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Documentation Updates",
+      "details": "Ensure all documentation is accurate, complete, and polished for public release. Add missing files and improve existing ones.",
+      "status": "pending",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Update README.md",
+          "details": "Enhancements:\n- Add project-specific .mcp.json example (project_memory vs system_memory)\n- Clarify default path is relative ./.memory\n- Show both local project and global ~/.claude.json examples\n- Add npm installation instructions (once published)\n- Verify all examples are accurate\n- Polish contributing section",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "4f075193-733f-4dbb-be52-a482520da38b",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Create LICENSE file",
+          "details": "Add MIT license file (license already declared in package.json).\nInclude:\n- Standard MIT license text\n- Copyright: Claude (claude-sonnet-4-5-20250929) with janbam\n- Year: 2025",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "a0df0d79-1cfc-4c56-96e8-0dd6e1a58cb0",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Create CHANGELOG.md",
+          "details": "Document version history:\n- v0.1.0 (current) - Initial release\n  - All 6 memory commands\n  - Tree view mode\n  - RW locks (38x speedup)\n  - stdio and HTTP transports\n  - Path security (27 tests)\n  - Production ready (85 tests + E2E)\n- Keep format for future updates",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "45fb2cf1-dda9-40b6-a3d0-2b5ff11da874",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Update CLAUDE.md",
+          "details": "Prepare CLAUDE.md for public repo:\n- Keep project overview and architecture\n- Keep technical details (useful for contributors)\n- Update session handoff to be more general\n- Ensure nothing overly personal/internal\n- Keep e/code and e/coll references (good practices)\n- Update 'Next Steps' to reflect public release status",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "229ee6eb-4642-4446-bf8a-fd905e3195d9",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Verify docs/ accuracy",
+          "details": "Review all files in docs/:\n- 039-Memory-tool.md (official spec - keep as-is)\n- ARCHITECTURE.md - verify accuracy\n- LOCKING-REDESIGN.md - verify accuracy\n- MCP-SDK-README.md (reference - keep)\n- tools-helpers-memory.ts (reference - keep or remove?)",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "e8b4ab94-2ac8-4661-86a5-a108138d07ec",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        }
+      ],
+      "uuid": "934301cf-814b-4ab0-8d06-1e4821abe41d",
+      "created_at": "2025-10-25T15:54:39.129Z",
+      "updated_at": "2025-10-25T15:54:39.129Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Optional Professional Touches",
+      "details": "Additional files that improve project professionalism and community engagement. Optional but recommended for open source projects.",
+      "status": "pending",
+      "priority": "low",
+      "sub_tasks": [
+        {
+          "name": "Create CONTRIBUTING.md",
+          "details": "Contribution guidelines:\n- How to set up development environment\n- Code style (e/code conventions)\n- Testing requirements\n- PR process\n- Issue reporting",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "40622dad-7477-4622-a556-b2df8ad16129",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Add GitHub templates",
+          "details": "Create .github/ templates:\n- ISSUE_TEMPLATE.md\n- PULL_REQUEST_TEMPLATE.md\n- SECURITY.md (vulnerability reporting)\nOptional: CODE_OF_CONDUCT.md",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "30618132-ff9b-49a6-aa76-a2e7fab6d64d",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Add npm badge and links",
+          "details": "Once published to npm:\n- Add npm version badge to README\n- Add npm download stats badge\n- Update installation instructions with npm command",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "9a26c980-bdae-4c45-9ed6-5d3e8f1c3302",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        }
+      ],
+      "uuid": "464ff52e-71a6-41db-9352-67bd76e7485d",
+      "created_at": "2025-10-25T15:54:39.129Z",
+      "updated_at": "2025-10-25T15:54:39.129Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Pre-Release Verification",
+      "details": "Final checks before public release. Ensure everything works, builds, tests pass, and code quality is high.",
+      "status": "pending",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run full test suite",
+          "details": "Verify all tests pass:\n- npm test (85 unit tests)\n- npm run test:coverage (verify 80%+ coverage)\n- Integration tests\n- Lint checks (npm run lint)",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "f73ffb25-c701-4c13-8c8d-d7f51bb4727f",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Test build process",
+          "details": "Verify clean build:\n- rm -rf dist/\n- npm run build\n- Verify dist/ structure\n- Test running: node dist/index.js --help",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "5d3efb82-0b49-4fa2-887b-671ac056b4f7",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Verify package.json metadata",
+          "details": "Check for npm publish:\n- version, description, keywords ✅\n- repository field (add GitHub URL)\n- homepage field (add GitHub URL)\n- bugs field (add GitHub issues URL)\n- Verify files field or .npmignore",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "67665c9f-d323-4db0-bc92-5681b35b2fa8",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Security audit",
+          "details": "Run security checks:\n- npm audit (check for vulnerabilities)\n- Review dependencies for security issues\n- Verify path security tests are comprehensive",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "c2f7413e-9763-4c1c-bada-5ad91150340d",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        }
+      ],
+      "uuid": "8255d17b-99f4-4f19-ae22-7d27c18edd9d",
+      "created_at": "2025-10-25T15:54:39.129Z",
+      "updated_at": "2025-10-25T15:54:39.129Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Comprehensive PR Review",
+      "details": "Use PR review agents to audit the entire repository for issues, inconsistencies, and improvements before final release.",
+      "status": "pending",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run code-reviewer agent",
+          "details": "Review entire codebase for:\n- Code quality issues\n- Style violations\n- Potential bugs\n- Best practice adherence\nFocus on src/ directory",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "de504f18-1d42-4a2d-b84a-34cb0c044a60",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Run type-design-analyzer",
+          "details": "Review TypeScript types for:\n- Proper encapsulation\n- Strong invariants\n- Type safety\n- API design quality",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "085f165e-1b16-4a19-ba85-7bf94dce720b",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Run comment-analyzer",
+          "details": "Review code comments for:\n- Accuracy\n- Completeness\n- Avoiding technical debt\n- Documentation quality",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "9eebb5a5-942a-43fa-8352-ce24f63e0d1a",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        },
+        {
+          "name": "Final manual review",
+          "details": "Human review of:\n- README clarity for new users\n- Installation instructions completeness\n- Example accuracy\n- Overall polish and professionalism",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "2cb4792c-4b7d-4733-8f95-f36840d8a747",
+          "created_at": "2025-10-25T15:54:39.129Z",
+          "updated_at": "2025-10-25T15:54:39.129Z"
+        }
+      ],
+      "uuid": "77f9cf94-d890-492d-96ed-244829994bc0",
+      "created_at": "2025-10-25T15:54:39.129Z",
+      "updated_at": "2025-10-25T15:54:39.129Z",
+      "completion_percentage": 0
+    }
+  ],
+  "created_at": "2025-10-25T15:54:39.129Z",
+  "updated_at": "2025-10-25T15:54:44.433Z"
+}
