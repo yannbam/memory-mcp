@@ -1,0 +1,494 @@
+{
+  "version": 3,
+  "session_id": "1761595236443-75uvjxnu",
+  "created_at": "2025-10-27T20:00:36.443Z",
+  "updated_at": "2025-10-27T20:04:57.795Z",
+  "model": "gpt-5",
+  "config": {
+    "reasoning_effort": "high",
+    "verbosity": "high"
+  },
+  "conversation": [
+    {
+      "timestamp": "2025-10-27T20:04:57.795Z",
+      "request": {
+        "model": "gpt-5",
+        "input": "I'm implementing an MCP (Model Context Protocol) server in TypeScript using @modelcontextprotocol/sdk v1.0.4 with Zod for schema validation.\n\n## My Challenge\n\nI need to implement a tool with a **top-level discriminated union** for its input schema. The tool has a `command` parameter that determines which other parameters are required:\n\n- When `command: \"view\"` → requires `path: string`, optional `view_range: [number, number]`\n- When `command: \"create\"` → requires `path: string`, `file_text: string`\n- When `command: \"str_replace\"` → requires `path: string`, `old_str: string`, `new_str: string`\n- When `command: \"insert\"` → requires `path: string`, `insert_line: number`, `insert_text: string`\n- When `command: \"delete\"` → requires `path: string`\n- When `command: \"rename\"` → requires `old_path: string`, `new_path: string` (note: different field name)\n\nThis is a classic discriminated union pattern where the discriminator field (`command`) determines the shape of the rest of the object.\n\n## The SDK Constraint I'm Working With\n\nThe MCP TypeScript SDK's `registerTool` method expects:\n```typescript\nregisterTool<InputArgs extends ZodRawShape>(\n    name: string,\n    config: {\n        inputSchema?: InputArgs;  // Type: { [key: string]: ZodTypeAny }\n    },\n    callback: ToolCallback<InputArgs>\n)\n```\n\nThe `inputSchema` parameter expects a `ZodRawShape` (a plain object of Zod types), which the SDK internally wraps with `z.object()`.\n\nHowever, I want to use Zod's discriminated union:\n```typescript\nz.discriminatedUnion('command', [\n    z.object({ command: z.literal('view'), path: z.string(), ... }),\n    z.object({ command: z.literal('create'), path: z.string(), file_text: z.string() }),\n    // etc.\n])\n```\n\nThis returns a `ZodDiscriminatedUnion`, not a `ZodRawShape`, so it doesn't fit the type signature.\n\n## What I Need\n\nI need to know **all possible approaches, patterns, workarounds, and techniques** for implementing a discriminated union as the top-level input schema for an MCP tool. This includes:\n\n1. **TypeScript/Zod techniques** - Are there ways to make a discriminated union conform to the expected types?\n2. **SDK patterns** - Are there undocumented or advanced patterns in the MCP SDK?\n3. **JSON Schema approaches** - Since MCP ultimately uses JSON Schema, can I work at that level?\n4. **Type system workarounds** - Can I satisfy the type checker while providing the runtime behavior I need?\n5. **Runtime schema manipulation** - Can I modify schemas after registration?\n6. **Alternative union patterns** - Are there other Zod union types that might work better?\n\n## Important Requirements\n\n- The tool MUST accept top-level command parameter (no wrapper objects like `{ params: { command: \"...\", ... } }`)\n- Each command variant should have proper validation (only required parameters for that command)\n- Ideally maintain TypeScript type safety in the callback\n- Should work with Claude Code as the MCP client\n- The resulting JSON Schema should properly represent the discriminated union\n\n## What I Don't Need\n\n- Suggestions to split into multiple tools (I'm specifically exploring unified tool patterns)\n- Suggestions to make all parameters optional (defeats the purpose of validation)\n\nPlease provide comprehensive technical approaches with code examples, including any creative or unconventional solutions. I want to explore all possibilities before deciding on an implementation.",
+        "instructions": "You are an expert in TypeScript, Zod schemas, MCP server development, JSON Schema, and type system manipulation. \n\nProvide a comprehensive analysis of ALL possible approaches to achieve a top-level discriminated union in an MCP tool input schema. Think creatively and exhaustively - include:\n\n1. Standard approaches\n2. Advanced TypeScript type system techniques  \n3. Runtime schema manipulation\n4. JSON Schema-level solutions\n5. SDK extension patterns\n6. Any unconventional or \"hacky\" approaches that might work\n\nFor each approach:\n- Explain the technique clearly\n- Provide concrete code examples\n- Analyze pros/cons\n- Note any risks or limitations\n- Indicate whether it maintains type safety\n\nSearch for any relevant MCP SDK documentation, GitHub issues, or community patterns that might inform this.",
+        "reasoning": {
+          "effort": "high"
+        },
+        "text": {
+          "verbosity": "high"
+        },
+        "tools": [
+          {
+            "type": "web_search"
+          }
+        ]
+      },
+      "response": {
+        "id": "resp_04daf86f43cfa8ba0068ffcf64dc2881948e390440cfa03597",
+        "object": "response",
+        "created_at": 1761595237,
+        "status": "completed",
+        "background": false,
+        "error": null,
+        "incomplete_details": null,
+        "instructions": "You are an expert in TypeScript, Zod schemas, MCP server development, JSON Schema, and type system manipulation. \n\nProvide a comprehensive analysis of ALL possible approaches to achieve a top-level discriminated union in an MCP tool input schema. Think creatively and exhaustively - include:\n\n1. Standard approaches\n2. Advanced TypeScript type system techniques  \n3. Runtime schema manipulation\n4. JSON Schema-level solutions\n5. SDK extension patterns\n6. Any unconventional or \"hacky\" approaches that might work\n\nFor each approach:\n- Explain the technique clearly\n- Provide concrete code examples\n- Analyze pros/cons\n- Note any risks or limitations\n- Indicate whether it maintains type safety\n\nSearch for any relevant MCP SDK documentation, GitHub issues, or community patterns that might inform this.",
+        "max_output_tokens": null,
+        "max_tool_calls": null,
+        "model": "gpt-5-2025-08-07",
+        "output": [
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcf6692c08194b90bac3f10c34dfc",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Exploring coding approaches**\n\nI need to provide code examples, and I’m considering a few approaches. One option is \"z.custom<...>({})\", which isn't typical. Another is using 'registerTool' with generics to bypass types, but that complicates validation since we want JSON Schema for clients. I could also explore using 'oneOf' at the JSON Schema level for inputSchema, but the SDK expects ZodRawShape. It seems I'll have to inspect the SDK code and check the MCP SDK v1.0.4 'registerTool' API for clarity."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Checking input schema types**\n\nI need to verify if 'inputSchema' should be typed as ZodRawShape, but it seems like they also accept an object or z.ZodTypeAny. Maybe they do support \"inputSchema: z.object({...})\" since their description mentions expecting a plain object shape. I should also check if later versions allow 'inputSchema: z.union([...])' at the top level. If v1.0.4 requires a raw shape, maybe upgrading would help. Another approach is to provide 'inputSchema' as a plain object and use refine logic to enforce specific requirements."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Assessing callback types and JSON Schema**\n\nI see that the callback types might not be discriminated, but I can implement typed narrowing by parsing to the discriminated union schema within the callback. This way, I can maintain type safety. However, the JSON Schema could end up showing an optional superset, which might mislead clients about required fields since refine rules may not be included. They’ll rely on server validation, and I need to ensure the JSON Schema accurately represents the discriminated union. I wonder if MCP's JSON Schema supports 'oneOf' with a discriminator."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Examining SDK and Zod integration**\n\nThe SDK uses a Zod to JSON Schema translator, where 'z.discriminatedUnion' translates to 'oneOf' with 'const' for discriminators. Ideally, I would like to pass a top-level Zod discriminated union to the 'inputSchema' field. However, since the SDK's 'registerTool' function expects ZodRawShape, I was considering using 'as any' to get around that. But if I supply a ZodDiscriminatedUnion instead of a plain shape, that could lead to issues at runtime or compile time. I need to explore providing a custom 'validate' function while keeping the JSON Schema defined correctly."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Investigating input schema options**\n\nI should check if the SDK now supports 'inputSchema' as 'z.ZodTypeAny' in later versions. Another idea is to give 'inputSchema' as an object with a 'oneOf' property recognized by the JSON Schema aggregator. However, they typed 'inputSchema' as extending ZodRawShape, so that may not work. I'm considering various approaches, like using 'command' as a property or creating unions with z.lazy. It seems complicated, but I might also have to upgrade to a newer version of the SDK for better support. Let’s search for relevant updates."
+              }
+            ]
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcf81d8488194b2cd2bfbd3b2098e",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "Model Context Protocol SDK TypeScript registerTool inputSchema ZodRawShape discriminated union"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcf8f0a5c8194a8e2997a3dc32a0c",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcf8f558081949ab71bb96e7b3af4",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcf918c7881948421b711385a164a",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Searching for registerTool definition**\n\nI need to locate the definition of \"registerTool\" in the source code. To do this, I'll perform a search for the term \"registerTool(\" to find where it's declared or utilized. This should give me a clearer understanding of its functionality and help me use it correctly in future tasks. Alright, let's dive into the source code and find that definition!"
+              }
+            ]
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcf93541881948c078de4beef4631",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcf952c0c819496548fc563f7835b",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcf9592dc8194aae9e81072d18e8f",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcf97518c8194936aabefb9c0ddf1",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcf97b09c8194ac98fbc9ce4a2883",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcf97bf948194897a856138342828",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcf98b6e88194a883af0efa37f37d",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcf9a52f48194962f68f9149fe56c",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcf9ac0ac81948c75f703c4cafc89",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "site:github.com/modelcontextprotocol/typescript-sdk registerTool inputSchema ZodRawShape"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcfa07f1c819481cde3c70e73efa0",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Checking PR details**\n\nI see that PR #816 is focused on allowing ZodType<object> for input and output schema, which is interesting because it enables discriminated union top-level usage. I need to check the details to confirm whether this has been merged. It could be related to Issue #588, so I think clicking on that PR will give me more context and clarity. Let's dive in and see what we can find out!"
+              }
+            ]
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcfa24e888194bf555ccc5bd5f75a",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcfadc844819493cbbdf123a0f7bb",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Confirming SDK status**\n\nThe PR is open but hasn't been merged as of October 8, 2025. Currently, it seems that the official SDK still might not accept ZodType at the top level, but I need to check the latest release version. The user is on v1.0.4, which is quite outdated. I can suggest upgrading to v1.17.x if it’s added support, but since the PR isn't merged, that might not be reliable. I should search for relevant terms like 'tool schema discriminated union mcp' or 'Claude Code supports oneOf'."
+              }
+            ]
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcfb025688194864278c75776a86c",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "Claude Code MCP tool input JSON Schema oneOf discriminator"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcfbd36a88194918e8f038872d47e",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcfbd94ac8194904f3ad29bc3fe06",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "zod-to-json-schema discriminated union output oneOf discriminators"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcfcb26e4819486713d297a039ccc",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Exploring Zod and JSON Schema**\n\nI'm diving into the Zod v4 documentation about 'z.toJSONSchema' but realizing the SDK actually uses the zod-to-json-schema plugin for v3. I think the plugin can handle union and discriminated union types, with notes on the 'discriminator' property. It seems like JSON Schema doesn’t standardize this but recognizes 'oneOf' with 'properties.command.const' in Ajv for discriminated unions. I wonder if I should propose patching the JSON Schema after registration to incorporate these elements, creating an 'inputSchema' with necessary properties."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Implementing tool changes**\n\nI’m considering implementing changes to \"list_tools,\" which involves hooking into 'server.server.handlers' for custom responses like 'tools.list' or 'tools.listChanged' to provide a tailored JSON Schema. To do this, I need to subclass 'McpServer' and override the 'toSerializableToolDefinition' method to patch the JSON Schema, but I must verify if that method exists. The documentation warns about potential invocation issues when subclassing, which makes customizing a bit tricky. I’ll look into how 'registerTool' returns a 'Registration' handle for updates. Searching the documentation for \"registerTool returns\" might be the next best step."
+              }
+            ]
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcfd299e8819486a16d6df2ce7d9c",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcfd74e988194bd7fa1c755a93988",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcfd7b3448194af2f1d77f02a583f",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "@modelcontextprotocol/sdk tool() inputSchema zod union"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcfdbee7c81949d2cc8295ee5c598",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Exploring tool registration solutions**\n\nI'm considering hooking 'server.on(\"transportConnected\", ...)' to call 'server.notifyToolsListChanged()' with a patched tool shape. Another option might be to wrap the 'zod-to-json-schema' call myself by providing 'inputSchema: {}' and using 'annotations' with schema metadata. I could also bypass 'zod' by using a placeholder shape for 'inputSchema', customizing the MCP handshake to declare tools. However, I need to verify if older methods accept JSONSchema for compatibility. Let's search for more details."
+              }
+            ]
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcfe03ca8819483ea424cb6ae4b83",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "mcp server tool() parameters JSON Schema inputSchema object registerTool 'parameters' JSON Schema"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcfe80600819498ad0c44e13724a1",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Assembling approaches for union support**\n\nThe search results are helpful but don't directly show 'discriminated union top-level support.' Still, I can propose various approaches. I plan to outline them, starting with potential upgrades to support ZodType<object>, although it seems that the related PR hasn't been merged.\n\nFirst, I want to provide users with code examples on how to work around current limitations, including patching the SDK if necessary. Gathering all possible approaches seems essential for a comprehensive answer!"
+              },
+              {
+                "type": "summary_text",
+                "text": "**Exploring signature patterns**\n\nI’m examining standard \"conform to existing signature\" patterns regarding Zod. First, using \"SuperRefine superset object\" could ensure that variant-specific fields are required, so I’ll provide code for that. \n\nThe parameter-level union using 'z.union' doesn’t seem useful. Then, exploring \"phantom types\" for callback types with discriminated unions is interesting, but it doesn’t mesh well with the registerTool’s requirements. I need to think about how to accurately define typed callbacks without complicating things too much. This isn’t straightforward!"
+              },
+              {
+                "type": "summary_text",
+                "text": "**Considering handler types and JSON Schema**\n\nI’m thinking about declaring 'handler(args: z.input<typeof unionSchema>)' as a function type, which we can cast to any when passing it to registerTool. This keeps our code type-safe since we’ve typed 'handler' according to the union shape. However, when calling 'server.registerTool', we lose some type safety, even though our own code remains well-typed.\n\nNext, I could explore building a JSON Schema from the Zod union using zod-to-json-schema. This might allow me to use the older 'tool()' method to feed into registerTool. I'll need to confirm what 'tool()' accepts regarding parameters."
+              }
+            ]
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcff18d508194b3ada298a5009d99",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "@modelcontextprotocol/sdk low-level server setTools custom tool list JSON Schema"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcff76c988194b38be4cf97ae683d",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_04daf86f43cfa8ba0068ffcff7fa1481948a7ffe3887b0b391",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "ListToolsRequestSchema @modelcontextprotocol/sdk types"
+            }
+          },
+          {
+            "id": "rs_04daf86f43cfa8ba0068ffcffb09ac819493d71a24f90a07d7",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "msg_04daf86f43cfa8ba0068ffd00d03b48194a2b4741afe1c83bc",
+            "type": "message",
+            "status": "completed",
+            "content": [
+              {
+                "type": "output_text",
+                "annotations": [
+                  {
+                    "type": "url_citation",
+                    "end_index": 1157,
+                    "start_index": 1058,
+                    "title": "Feature request: accept param spec as `ZodType` instead of `ZodRawShape` · Issue #588 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/588?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 3097,
+                    "start_index": 2998,
+                    "title": "MCP SDK v1.17.5 Incompatible with Zod v4 - Breaking Changes · Issue #925 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 3486,
+                    "start_index": 3405,
+                    "title": "`registerTool`: accept ZodType<object> for input and output schema by ksinder · Pull Request #816 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/816"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 4576,
+                    "start_index": 4430,
+                    "title": "MCP Instruct | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 6594,
+                    "start_index": 6448,
+                    "title": "MCP Instruct | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 7795,
+                    "start_index": 7717,
+                    "title": "modelcontextprotocol/sdk の MCP サーバのメモ",
+                    "url": "https://zenn.dev/syoyo/articles/44c3201cdc9991?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 14339,
+                    "start_index": 14240,
+                    "title": "SDK v1.9.0: Incompatibility between Tool Registration Limitations and Client Parameter Passing · Issue #324 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/324?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 19629,
+                    "start_index": 19482,
+                    "title": "Class Tool | MCP C# SDK",
+                    "url": "https://modelcontextprotocol.github.io/csharp-sdk/api/ModelContextProtocol.Protocol.Tool.html?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 20323,
+                    "start_index": 20224,
+                    "title": "MCP SDK v1.17.5 Incompatible with Zod v4 - Breaking Changes · Issue #925 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 20537,
+                    "start_index": 20438,
+                    "title": "MCP SDK v1.17.5 Incompatible with Zod v4 - Breaking Changes · Issue #925 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 21311,
+                    "start_index": 21165,
+                    "title": "MCP Instruct | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 22745,
+                    "start_index": 22658,
+                    "title": "MCP Server Configuration Fails: Invalid JSON Schema for Tool Input · Issue #1690 · anthropics/claude-code · GitHub",
+                    "url": "https://github.com/anthropics/claude-code/issues/1690?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 26313,
+                    "start_index": 26232,
+                    "title": "`registerTool`: accept ZodType<object> for input and output schema by ksinder · Pull Request #816 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/816"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 26580,
+                    "start_index": 26481,
+                    "title": "Feature request: accept param spec as `ZodType` instead of `ZodRawShape` · Issue #588 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/588?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 26852,
+                    "start_index": 26753,
+                    "title": "MCP SDK v1.17.5 Incompatible with Zod v4 - Breaking Changes · Issue #925 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 27164,
+                    "start_index": 27018,
+                    "title": "MCP Instruct | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai"
+                  }
+                ],
+                "logprobs": [],
+                "text": "Short version: with @modelcontextprotocol/sdk v1.0.4 you can’t hand a top-level z.discriminatedUnion to registerTool because the SDK’s inputSchema is constrained to a ZodRawShape (plain object of fields) that the SDK wraps in z.object(...). That constraint prevents passing a ZodDiscriminatedUnion at the top level. Below are every practical way I’ve seen or used to still get a true top-level discriminated union (DU) for an MCP tool, from “clean” to “hacky”, with code, trade-offs, JSON Schema implications, and TypeScript-safety notes.\n\nWhat the SDK currently does and why it blocks a top-level union\n- In the TS SDK, registerTool currently types inputSchema as a raw shape, i.e., Record<string, z.ZodTypeAny>, which the SDK turns into z.object(shape) internally and then converts to JSON Schema. This is why a ZodDiscriminatedUnion can’t fit the type hole.\n- This limitation is called out by users and a PR exists to relax it so inputSchema can be any ZodType<object>, enabling top-level unions; as of Oct 27, 2025, that PR is still open and not merged. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/588?utm_source=openai))\n\nBaseline target schema you want\nWe’ll reuse this in multiple approaches.\n\n- Zod discriminated union\n\n  const FileToolDU = z.discriminatedUnion('command', [\n    z.object({\n      command: z.literal('view'),\n      path: z.string(),\n      view_range: z.tuple([z.number(), z.number()]).optional(),\n    }),\n    z.object({\n      command: z.literal('create'),\n      path: z.string(),\n      file_text: z.string(),\n    }),\n    z.object({\n      command: z.literal('str_replace'),\n      path: z.string(),\n      old_str: z.string(),\n      new_str: z.string(),\n    }),\n    z.object({\n      command: z.literal('insert'),\n      path: z.string(),\n      insert_line: z.number(),\n      insert_text: z.string(),\n    }),\n    z.object({\n      command: z.literal('delete'),\n      path: z.string(),\n    }),\n    z.object({\n      command: z.literal('rename'),\n      old_path: z.string(),\n      new_path: z.string(),\n    }),\n  ]);\n\n- Useful types\n\n  type FileToolArgs = z.infer<typeof FileToolDU>;\n  type Cmd = FileToolArgs['command'];\n\nApproach 1 — Upgrade or patch the SDK so inputSchema accepts a full ZodType<object> (cleanest “official” path when available)\n- Technique\n  - Move to an SDK version that accepts ZodType<object> for inputSchema/outputSchema (instead of ZodRawShape).\n  - Then pass FileToolDU directly.\n\n- Code (once supported)\n\n  server.registerTool(\n    'file',\n    {\n      title: 'File operations',\n      description: 'view/create/insert/delete/rename files',\n      // after SDK supports ZodType<object>:\n      inputSchema: FileToolDU,\n    },\n    async (args: FileToolArgs) => { /*...*/ }\n  );\n\n- JSON Schema result\n  - zod-to-json-schema will emit oneOf with discriminant consts on command (and required per variant). That’s ideal for clients that render DUs. The SDK today uses zod-to-json-schema; issue threads confirm usage and limitations. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai))\n\n- Pros\n  - Perfect fit: true top-level DU, accurate JSON Schema, end-to-end type safety.\n  - Clients like Claude Code get proper oneOf.\n\n- Cons\n  - As of Oct 27, 2025, this capability is not merged. You can’t rely on this in v1.0.4. The PR (#816) is open and references the earlier feature request (#588). ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/816))\n\n- Workaround before merge (patch-package)\n  - Locally patch the SDK along the lines of PR #816: change registerTool typing to accept ZodType<object> and branch at runtime if you were given a ZodType instead of a shape; keep backward compatibility.\n  - Risk: maintaining a fork/patch through updates.\n  - Still preserves type-safety in your codebase.\n\nApproach 2 — Drop to the low-level Server API and serve your own tools/list and tools/call with a JSON Schema oneOf (works today, fully correct JSON Schema)\n- Technique\n  - Use the low-level Server rather than McpServer.registerTool.\n  - Implement handlers for ListToolsRequestSchema (return tools with inputSchema = a JSON Schema that has oneOf for your variants) and CallToolRequestSchema (validate args with FileToolDU.parse() then execute).\n  - This is how several public MCP servers do advanced schemas today. Examples show setting ListToolsRequestSchema/CallToolRequestSchema by hand. ([glama.ai](https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai))\n\n- Code\n\n  import { Server } from '@modelcontextprotocol/sdk/server/index.js';\n  import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';\n  import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';\n  import { z } from 'zod';\n  import { zodToJsonSchema } from 'zod-to-json-schema';\n\n  // Your DU\n  const FileToolDU = /* (see baseline above) */;\n\n  // Produce proper JSON Schema (oneOf with const discriminants)\n  const fileToolJsonSchema = zodToJsonSchema(FileToolDU, { name: 'FileToolArgs' });\n\n  const server = new Server(\n    { name: 'file-server', version: '1.0.0' },\n    { capabilities: { tools: {} } }\n  );\n\n  server.setRequestHandler(ListToolsRequestSchema, async () => {\n    return {\n      tools: [\n        {\n          name: 'file',\n          description: 'view/create/insert/delete/rename files',\n          inputSchema: fileToolJsonSchema, // top-level oneOf\n        },\n      ],\n    };\n  });\n\n  server.setRequestHandler(CallToolRequestSchema, async (req) => {\n    if (req.params.name !== 'file') throw new Error('Unknown tool');\n\n    // Strong runtime validation + narrowing\n    const args = FileToolDU.parse(req.params.arguments);\n\n    switch (args.command) {\n      case 'view':     /* ... */ break;\n      case 'create':   /* ... */ break;\n      case 'str_replace': /* ... */ break;\n      case 'insert':   /* ... */ break;\n      case 'delete':   /* ... */ break;\n      case 'rename':   /* ... */ break;\n    }\n    return { content: [{ type: 'text', text: 'ok' }] };\n  });\n\n  const transport = new StdioServerTransport();\n  await server.connect(transport);\n\n- Pros\n  - Fully accurate JSON Schema “oneOf” representing the DU at the top level; clients get exactly what they need to render/validate correctly. (Many servers do this; examples show ListToolsRequestSchema/CallToolRequestSchema usage.) ([glama.ai](https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai))\n  - Clean runtime validation with Zod DU; excellent type narrowing in handler.\n  - No SDK fork required.\n\n- Cons\n  - You lose some McpServer convenience APIs (dynamic enable/disable helpers, built-in Zod wrapping, etc.), but you can reimplement small parts.\n  - You must keep JSON Schema conversion yourself (zod-to-json-schema).\n  - More boilerplate.\n\n- Type-safety\n  - Strong. Your handler uses FileToolDU.parse to narrow to the correct variant.\n\nApproach 3 — Hybrid: keep McpServer for everything else, but override just the tools layer with low-level handlers (minimally invasive)\n- Technique\n  - Use McpServer for resources/prompts/etc., but for tools you:\n    - Either don’t register with registerTool at all, or register a dummy tool disabled;\n    - Then override the underlying low-level server’s tools handlers:\n      server.server.setRequestHandler(ListToolsRequestSchema, ...) and server.server.setRequestHandler(CallToolRequestSchema, ...).\n  - You may need to register capabilities tools: { listChanged: true } yourself, and ensure you send notifications as appropriate (the Zenn article shows this pattern). ([zenn.dev](https://zenn.dev/syoyo/articles/44c3201cdc9991?utm_source=openai))\n\n- Pros\n  - Keeps most of McpServer ergonomics.\n  - Gains full control over tool JSON Schema to advertise the DU.\n\n- Cons\n  - Slightly “off the beaten path”: you’re mixing high-level and low-level APIs.\n  - You must ensure your custom handlers don’t conflict with McpServer’s own handlers. If you didn’t register tools via McpServer, there’s no conflict.\n\n- Type-safety\n  - Same as Approach 2 inside your tool handler.\n\nApproach 4 — Keep registerTool, but bypass SDK validation and do DU validation yourself (works today, simplest, but JSON Schema is not ideal)\n- Technique\n  - Use registerTool with a “superset” shape (every possible field optional), so it satisfies ZodRawShape.\n  - Set inputSchema: { command: z.enum([...]), all other fields optional }.\n  - In the callback, immediately parse the raw args with FileToolDU.parse(...) to narrow to a precise variant and enforce per-command requirements.\n\n- Code\n\n  // Superset shape for SDK’s ZodRawShape requirement\n  const SupersetShape = {\n    command: z.enum(['view','create','str_replace','insert','delete','rename']),\n    path: z.string().optional(),\n    view_range: z.tuple([z.number(), z.number()]).optional(),\n    file_text: z.string().optional(),\n    old_str: z.string().optional(),\n    new_str: z.string().optional(),\n    insert_line: z.number().optional(),\n    insert_text: z.string().optional(),\n    old_path: z.string().optional(),\n    new_path: z.string().optional(),\n  } satisfies z.ZodRawShape;\n\n  server.registerTool(\n    'file',\n    {\n      title: 'File operations',\n      description: 'view/create/insert/delete/rename files',\n      inputSchema: SupersetShape,\n    },\n    // Type-safe inside by re-parse:\n    async (raw: Record<string, unknown>) => {\n      const args = FileToolDU.parse(raw); // strict check + narrowing\n\n      switch (args.command) {\n        case 'rename':\n          // args.old_path and args.new_path required here\n          break;\n        // ...\n      }\n      return { content: [{ type: 'text', text: 'ok' }] };\n    }\n  );\n\n- Pros\n  - Works on v1.0.4, minimal changes.\n  - Maintains strong type-safety where it matters: in your handler.\n\n- Cons\n  - The JSON Schema advertised to clients will not represent the DU. It will look like “command + a bunch of optional fields,” so UIs can’t render variant-specific required fields.\n  - You rely on server-side validation only for correctness; clients may call you with invalid combos more often.\n\n- Type-safety\n  - Strong in handler after FileToolDU.parse(...).\n  - The registerTool callback signature (args) will be typed as the superset object. If you want compilation to force you to handle all variants, define your handler with a different signature and cast when passing to registerTool:\n\n    const handler: (args: FileToolArgs) => Promise<ToolResult> = async args => { /* ... */ };\n    server.registerTool('file', { inputSchema: SupersetShape }, handler as any);\n\nApproach 5 — Exploit the low-level Server to advertise a DU JSON Schema, but still call your existing McpServer-registered handler (bridge pattern)\n- Technique\n  - Register your handler with McpServer.registerTool using the superset shape (as in Approach 4), but then intercept tools/list at the low level and return an overridden tool definition whose inputSchema is the DU JSON Schema (zod-to-json-schema(FileToolDU)).\n  - On tools/call, just pass arguments through to the McpServer handler by invoking the callback you registered (requires reaching into the internal registry or keeping a reference to your handler to call). This way you reuse your code and keep McpServer’s runtime around.\n  - This is hacky, but it satisfies “true DU JSON Schema to the client” while keeping your existing structure.\n\n- Pros\n  - Clients see the correct DU schema (oneOf); handler reuse.\n\n- Cons\n  - You are overriding what McpServer would normally advertise. Ensure you don’t end up with two tool entries or conflicting handlers.\n  - Internal API coupling can break on SDK upgrades.\n\n- Type-safety\n  - Same as Approach 4 + your own DU parse.\n\nApproach 6 — Provide no inputSchema to registerTool (or pass an empty object), let the handler be the sole validator with FileToolDU.parse (works, but not ideal)\n- Technique\n  - inputSchema omitted (or {}).\n  - In handler, FileToolDU.parse(raw) to do all validation.\n\n- Pros\n  - Very simple, works everywhere.\n\n- Cons\n  - Clients won’t get useful schema to guide input; Claude Code may offer no/poor form affordances.\n  - Fails your “JSON Schema should properly represent the discriminated union” goal.\n\n- Type-safety\n  - Strong in handler; none at presentation time.\n\nApproach 7 — Runtime monkey-patch of the tool’s JSON Schema after registration (SDK-object mutation)\n- Technique\n  - Call registerTool with any shape so the tool exists.\n  - After the tool is registered, mutate the in-memory tool definition object that McpServer keeps so its inputSchema equals the DU JSON Schema (zod-to-json-schema(FileToolDU)), and send a tools/list_changed notification so clients refresh.\n  - This requires reaching inside private SDK structures to patch the advertised schema. Risky.\n\n- Code sketch (pseudo – depends on SDK internals)\n\n  const handle = server.registerTool('file', { inputSchema: SupersetShape }, handler);\n  // Somewhere inside server there is a registry map; find the tool entry:\n  (server as any)._tools['file'].definition.inputSchema = zodToJsonSchema(FileToolDU);\n  (server as any).notifyToolsListChanged?.();\n\n- Pros\n  - Achieves the DU JSON Schema with minimal code changes.\n\n- Cons\n  - Depends on private fields and methods; can break any time.\n  - Harder to keep working across SDK updates.\n\n- Type-safety\n  - Whatever you enforce in the handler.\n\nApproach 8 — Use the legacy tool()/resource()/prompt() APIs only if they allow JSON Schema directly (varies by version; most examples still use Zod)\n- Technique\n  - Some early or alternate SDKs expose lower-level ways to shove JSON Schema directly. In the TS SDK, most docs/examples still use Zod and convert internally; I don’t recommend relying on legacy overloads because they typically lead back to the same ZodRawShape path.\n  - If you find a specific overload that accepts a prebuilt JSON Schema object for inputSchema, it becomes equivalent to Approaches 2–3 (direct JSON Schema). I haven’t seen such an overload in current docs; modern guidance is to use registerTool with Zod or drop to the low-level Server to serve JSON ourselves. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/324?utm_source=openai))\n\nApproach 9 — “All fields optional with .superRefine” inside a ZodObject … but you can’t attach that refine because the SDK constructs the object for you\n- Technique\n  - If you could pass a ZodObject, you could do:\n    z.object({...all optional...}).superRefine(ctx => { … cross-field checks … });\n  - But registerTool’s inputSchema only accepts a raw shape; the SDK builds the ZodObject, so you cannot add object-level superRefine. Property-level refine can’t see sibling fields.\n\n- Pros\n  - Would be elegant if allowed.\n\n- Cons\n  - Not viable under v1.0.4 typing because you can’t pass a prebuilt ZodObject with superRefine.\n\n- Type-safety\n  - N/A (blocked by API).\n\nApproach 10 — Low-level JSON Schema only (no Zod), validate at runtime with AJV (or similar), keep DU at JSON Schema level\n- Technique\n  - Skip Zod entirely for the input side. Write a JSON Schema with oneOf and const discriminants explicitly, advertise it via low-level Server (Approach 2), and validate on tools/call with Ajv.\n  - If you still love Zod types for the handler, you can keep FileToolDU just for TypeScript inference and cast after Ajv validation.\n\n- Code sketch (JSON Schema DU)\n\n  const FileToolJSONSchema = {\n    oneOf: [\n      {\n        type: 'object',\n        properties: {\n          command: { const: 'view' },\n          path: { type: 'string' },\n          view_range: {\n            type: 'array',\n            items: [{ type: 'number' }, { type: 'number' }],\n            minItems: 2, maxItems: 2\n          }\n        },\n        required: ['command', 'path'],\n        additionalProperties: false\n      },\n      // ... other variants with const 'create', 'str_replace', etc.\n      {\n        type: 'object',\n        properties: {\n          command: { const: 'rename' },\n          old_path: { type: 'string' },\n          new_path: { type: 'string' },\n        },\n        required: ['command', 'old_path', 'new_path'],\n        additionalProperties: false\n      }\n    ]\n  };\n\n  // Advertise via ListToolsRequestSchema (Approach 2)\n  // Validate with Ajv in CallToolRequestSchema\n\n- Pros\n  - Zero dependency on Zod for input; complete control over JSON Schema details (discriminator forms, oneOf, $defs).\n  - Good if you’re already an Ajv shop.\n\n- Cons\n  - Two sources of truth if you keep Zod for types elsewhere.\n  - Slightly more verbose to hand-write JSON Schema.\n\n- Type-safety\n  - Good if you re-derive TS types from the JSON Schema (e.g., with json-schema-to-ts) or keep a parallel Zod schema just for inference.\n\nApproach 11 — “SDK extension” wrapper that gives you a DU-friendly registerTool API today\n- Technique\n  - Write your own helper function registerDiscriminatedTool that takes:\n    - name, zodDiscriminatedUnion, and a handler (typed with z.infer<typeof DU>);\n    - Under the hood, either:\n      - Uses the low-level Server (Approach 2), or\n      - Uses McpServer.registerTool with a superset shape (Approach 4) but also overrides tools/list to advertise the DU JSON Schema (Approach 5).\n  - This isolates the hacks and gives your project a nice API.\n\n- Code sketch\n\n  function registerDiscriminatedTool<\n    S extends z.ZodDiscriminatedUnion<string, any>\n  >(\n    server: McpServer | Server,\n    name: string,\n    schema: S,\n    handler: (args: z.infer<S>) => Promise<any>\n  ) {\n    const jsonSchema = zodToJsonSchema(schema, { name: `${name}Args` });\n\n    if (server instanceof Server) {\n      // Approach 2 under the hood...\n      // Install ListToolsRequestSchema and CallToolRequestSchema\n    } else {\n      // Approach 5 under the hood:\n      // 1) registerTool with superset shape\n      // 2) override tools/list with DU JSON Schema\n      // 3) handler: schema.parse(args) then dispatch\n    }\n  }\n\n- Pros\n  - Encapsulates complexity and can be reused across tools.\n\n- Cons\n  - Still built on the underlying approaches’ trade-offs.\n\n- Type-safety\n  - Strong at the handler.\n\nApproach 12 — Multiple tools combined at the protocol layer (not splitting your code), but the client still sees one logical “file” tool (advanced client-dependent)\n- Technique\n  - Register hidden or disabled tools for each variant (file.view, file.create, etc.) and one public “router” tool “file” whose JSON Schema is DU. The router tool doesn’t do the operation; it simply forwards to the right hidden tool during CallTool based on the DU. Some clients might still list all tools if they ignore your “hidden” convention; the MCP spec doesn’t have a “hidden” flag today, so this is client-behavior dependent.\n\n- Pros\n  - Can simplify handler code by delegating to separate specialized functions.\n\n- Cons\n  - Risk of clients exposing internal tools; relies on conventions, not spec.\n  - Doesn’t buy much compared to Approaches 2–3.\n\n- Type-safety\n  - Same as DU parse in the router.\n\nApproach 13 — Use another MCP SDK that natively allows JSON Schema for tool parameters (non-TS, e.g., .NET or Java)\n- Technique\n  - The .NET SDK exposes inputSchema directly as a JSON object and enforces only that it be a valid object schema at the outer level. You could run your server in .NET if you want first-class JSON Schema control with oneOf and a true discriminator. ([modelcontextprotocol.github.io](https://modelcontextprotocol.github.io/csharp-sdk/api/ModelContextProtocol.Protocol.Tool.html?utm_source=openai))\n\n- Pros\n  - Native control over JSON Schema; no Zod constraint.\n\n- Cons\n  - Different runtime/language.\n\n- Type-safety\n  - Depends on your language tooling (e.g., System.Text.Json with source generators, etc.).\n\nApproach 14 — Wait for Zod v4 adoption in the SDK and use z.toJSONSchema (future-looking)\n- Context\n  - Zod v4 has built-in JSON Schema conversion in core (z.toJSONSchema). But the TS SDK currently has compatibility issues with Zod v4 per user reports; they still rely on zod-to-json-schema. Until the SDK adopts/permits v4, don’t switch your project to Zod v4 for MCP server code. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai))\n\n- Pros\n  - Cleaner conversion when supported.\n\n- Cons\n  - Not compatible as of v1.17.5 report; you’re on v1.0.4. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai))\n\nWhat I recommend for your exact constraints\nGiven your requirements:\n- Must accept top-level command parameter (no wrapper)\n- Validation must be per-variant\n- Ideally preserve TS type safety in the callback\n- Must work with Claude Code\n- JSON Schema should properly represent the DU\n\nPick one of these:\n\nA) If you can accept using the low-level Server for tools: Approach 2. It gives you an exact DU JSON Schema via oneOf at the top level today, with strong Zod DU validation in the handler. This is the most correct and robust solution without forking the SDK. The pattern is widely used by servers that need custom schemas. ([glama.ai](https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai))\n\nB) If you need to keep McpServer for everything: Approach 3 or 5. Register nothing (or a dummy) with registerTool, then override tools/list and tools/call at the low-level to advertise and enforce the DU. Slightly hacky, but practical.\n\nC) If you want to stay “inside” registerTool for now and just get work done: Approach 4. Use a superset shape so the SDK is happy; re-parse with FileToolDU in the handler for correctness and types. You lose DU JSON Schema to clients, so it’s not ideal for UI affordances, but it’s simple and reliable.\n\nD) If you’re comfortable patching: Approach 1 with patch-package mirroring PR #816 until it lands. That gives you the best developer ergonomics.\n\nNotes about clients and JSON Schema features\n- oneOf with const discriminator: JSON Schema doesn’t have an official discriminator keyword (that’s OpenAPI), but oneOf variants with a const property (command = \"view\"/\"create\"/...) are well-supported by validators and most schema UIs. It’s the right way to represent a Zod discriminated union in raw JSON Schema.\n- Claude Code’s tool ingestion: It consumes the inputSchema you provide via tools/list; using oneOf should be fine and improves the model’s adherence. Some ecosystem issues exist around JSON Schema handling in various clients (e.g., $ref, strictness), but oneOf is the most interoperable approach. ([github.com](https://github.com/anthropics/claude-code/issues/1690?utm_source=openai))\n\nPutting it all together: end-to-end example using the low-level Server (Approach 2)\n- DU schema and types\n\n  import { z } from 'zod';\n  import { zodToJsonSchema } from 'zod-to-json-schema';\n\n  const FileToolDU = z.discriminatedUnion('command', [\n    z.object({ command: z.literal('view'), path: z.string(), view_range: z.tuple([z.number(), z.number()]).optional() }),\n    z.object({ command: z.literal('create'), path: z.string(), file_text: z.string() }),\n    z.object({ command: z.literal('str_replace'), path: z.string(), old_str: z.string(), new_str: z.string() }),\n    z.object({ command: z.literal('insert'), path: z.string(), insert_line: z.number(), insert_text: z.string() }),\n    z.object({ command: z.literal('delete'), path: z.string() }),\n    z.object({ command: z.literal('rename'), old_path: z.string(), new_path: z.string() }),\n  ]);\n  type FileToolArgs = z.infer<typeof FileToolDU>;\n\n- Low-level server and handlers\n\n  import { Server } from '@modelcontextprotocol/sdk/server/index.js';\n  import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';\n  import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';\n\n  const server = new Server(\n    { name: 'file-server', version: '1.0.0' },\n    { capabilities: { tools: {} } }\n  );\n\n  const inputSchema = zodToJsonSchema(FileToolDU, { name: 'FileToolArgs' });\n\n  server.setRequestHandler(ListToolsRequestSchema, async () => ({\n    tools: [\n      {\n        name: 'file',\n        description: 'view/create/insert/delete/rename files',\n        inputSchema, // top-level oneOf + const discriminants\n      },\n    ],\n  }));\n\n  server.setRequestHandler(CallToolRequestSchema, async (req) => {\n    if (req.params.name !== 'file') throw new Error('Unknown tool');\n    const args = FileToolDU.parse(req.params.arguments) as FileToolArgs;\n\n    switch (args.command) {\n      case 'view':\n        // args.path, args.view_range?\n        break;\n      case 'create':\n        // args.path, args.file_text\n        break;\n      case 'str_replace':\n        // args.path, args.old_str, args.new_str\n        break;\n      case 'insert':\n        // args.path, args.insert_line, args.insert_text\n        break;\n      case 'delete':\n        // args.path\n        break;\n      case 'rename':\n        // args.old_path, args.new_path\n        break;\n    }\n\n    return { content: [{ type: 'text', text: 'ok' }] };\n  });\n\n  const transport = new StdioServerTransport();\n  await server.connect(transport);\n\nComparison matrix (quick)\n- True top-level DU in JSON Schema visible to clients:\n  - Yes: Approaches 1 (after merge), 2, 3/5, 7, 10.\n  - No: Approaches 4, 6, 9.\n- Strong compile-time types for handler:\n  - Yes: 1, 2, 3/5, 4, 6, 7, 10 (when paired with Zod or schema-to-TS).\n- Risk surface:\n  - Low: 2, 4, 6, 10.\n  - Medium: 3/5 (hybrid/override), 1 with patch-package.\n  - High: 7 (monkey-patch internals).\n\nFinal guidance for your project\n- If you can adopt low-level handlers for tools, do Approach 2. It’s standards-compliant, robust, and gives Claude Code exactly the DU schema it needs to behave well.\n- If you must stay with McpServer.registerTool and want correctness over UI affordances, do Approach 4 (superset + DU parse in handler). It’s the least risky and works in v1.0.4, but the client schema will be generic.\n- If you value developer ergonomics and are okay with a patch, mirror PR #816 locally until it merges (Approach 1), then switch back to upstream when available. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/816))\n\nReferences and notes\n- The SDK’s current typing restriction and request to accept ZodType<object> for input/output: issue #588 and PR #816 (open as of Oct 27, 2025). ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/588?utm_source=openai))\n- Zod v4 compatibility concern in the SDK (still v3-oriented): developers reporting breakage in v1.17.5 when using Zod v4. Stick to Zod v3 with zod-to-json-schema for now. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai))\n- Examples of using the low-level Server API to implement ListToolsRequestSchema/CallToolRequestSchema directly (showing that advanced schemas are practical today). ([glama.ai](https://glama.ai/mcp/servers/%40hlsitechio/mcp-instruct/blob/0052421906e66c14362de4e8213fb51c54d656ac/src/index.ts?utm_source=openai))\n\nIf you want, I can:\n- Generate the exact JSON Schema (oneOf with per-variant required lists) for your DU, and\n- Drop in a minimal “tools-only low-level shim” around your existing McpServer instance so your code stays mostly the same but clients see the proper DU."
+              }
+            ],
+            "role": "assistant"
+          }
+        ],
+        "parallel_tool_calls": true,
+        "previous_response_id": null,
+        "prompt_cache_key": null,
+        "reasoning": {
+          "effort": "high",
+          "summary": "detailed"
+        },
+        "safety_identifier": null,
+        "service_tier": "default",
+        "store": true,
+        "temperature": 1,
+        "text": {
+          "format": {
+            "type": "text"
+          },
+          "verbosity": "high"
+        },
+        "tool_choice": "auto",
+        "tools": [
+          {
+            "type": "web_search",
+            "filters": null,
+            "search_context_size": "medium",
+            "user_location": {
+              "type": "approximate",
+              "city": null,
+              "country": "US",
+              "region": null,
+              "timezone": null
+            }
+          }
+        ],
+        "top_logprobs": 0,
+        "top_p": 1,
+        "truncation": "auto",
+        "usage": {
+          "input_tokens": 60654,
+          "input_tokens_details": {
+            "cached_tokens": 4096
+          },
+          "output_tokens": 13841,
+          "output_tokens_details": {
+            "reasoning_tokens": 7360
+          },
+          "total_tokens": 74495
+        },
+        "user": null,
+        "metadata": {}
+      }
+    }
+  ],
+  "cwd": "/home/jan/projects/memory-mcp"
+}

@@ -1,0 +1,752 @@
+{
+  "version": 3,
+  "session_id": "1761594457651-cwsofmkp",
+  "created_at": "2025-10-27T19:47:37.651Z",
+  "updated_at": "2025-10-27T19:53:38.992Z",
+  "model": "gpt-5",
+  "config": {
+    "reasoning_effort": "high",
+    "verbosity": "high"
+  },
+  "conversation": [
+    {
+      "timestamp": "2025-10-27T19:53:38.992Z",
+      "request": {
+        "model": "gpt-5",
+        "input": "I'm implementing an MCP (Model Context Protocol) server in TypeScript using @modelcontextprotocol/sdk v1.0.4. I need expert guidance on the optimal solution for a discriminated union input schema challenge.\n\n## Context: My Use Case\n\nI'm building a \"memory\" tool that provides 6 different commands (view, create, str_replace, insert, delete, rename). Each command requires different parameters:\n\n- **view**: command, path, view_range? (optional)\n- **create**: command, path, file_text\n- **str_replace**: command, path, old_str, new_str\n- **insert**: command, path, insert_line, insert_text\n- **delete**: command, path\n- **rename**: old_path, new_path (no path field)\n\nThis is a classic discriminated union pattern where the `command` field determines which other fields are required.\n\n## The MCP SDK Constraint\n\nThe MCP TypeScript SDK's `registerTool` method has this signature:\n\n```typescript\nregisterTool<InputArgs extends ZodRawShape>(\n    name: string,\n    config: {\n        inputSchema?: InputArgs;  // Expects ZodRawShape: { [key: string]: ZodTypeAny }\n        // ...\n    },\n    callback: ToolCallback<InputArgs>\n): RegisteredTool\n```\n\n**The problem**: It expects `ZodRawShape` (an object of Zod types), NOT a complete Zod schema. Internally, the SDK wraps this in `z.object(inputSchema)`.\n\nThis means I **cannot** pass `z.discriminatedUnion()` directly because it returns a `ZodDiscriminatedUnion`, not a plain object shape.\n\nWhen the SDK converts to JSON Schema (using `zodToJsonSchema` with `strictUnions: true`), discriminated unions become `anyOf`, not `oneOf`.\n\n## My Three Options\n\n### Option 1: Flat Schema with All Optional (Current Implementation)\n```typescript\nserver.registerTool('memory', {\n    inputSchema: {\n        command: z.enum(['view', 'create', 'str_replace', 'insert', 'delete', 'rename']),\n        path: z.string().optional(),\n        old_path: z.string().optional(),\n        new_path: z.string().optional(),\n        file_text: z.string().optional(),\n        // ... all 10+ parameters as optional\n    }\n}, async (input) => {\n    switch (input.command) {\n        case 'view': return handleView(input);  // Manual validation needed\n    }\n});\n```\n\n**Pros**: Works within SDK constraints, flat API  \n**Cons**: No compile-time type safety, all params appear optional, requires manual validation\n\n### Option 2: Nest Under a Property\n```typescript\nconst MemoryCommands = z.discriminatedUnion('command', [\n    z.object({ command: z.literal('view'), path: z.string(), view_range: z.array(z.number()).optional() }),\n    z.object({ command: z.literal('create'), path: z.string(), file_text: z.string() }),\n    // ... etc\n]);\n\nserver.registerTool('memory', {\n    inputSchema: {\n        params: MemoryCommands  // Nest discriminated union\n    }\n}, async ({ params }) => {\n    switch (params.command) {\n        case 'view': return handleView(params);  // TypeScript knows exact type\n    }\n});\n```\n\n**Pros**: Full type safety, proper discrimination  \n**Cons**: Users must call `memory({ params: { command: 'view', path: '...' } })`\n\n### Option 3: Manual Override (Bypass SDK)\n```typescript\nconst tool = server.registerTool('memory', { inputSchema: {} }, callback);\n(tool as any).inputSchema = z.discriminatedUnion('command', [...]);\n```\n\n**Pros**: Flat API, proper discrimination in JSON Schema  \n**Cons**: Type-unsafe, bypasses SDK API, fragile to updates\n\n## My Questions\n\n1. **What is the standard/recommended approach in the MCP ecosystem for command-based tools with varying parameters?** Are there official examples or best practices?\n\n2. **Is there a way to achieve a flat API (no `params` wrapper) while maintaining type safety that I'm missing?**\n\n3. **Does the MCP protocol specification have any guidance on discriminated unions in tool schemas?** Would clients (like Claude Code) handle `anyOf` properly for this use case?\n\n4. **Are there any modern alternatives or patterns I should consider?** For example, should I abandon the unified tool approach and instead register 6 separate tools (memory-view, memory-create, etc.)?\n\n5. **What would be the most maintainable and user-friendly solution long-term?**\n\nPlease search for current MCP best practices, examine any official MCP server implementations that handle similar patterns, and provide your expert recommendation with detailed reasoning.",
+        "instructions": "You are an expert in TypeScript, Zod schemas, MCP (Model Context Protocol) server development, and API design patterns. Provide a comprehensive analysis with:\n\n1. Search for current MCP best practices and real-world implementations\n2. Analyze the trade-offs of each approach deeply\n3. Consider both developer experience (DX) and type safety\n4. Look for any official guidance or examples from Anthropic/MCP documentation\n5. Provide a clear recommendation with detailed reasoning\n6. Suggest any alternative approaches I might have missed\n\nUse your reasoning capabilities to think through the architectural implications of each choice.",
+        "reasoning": {
+          "effort": "high"
+        },
+        "text": {
+          "verbosity": "high"
+        },
+        "tools": [
+          {
+            "type": "web_search"
+          }
+        ]
+      },
+      "response": {
+        "id": "resp_09a0d9afa340880b0068ffcc5ab038819bac446f307f1d1eaf",
+        "object": "response",
+        "created_at": 1761594459,
+        "status": "completed",
+        "background": false,
+        "error": null,
+        "incomplete_details": null,
+        "instructions": "You are an expert in TypeScript, Zod schemas, MCP (Model Context Protocol) server development, and API design patterns. Provide a comprehensive analysis with:\n\n1. Search for current MCP best practices and real-world implementations\n2. Analyze the trade-offs of each approach deeply\n3. Consider both developer experience (DX) and type safety\n4. Look for any official guidance or examples from Anthropic/MCP documentation\n5. Provide a clear recommendation with detailed reasoning\n6. Suggest any alternative approaches I might have missed\n\nUse your reasoning capabilities to think through the architectural implications of each choice.",
+        "max_output_tokens": null,
+        "max_tool_calls": null,
+        "model": "gpt-5-2025-08-07",
+        "output": [
+          {
+            "id": "rs_09a0d9afa340880b0068ffcc5ceee4819bac13841e23691f44",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcc63e4b0819bb2a30aa666050250",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "Model Context Protocol TypeScript SDK registerTool inputSchema ZodRawShape"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcc7432fc819bb8604c7829fa6f8a",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Searching for tool input schema**\n\nI need to look for official documents regarding tool input schema definitions, especially to see if they support discriminated unions. The modelcontextprotocol/typescript-sdk repository might contain some code that shows the registerTool signature. I’m curious to see if the inputSchema is in the Zod raw shape, as the user mentioned. So, let’s dive in and open that up!"
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcc767b90819b94e9b45b34db1915",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcc79e6b8819b95928401ce015ad7",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Finding tool signatures**\n\nI need to locate the signature of the registerTool function along with its input types. To do that efficiently, I can use the \"find\" feature in the repository I'm working with. This should help me pinpoint exactly where it’s defined and give me the information I need for the next steps. It's all about being methodical, so I want to make sure I get this right!"
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcc7c1b50819b96629977549c059b",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcc7ef3a8819ba16d1479b625e4a3",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcc7f41e8819baf507b8d8088acf1",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcc82ad20819bbf2b1de2398274ed",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcc8347f8819bb6f14fd6482401c3",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "site:github.com modelcontextprotocol/typescript-sdk registerTool inputSchema"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcc90d714819bbeea27af0a6258e5",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Searching for tool schema**\n\nI need to look into the documentation for the tool schema type for MCP. The protocol specification likely has details about the tools' schema in a JSON Schema format. I’ll try searching for something like “mcp spec tools input schema oneOf” to find the relevant information. This should help clarify how the tools are structured and utilized!"
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcc92ca6c819b83444dc8f55d0910",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "site:modelcontextprotocol.io tools inputSchema discriminated union"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcca6fe68819ba89f2c6d893beca8",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Checking JSON Schema support**\n\nI found a documentation claim saying \"MCP doesn't support oneOf at the top level,\" but I'm wondering if that's from an official source or just a third-party server doc. I think it’s vital to use disclaimers and clarify that it might not be official. I need to check the official JSON Schema support documentation to see if oneOf or anyOf is allowed. The spec could clarify if it defines Tool.parameters and what it allows regarding object properties."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcca90270819b9248931ca3fb440e",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcccc0d44819bb331639a535210ce",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffccccfe10819b8e414b59c2afaf3c",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffccd579ec819b9eb8ab255d6c47c5",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffccd60234819ba5ac43913d3da2b3",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffccdb1cf4819b84e026409317968b",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffccdbb538819bb7558271bdd84d86",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffccdc7bbc819b8e5620136eae7167",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Searching for schema references**\n\nI noticed we had a timeout, but I can rely on the Tools page, which shows the inputSchema as a JSON Schema with an object type. However, it doesn't mention unions. I'm curious if \"Schema Reference -> Tool\" includes property definitions, including inputSchema typed as JSON Schema or possibly \"ObjectSchema.\" But it seems that isn't retrieved. I'll also need to search for \"discriminated union\" in the MCP documentation to gather more information."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcce0fbd0819bb1578c138adbdd88",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "site:modelcontextprotocol.io discriminated union tools"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcceac8d8819bba5a47a54f2ca157",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Selecting sources and analyzing SDK updates**\n\nI need to carefully select authoritative sources for this task. The official sources include modelcontextprotocol.io and the GitHub repositories for modelcontextprotocol and typescript-sdk. I'll also look at third-party blog posts and Reddit for anecdotal evidence about client limitations, like those concerning Claude, but I won’t rely too heavily on them. Plus, I need to answer the five questions with analysis and check if the SDK has changed since v1.0.4, particularly regarding ZodType objects. I'll open the PR to confirm its status."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcced8f70819b8a7b3403e5111f48",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffccf334ec819bbe7236eb55df7944",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Verifying SDK and PR Updates**\n\nThis PR has been open since October 8, 2025, and hasn’t been merged. The standard SDK currently only accepts raw shapes, but I need to confirm if there's an updated SDK version. The user is on v1.0.4, which is quite early, around early 2024. The repo has about 10.5k stars. Also, the suggestion from the PR is to accept a ZodType object but hasn't been implemented yet. I need to check how \"zodToJsonSchema\" manages discriminated unions, as it outputs either anyOf or oneOf based on the options provided."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Checking Discriminator Property**\n\nI remember that the zod-to-json-schema library doesn’t currently generate a \"discriminator\" property. However, there’s a possibility they might introduce it to support OpenAPI specifications. I’m not entirely sure about this, so I need to do a bit of research. I want to clarify how this feature could be implemented and if it's already in the works or if I’m jumping the gun here. Let's look into it!"
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffccf93620819b977ad0daf31d32d3",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "zod-to-json-schema discriminated union oneOf discriminator"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd0a7184819b87658db40a84aff6",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd0d4d7c819b8ca3e7bf5666de63",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "MCP typescript server discriminated union input schema"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd18ae58819b9b7e53a38e15aacf",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Checking MCP constraints**\n\nI want to focus on credible sources, like the official modelcontextprotocol documentation and community posts. I noticed that some clients might struggle with oneOf/anyOf at the top level, as indicated in the Glama documentation. It mentions that \"MCP input_schema does not support oneOf/allOf/anyOf at top-level\" and points to an error. I'm questioning if this is an official MCP constraint or something specific to Glama's MCP registry. It might involve how certain clients handle union tool arguments, so searching for \"Claude Code input_schema oneOf anyOf not supported\" could be useful."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd1d4a7c819b8c7f67df10cc4f81",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "Claude Code MCP tool input_schema oneOf anyOf support"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd3a8c64819bb62783f06ab0fd68",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Evaluating JSON Schemas**\n\nI'm looking into the reddit evidence which points out various issues, but I should focus on the main aspects: discriminated unions, type safety, and the recommended approach. Many clients, including Claude, might struggle with advanced JSON Schema features, so breaking things down into separate tools could be helpful for improving LLM usage and UI. Official guidance suggests using simpler, single-responsibility tools that are model-controlled, and I’ll look for examples of MCP servers with multiple operations for better clarity."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Exploring MCP Servers**\n\nI’m looking into the official \"filesystem\" MCP server from Anthropic, specifically the \"fs\" server. It seems that many community servers have implemented file operations as separate tools, like \"read_file,\" \"write_file,\" \"create,\" \"delete,\" and \"rename.\" This specialization could help streamline processes. Now, I should search for more information about these community implementations to understand their structure and functionality better. Let's see what I can find!"
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd404a90819b84f48a44abd26d26",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "filesystem mcp server tools rename delete insert create list"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd4d6eec819b84f0dc8392b1979c",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Evaluating tool usage**\n\nI'm thinking about how the servers provide separate tools for each operation, rather than a union single tool. This indicates that best practice would be to register separate tools per command, which fits with common LLM tool-calling patterns and UI. I want to support my recommendation with real-world examples, so I should also check the official \"sqlite explorer\" example to see if their \"db.execute\" tool uses a union. Let's look into that."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd50e444819bb9dc29b571bed39a",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd53da00819bac5f56ceb4d9a23f",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Researching design guidelines**\n\nI'm noticing that the examples provide simple inputSchema shapes but don’t actually show examples of union or discrimination. I think I need to search for official comments that suggest registering separate tools rather than using a \"command\" field union. This might point to an issue in the repository or some design guideline. So, I should look through the issues for references to \"oneOf union\" to get clarity!"
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd571e20819bbe390b6e888fc01a",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "site:github.com modelcontextprotocol/typescript-sdk discriminated union inputSchema tool"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd5fd77c819b99b3ee2fbd5fceb1",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Evaluating schema options**\n\nLet’s address the user's questions with clear guidance. I’m considering three options. \n\nOption 1 involves using a flat schema with manual runtime validation, which isn’t great for developer experience and type safety. Although it might align with client needs, LLM use could get confused by the optional fields. It might be useful to generate a server-side function to refine the Zod schema with conditional runtime validation, but I need to think through the implications of this approach carefully."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Assessing type inference options**\n\nI’m looking at compile-time type inference for the callback parameter, which isn't ideal. Inside the callback, casting to unknown and parsing seems necessary. \n\nFor Option 2, nesting under a \"params\" property as a discriminated union works with the SDK since the top-level shape is primarily {params: unions}. However, I wonder if some clients might struggle with this nested structure. The inputSchema's \"params\" is just a name without restrictions, and since it's nested, it should be good to go despite concerns about union handling."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Considering LLM options and schemas**\n\nI'm thinking about how the LLM might struggle to fill the correct shape if the function calls the tool with \"params.\" This poses a question of complexity for the LLM. Many servers use separate tools for actions like 'create' and 'move_file', suggesting this might be a better approach than unifying them. \n\nThere's also Option 3, which involves manually overriding the inputSchema to create a discriminated union, but it could break compatibility with clients that restrict top-level unions. I have to take those specifications into account."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Evaluating client compatibility with schemas**\n\nI’m considering whether widely used clients like Claude Code accept top-level \"object\" paired with \"oneOf.\" It's crucial to check this since there was an earlier restriction on the inputSchema in TypeScript SDK that limited it to type literal \"object.\" \n\nHowever, the spec has loosened it to allow for additional properties that support JSON Schema 2020-12, including validations like \"anyOf\" and \"oneOf.\" This is promising, suggesting that it’s indeed possible to have both a type of \"object\" and apply composition with restrictions, which could be beneficial."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Exploring schema compatibility**\n\nI’m considering the complexities surrounding top-level \"oneOf\" in schemas. Although the official spec allows it, some registries still disallow it, which could cause issues for certain clients. \n\nI need to look more closely at how the SDK converts to JSON Schema using zod-to-json-schema with the \"strictUnions\" option and whether it produces the union as \"oneOf.\" The user mentioned that a discriminated union might map to \"anyOf\" instead, so I should verify this. It seems zod-to-json-schema might not support discriminated unions mapping to \"oneOf,\" so a search in the repo could clarify that."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd6ffc30819bbadf24ae21b0f21f",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd79a778819b988d92ed67fe3118",
+            "type": "reasoning",
+            "summary": []
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd7a4964819ba6e97d6d36bcab02",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd819464819bb0ddd695d9a4add9",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Verifying union types in Zod**\n\nI'm searching for info on discriminated unions with Zod and how they convert to JSON Schema. I think Zod-to-json-schema typically represents simple unions as \"anyOf\" with \"type\" arrays, while discriminated unions might also use \"anyOf.\" However, I shouldn’t make assumptions without verifying. The user mentioned that with \"strictUnions: true,\" discriminated unions should become \"anyOf.\" I’ll need to check the SDK and documentation to clarify how this works and ensure my citations are accurate."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Providing guidance on JSON schema**\n\nI think it's important to offer some guidance for ensuring compatibility. It's a good idea to avoid placing top-level unions directly; instead, we can nest the union under something like 'params' or an \"action-specific field.\" I also need to check if clients handle \"anyOf\" correctly. I'll search for information regarding \"Claude JSON schema anyOf oneOf support\" to see what others have experienced with these features and how they work together."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd876b40819bb70b8ce665faf985",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search",
+              "query": "Claude Code JSON Schema oneOf support MCP"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd953ec8819bbeb755f048a4b0e9",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Exploring union handling**\n\nIt seems I haven't found an official document about union handling. I'll rely on the specification that says inputSchema is based on JSON Schema, which isn't restricted. However, I also want to discuss practical client issues. I need to look for an example of a \"rename tool pattern\" or \"unified tool pattern.\" The \"raindrop mcp\" includes \"tag_manage\" with various actions, and I'm considering how that parallels our memory tool. I'll check that repository to examine their schema."
+              }
+            ]
+          },
+          {
+            "id": "ws_09a0d9afa340880b0068ffcd991c10819ba4486d8eafb3158b",
+            "type": "web_search_call",
+            "status": "completed",
+            "action": {
+              "type": "search"
+            }
+          },
+          {
+            "id": "rs_09a0d9afa340880b0068ffcd9ef1a0819b89749ab7de208e8d",
+            "type": "reasoning",
+            "summary": [
+              {
+                "type": "summary_text",
+                "text": "**Conserving web calls**\n\nI’m noticing that we’re running low on web.run calls, so I need to be strategic about conserving them. Given the situation, we have enough information to produce our analysis without needing excessive calls. I plan to start by searching for current MCP best practices and examples like file system servers, raindrop, and the Glama guidelines. I’ll also dive into trade-offs for different approaches, like Options 1, 2, 3, and the separate tools option."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Exploring type safety**\n\nI need to consider developer experience and type safety, focusing on TypeScript generics within the registerTool function. I plan to cover how to achieve type-safe callback parameters, using concepts like \"z.infer<typeof MemoryCommands>.\" I’m a bit unsure about the generics; the SDK’s callback type is ToolCallback<InputArgs extends ZodRawShape>. If the inputSchema property is typed as a ZodType instead of a shape, the generic type remains as the shape. I think I might need to utilize casting or function overloads for typed parameters and check the SDK type of \"ToolCallback\" for clarity."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Clarifying type inference**\n\nI’m wondering if it will infer the union of \"params\" properly, which might produce the type for the \"params\" property as unknown. That's probably okay. I’m proposing to define \"type MemoryInput = z.infer<typeof MemoryCommands>;\" and using \"const args = MemoryCommands.parse(params);\" to achieve typed sanitization. Alternatively, I could consider using \"zod.preprocess\" or \"zod.union.\" However, I can't pass a union at the top level due to SDK limits. There are many considerations regarding field constraints and refining shapes, which complicates the implementation quite a bit."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Evaluating validation options**\n\nI’m realizing we can’t pass \"z.object(...).superRefine\" since that's treated purely as a shape. Instead, it seems more effective to handle runtime validation within the callback using \"MemoryCommands.parse(input).\" I see that Option 3, the \"Manual override,\" isn’t recommended. Alternative Option 4 involves creating six separate tools for tasks like \"memory.view\" and \"memory.create.\" There's also the potential for using multiple tool sets to reduce complexity and improve client security. Lastly, exploring nested operations within the \"memory\" tool could further streamline things, but it comes with its own challenges."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Discussing tool patterns and options**\n\nI’m considering an alternative approach using a \"routing tool\" pattern, keeping \"memory\" as a single tool but computing commands to call the right sub-tool. I can also suggest prompts for each command to guide when to call them, but that might not solve the input schema issue. We should analyze the flat API while maintaining type safety, and I’ll explore options like separate tools versus a unified tool. Ultimately, I’ll recommend going with separate tools for better user experience and fewer errors."
+              },
+              {
+                "type": "summary_text",
+                "text": "**Incorporating citations and guidance**\n\nI need to ensure that I include citations at the end of relevant sections for major claims, with up to five citations each. For instance, the SDK's registerTool necessitating a shape can be demonstrated through documentation. Additionally, I'll reference the Tools spec page that emphasizes the JSON Schema requirements, and cite the PR #816 for ZodType acceptance. Following widely used patterns that favor separate tools, I’ll also address known issues with clients and include disclaimers from third-party documentation. Ultimately, I’ll recommend using six separate tools unless unification is necessary, in which case, Option 2 is the way to go, focusing on developer experience and type safety."
+              }
+            ]
+          },
+          {
+            "id": "msg_09a0d9afa340880b0068ffcdb5cb68819bb1e4a45c7b903438",
+            "type": "message",
+            "status": "completed",
+            "content": [
+              {
+                "type": "output_text",
+                "annotations": [
+                  {
+                    "type": "url_citation",
+                    "end_index": 578,
+                    "start_index": 482,
+                    "title": "Filesystem MCP Server | FlowHunt",
+                    "url": "https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 963,
+                    "start_index": 870,
+                    "title": "Tools - Model Context Protocol",
+                    "url": "https://modelcontextprotocol.io/specification/draft/server/tools"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 1330,
+                    "start_index": 1164,
+                    "title": "Attio MCP Server | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 1821,
+                    "start_index": 1728,
+                    "title": "Tools - Model Context Protocol",
+                    "url": "https://modelcontextprotocol.io/specification/draft/server/tools"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 2116,
+                    "start_index": 2046,
+                    "title": "GitHub - modelcontextprotocol/typescript-sdk: The official TypeScript SDK for Model Context Protocol servers and clients",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 2494,
+                    "start_index": 2413,
+                    "title": "`registerTool`: accept ZodType<object> for input and output schema by ksinder · Pull Request #816 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/816"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 2932,
+                    "start_index": 2827,
+                    "title": "SEP-834 Support full JSON Schema `2020-12` · Issue #834 · modelcontextprotocol/modelcontextprotocol · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/issues/834?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 3374,
+                    "start_index": 3287,
+                    "title": "[BUG] Claude Code incorrectly serializes JSON objects as strings when calling MCP tools · Issue #5504 · anthropics/claude-code · GitHub",
+                    "url": "https://github.com/anthropics/claude-code/issues/5504?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 3903,
+                    "start_index": 3737,
+                    "title": "Attio MCP Server | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 4367,
+                    "start_index": 4271,
+                    "title": "Filesystem MCP Server | FlowHunt",
+                    "url": "https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 6170,
+                    "start_index": 6004,
+                    "title": "Attio MCP Server | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 6826,
+                    "start_index": 6733,
+                    "title": "Tools - Model Context Protocol",
+                    "url": "https://modelcontextprotocol.io/specification/draft/server/tools"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 7098,
+                    "start_index": 7017,
+                    "title": "`registerTool`: accept ZodType<object> for input and output schema by ksinder · Pull Request #816 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/816"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 7839,
+                    "start_index": 7673,
+                    "title": "Attio MCP Server | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 8462,
+                    "start_index": 8366,
+                    "title": "Filesystem MCP Server | FlowHunt",
+                    "url": "https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 9606,
+                    "start_index": 9513,
+                    "title": "Tools - Model Context Protocol",
+                    "url": "https://modelcontextprotocol.io/specification/draft/server/tools"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 9948,
+                    "start_index": 9782,
+                    "title": "Attio MCP Server | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 10246,
+                    "start_index": 10153,
+                    "title": "Tools - Model Context Protocol",
+                    "url": "https://modelcontextprotocol.io/specification/draft/server/tools"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 10435,
+                    "start_index": 10365,
+                    "title": "GitHub - modelcontextprotocol/typescript-sdk: The official TypeScript SDK for Model Context Protocol servers and clients",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 10726,
+                    "start_index": 10645,
+                    "title": "`registerTool`: accept ZodType<object> for input and output schema by ksinder · Pull Request #816 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/816"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 11106,
+                    "start_index": 10940,
+                    "title": "Attio MCP Server | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 11509,
+                    "start_index": 11413,
+                    "title": "Filesystem MCP Server | FlowHunt",
+                    "url": "https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 12075,
+                    "start_index": 11994,
+                    "title": "`registerTool`: accept ZodType<object> for input and output schema by ksinder · Pull Request #816 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/816"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 12603,
+                    "start_index": 12510,
+                    "title": "Tools - Model Context Protocol",
+                    "url": "https://modelcontextprotocol.io/specification/draft/server/tools"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 13315,
+                    "start_index": 13231,
+                    "title": "Claude team, could you please update the MCP docs? Lots of guides are outdated.",
+                    "url": "https://www.reddit.com/r/ClaudeAI/comments/1krvdif?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 14430,
+                    "start_index": 14334,
+                    "title": "Filesystem MCP Server | FlowHunt",
+                    "url": "https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 15579,
+                    "start_index": 15486,
+                    "title": "Tools - Model Context Protocol",
+                    "url": "https://modelcontextprotocol.io/specification/draft/server/tools"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 15931,
+                    "start_index": 15832,
+                    "title": "MCP SDK v1.17.5 Incompatible with Zod v4 - Breaking Changes · Issue #925 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 16327,
+                    "start_index": 16161,
+                    "title": "Attio MCP Server | Glama",
+                    "url": "https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 16584,
+                    "start_index": 16503,
+                    "title": "`registerTool`: accept ZodType<object> for input and output schema by ksinder · Pull Request #816 · modelcontextprotocol/typescript-sdk · GitHub",
+                    "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues/816"
+                  },
+                  {
+                    "type": "url_citation",
+                    "end_index": 16903,
+                    "start_index": 16807,
+                    "title": "Filesystem MCP Server | FlowHunt",
+                    "url": "https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai"
+                  }
+                ],
+                "logprobs": [],
+                "text": "Short answer up front\n- The most robust, user-friendly, and future‑proof approach in today’s MCP ecosystem is to register six separate tools (memory.view, memory.create, memory.str_replace, memory.insert, memory.delete, memory.rename) rather than one discriminated‑union “memory” tool. This matches real‑world servers, works across clients (Claude Code, Cursor, MCP Inspector), avoids current JSON Schema/union quirks in clients, and gives clearer ergonomics to the LLM and the UI. ([flowhunt.io](https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai))\n- If you insist on a single tool, the safest pattern under the current TypeScript SDK (v1.x) is Option 2 (nest the discriminated union under a property like params). It preserves TypeScript type narrowing while avoiding top‑level oneOf/anyOf that some tooling and registries still choke on. ([modelcontextprotocol.io](https://modelcontextprotocol.io/specification/draft/server/tools))\n- I do not recommend Option 3 (manually overriding the SDK’s inputSchema) because it is fragile against SDK updates and can introduce top‑level union shapes that some clients/registries reject today. ([glama.ai](https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai))\n\nBelow is a complete analysis with sources, trade‑offs, DX and type‑safety notes, and recommendations.\n\nWhat the spec and SDK officially support today\n- Tools accept a JSON Schema inputSchema; the spec’s examples show a simple object with properties and required. The spec does not prescribe your exact shape beyond “JSON Schema,” but most examples keep it to “type: object” with flat properties. ([modelcontextprotocol.io](https://modelcontextprotocol.io/specification/draft/server/tools))\n- The official TypeScript SDK encourages passing a Zod raw shape (object of fields) which it wraps with z.object() to generate JSON Schema. The readme examples reflect this (“inputSchema: { a: z.number(), b: z.number() }”). ([github.com](https://github.com/modelcontextprotocol/typescript-sdk))\n- There is an open PR to allow passing a full ZodType<object> (including unions) directly to registerTool, but as of October 2025 this PR is not merged, so you can’t rely on it for production. If/when merged, you could pass a discriminated union directly (still subject to client compatibility). ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/816))\n- The MCP project is clarifying JSON Schema dialect expectations and composition support (anyOf/oneOf). A spec proposal points toward standardizing on JSON Schema 2020‑12 and allowing compositions like anyOf/oneOf, but real clients vary in how well they handle unions. Plan for conservative schemas when targeting multiple clients. ([github.com](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/834?utm_source=openai))\n\nClient reality: unions and complex schemas are still bumpy\n- Multiple reports indicate some MCP clients (notably certain Claude Code/Desktop builds) struggle with complex parameter schemas (e.g., JSON objects passed as strings, unions misunderstood, required fields guessed). This pushes server authors toward simple, single‑responsibility tool shapes. ([github.com](https://github.com/anthropics/claude-code/issues/5504?utm_source=openai))\n- A widely circulated guideline (non‑official but aligned with observed behavior) warns against top‑level oneOf/allOf/anyOf in inputSchema; instead, keep top‑level as an object and perform either/or validation in code or nest unions below the top level. Even where the protocol allows it, some registries/clients/validators still fail on top‑level compositions. ([glama.ai](https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai))\n\nHow practitioners structure tools\n- Production MCP servers for filesystem operations overwhelmingly use separate tools per action (read_file, write_file, move_file, delete_file, etc.). This avoids the “one tool with a command discriminator” pattern and gives the LLM and UI a clearer menu of affordances. It also prevents accidental parameter mixing across actions. ([flowhunt.io](https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai))\n\nYour three options, deeply analyzed\n\nOption 1: Flat schema with all optional fields (current)\n- What it looks like: One tool with a command enum and many optional parameters, and you validate at runtime after switching on command.\n- Pros\n  - Satisfies the SDK’s ZodRawShape constraint without hacks.\n  - Flat API surface from the client’s perspective.\n- Cons\n  - You lose compile‑time inference at the tool boundary; everything is optional and you only recover types after manual validation. The callback signature sees a lax type, making refactors dangerous.\n  - It communicates to clients/LLMs that every field is optional, which increases bad calls, retries, and tool misuse (poorer DX for humans in UIs as well).\n- When to consider: If you must keep a single tool name for backwards compatibility, you can mitigate by immediately parsing the input with a discriminated union inside the callback:\n  - const parsed = MemoryCommands.parse(input); switch (parsed.command) { … }\n  This recovers type narrowing, but only inside the callback; it doesn’t improve the published JSON Schema (the client still sees many optional fields).\n\nOption 2: Nest the discriminated union under params (recommended if you insist on one tool)\n- What it looks like: inputSchema: { params: z.discriminatedUnion('command', [...]) } and then handle params in the callback.\n- Pros\n  - Excellent TypeScript narrowing in your implementation: z.infer<typeof MemoryCommands> on params gives exact types per command branch.\n  - Avoids top‑level oneOf/anyOf. The top level remains a plain object, which is the most compatible shape across clients/registries today. ([glama.ai](https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai))\n  - You keep a single tool “memory,” satisfying your “flat” name preference as far as tool listing goes.\n- Cons\n  - Callers must send { params: { command: \"...\", ... } }, which is one level of nesting.\n  - Depending on how the client renders parameter forms, the extra nesting can be slightly more cumbersome to fill.\n- Notes\n  - This pattern maps cleanly to JSON Schema as an object with a property whose schema is a union, avoiding the specific pain point of top‑level compositions. It also aligns with the spec’s general examples of object‑typed inputSchema. ([modelcontextprotocol.io](https://modelcontextprotocol.io/specification/draft/server/tools))\n  - If you later move to an SDK that accepts full ZodType<object> (PR #816), you could consider lifting the discriminated union to the top level. But test against your target clients first. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/816))\n\nOption 3: Manual override of inputSchema to a discriminated union (bypass SDK)\n- What it looks like: Register with an empty shape, then patch tool.inputSchema to a ZodDiscriminatedUnion yourself.\n- Pros\n  - Keeps your tool flat (no params wrapper) and advertises the correct union at the top level.\n- Cons\n  - Fragile: relies on private/internal SDK behavior and may break across versions.\n  - Risk of generating a top‑level oneOf/anyOf that some discovery services or clients reject, even if the protocol technically allows it. This can cause connection/listing failures. ([glama.ai](https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai))\n  - You lose type safety at the registerTool boundary and make upgrades harder.\n- Verdict: Not recommended.\n\nA fourth option you should seriously consider: register six separate tools\n- What it looks like: memory.view, memory.create, memory.str_replace, memory.insert, memory.delete, memory.rename.\n- Why it’s the practical standard\n  - Mirrors real‑world servers (especially filesystem‑like operations) that expose one tool per action. These servers work across Claude Code, MCP Inspector, Cursor, etc. with fewer surprises. ([flowhunt.io](https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai))\n  - Simpler schemas are easier for LLMs to select correctly. Clear names and minimal required parameters reduce retries, wasted tokens, and model confusion.\n  - Better UI/UX: clients can show six obvious buttons/commands; humans can auto‑approve non‑destructive tools and scrutinize destructive ones.\n  - Avoids all union/discriminator schema ambiguity outright.\n- DX/type‑safety\n  - Each tool’s callback parameter is precisely typed; you don’t need discriminated unions or nested params at all.\n  - Easier to evolve: adding a new operation doesn’t change a central union and risk breaking prior calls—just register a new tool.\n\nWill clients handle anyOf/oneOf properly?\n- Officially, the spec says inputSchema is JSON Schema and shows object examples; it doesn’t forbid schema composition. In practice, support varies: some clients mangle complex params (e.g., serializing objects as strings), others ignore or misread unions, especially at the top level. That’s why many production servers avoid top‑level oneOf/anyOf and/or avoid unions entirely. ([modelcontextprotocol.io](https://modelcontextprotocol.io/specification/draft/server/tools))\n- If you must use a union today, prefer nesting it (Option 2) and test with the clients you target (Claude Code, MCP Inspector, Cursor). Keep the top level as a plain object. ([glama.ai](https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai))\n\nOfficial and ecosystem guidance (what we can point to)\n- The Tools spec gives object‑shaped examples and emphasizes JSON Schema for parameters; it does not recommend a particular API layout beyond that. ([modelcontextprotocol.io](https://modelcontextprotocol.io/specification/draft/server/tools))\n- The TypeScript SDK readme and examples consistently use object shapes with explicit properties—no top‑level unions. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk))\n- There’s ongoing work to improve schema expressiveness in the SDK (accept full ZodType<object>) and to clarify JSON Schema dialect/composition in the spec, but you can’t count on uniform client behavior yet. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/816))\n- Several community servers and directories explicitly recommend avoiding top‑level oneOf/anyOf due to client and registry validation behavior; even if not “official,” this reflects the current reality users hit. ([glama.ai](https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai))\n\nAnswering your specific questions\n\n1) What’s standard/recommended in MCP for varying parameters?\n- De facto practice is “one tool per action,” especially for CRUD‑/filesystem‑style servers, not a single discriminated‑union tool. This aligns with client UX and LLM behavior, and minimizes schema pitfalls. ([flowhunt.io](https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai))\n\n2) Can you keep a flat API (no params wrapper) and maintain type safety?\n- Not reliably with @modelcontextprotocol/sdk v1.0.4. You can recover type safety inside the callback by parsing the received input with your discriminated union, but compile‑time inference at registerTool’s boundary will still see the flat optional bag. If the pending PR merges in a future SDK release, you could pass a Zod discriminated union directly; just validate client compatibility (top‑level union). ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/816))\n\n3) Does the protocol have guidance on discriminated unions? Will clients like Claude Code handle anyOf for this?\n- The protocol treats inputSchema as JSON Schema; no special MCP‑level rules for discriminated unions. However, client support for union compositions is inconsistent today; some issues show parameter serialization bugs and poor handling of complex schemas. Favor simpler object shapes; if you must use a union, nest it. ([modelcontextprotocol.io](https://modelcontextprotocol.io/specification/draft/server/tools))\n\n4) Alternatives or modern patterns?\n- Six separate tools (memory.view etc.) is the most interoperable pattern.\n- If you want to preserve the single “memory” entry point for humans but keep technical clarity: register a lightweight “memory.help” tool that returns examples and guidance, and register the six action tools for actual work.\n- If you insist on one tool for routing: Option 2 with params is the safest. Avoid Option 3 (manual override).\n- If schema heaviness is a concern in Claude Code (tools bloating the context), consider grouping tools or dynamically enabling toolsets (some clients are adding features here). ([reddit.com](https://www.reddit.com/r/ClaudeAI/comments/1krvdif?utm_source=openai))\n\n5) What’s most maintainable and user‑friendly long‑term?\n- Separate tools win on maintainability, testability, and cross‑client reliability. They make it easier to:\n  - add/remove operations without risking a central union schema,\n  - write focused unit tests per operation,\n  - provide per‑tool annotations (e.g., destructiveHint) and titles/descriptions that help both LLMs and users choose the right tool,\n  - gate/auto‑approve only non‑destructive tools in client UIs.\n\nRecommended design for your case\n\nPreferred (separate tools)\n- memory.view: { path: string, view_range?: [number, number] }\n- memory.create: { path: string, file_text: string }\n- memory.str_replace: { path: string, old_str: string, new_str: string }\n- memory.insert: { path: string, insert_line: number, insert_text: string }\n- memory.delete: { path: string }\n- memory.rename: { old_path: string, new_path: string }\nRationale: clean schemas, perfect type inference, great client compatibility (no unions), nice affordances for the LLM and UI. ([flowhunt.io](https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai))\n\nIf you must keep one tool (use Option 2)\n- Define MemoryCommands = z.discriminatedUnion('command', [...]).\n- Register inputSchema: { params: MemoryCommands }.\n- In the callback: const { command } = MemoryCommands.parse(params); switch (command) { … }.\n- Document clearly in the tool description how to call each sub‑command; unions still need clear English guidance for LLMs.\n\nA few TypeScript/Zod tips to keep DX high\n- Strongly type your handler with z.infer<typeof MemoryCommands> to get exhaustiveness checking in the switch:\n  - type MemoryParams = z.infer<typeof MemoryCommands>;\n  - function handle(params: MemoryParams) { switch(params.command) { case 'view': return handleView(params); … default: assertNever(params); } }\n- Even if using separate tools, always parse inputs with the exact Zod schema at the top of the callback and return early with informative errors; many clients surface these nicely.\n- Consider providing outputSchema to validate structured results; newer spec drafts encourage clients to validate structuredContent as well. ([modelcontextprotocol.io](https://modelcontextprotocol.io/specification/draft/server/tools))\n\nWatch‑outs and future‑proofing\n- Keep SDK and Zod versions compatible—there have been multiple reports of version mismatches and breaking changes (e.g., Zod v4 not supported by current SDKs). Pin Zod 3.x with the SDK you’re on; test before upgrading. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/925?utm_source=openai))\n- Test end‑to‑end with the clients you care about (Claude Code, MCP Inspector, Cursor) because schema handling varies more than the spec suggests. Avoid top‑level oneOf/anyOf until you’ve verified it works in your client matrix. ([glama.ai](https://glama.ai/mcp/servers/%40kesslerio/attio-mcp-server/blob/f3302a945c812139d2cc3b26bfefac5c74b75ca0/docs/mcp-schema-guidelines.md?utm_source=openai))\n- Keep an eye on the SDK PR that would allow passing ZodType<object> directly to registerTool; if/when merged, you can revisit a flatter API—still beware client union quirks. ([github.com](https://github.com/modelcontextprotocol/typescript-sdk/issues/816))\n\nBottom line\n- Best long‑term choice: register six tools. It’s how most successful MCP servers in this space already ship filesystem‑like operations, and it side‑steps today’s union/composition potholes in client tooling. ([flowhunt.io](https://www.flowhunt.io/mcp-servers/golang-filesystem-server/?utm_source=openai))\n- If unified is non‑negotiable: use the “params: discriminated union” wrapper (Option 2). It preserves TypeScript safety and avoids top‑level union problems. Avoid overriding the SDK internals.\n\nIf you want, I can sketch the exact TypeScript/Zod scaffolding (both variants) with a minimal helper type to get perfect narrowing and exhaustive switches, plus sample JSON Schemas as they’ll look after conversion."
+              }
+            ],
+            "role": "assistant"
+          }
+        ],
+        "parallel_tool_calls": true,
+        "previous_response_id": null,
+        "prompt_cache_key": null,
+        "reasoning": {
+          "effort": "high",
+          "summary": "detailed"
+        },
+        "safety_identifier": null,
+        "service_tier": "default",
+        "store": true,
+        "temperature": 1,
+        "text": {
+          "format": {
+            "type": "text"
+          },
+          "verbosity": "high"
+        },
+        "tool_choice": "auto",
+        "tools": [
+          {
+            "type": "web_search",
+            "filters": null,
+            "search_context_size": "medium",
+            "user_location": {
+              "type": "approximate",
+              "city": null,
+              "country": "US",
+              "region": null,
+              "timezone": null
+            }
+          }
+        ],
+        "top_logprobs": 0,
+        "top_p": 1,
+        "truncation": "auto",
+        "usage": {
+          "input_tokens": 91664,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens": 8668,
+          "output_tokens_details": {
+            "reasoning_tokens": 5120
+          },
+          "total_tokens": 100332
+        },
+        "user": null,
+        "metadata": {}
+      }
+    }
+  ],
+  "cwd": "/home/jan/projects/memory-mcp"
+}

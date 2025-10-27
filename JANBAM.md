@@ -75,3 +75,13 @@ The memory tool has 6 different command types. You need a discriminated union sc
       }
     }
   );
+
+
+  ----
+
+  And let's implement both approaches:
+    a) one unified tool with command parameter
+    b) one tool per command
+    switchable with a server cli arg
+
+  Also implement --include-commands and --exclude-commands for which tools/commands get exposed by the server
