@@ -31,9 +31,28 @@ export async function executeMemoryCommand(
       // TypeScript knows: args has { command: 'create', path: string, file_text: string }
       return await operations.create(args, context);
 
-    case 'str_replace':
-      // TypeScript knows: args has { command: 'str_replace', path: string, old_str: string, new_str: string }
-      return await operations.str_replace(args, context);
+    case 'str_replace': {
+      // Normalize field names: accept both snake_case and camelCase
+      const argsAny = args as any;
+      const oldStr = args.old_str || argsAny.old_string;
+      const newStr = args.new_str || argsAny.new_string;
+
+      if (!oldStr) {
+        throw new Error('Missing required field: old_str (or old_string)');
+      }
+      if (!newStr) {
+        throw new Error('Missing required field: new_str (or new_string)');
+      }
+
+      return await operations.str_replace(
+        {
+          path: args.path,
+          old_str: oldStr,
+          new_str: newStr,
+        } as any,
+        context,
+      );
+    }
 
     case 'insert': {
       // TypeScript knows: args has { command: 'insert', path: string, insert_line: number | string, insert_text: string }

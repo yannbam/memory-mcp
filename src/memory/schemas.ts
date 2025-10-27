@@ -24,12 +24,18 @@ const CreateCommand = z.object({
   file_text: z.string().describe('Content to write to the file'),
 });
 
-const StrReplaceCommand = z.object({
-  command: z.literal('str_replace'),
-  path: z.string().describe('Path to file to modify'),
-  old_str: z.string().describe('Exact text to find (must be unique in file)'),
-  new_str: z.string().describe('Text to replace with'),
-});
+// UX: Accept both snake_case and camelCase naming for str_replace parameters
+// Use passthrough to allow both field names, normalize in command executor
+const StrReplaceCommand = z
+  .object({
+    command: z.literal('str_replace'),
+    path: z.string().describe('Path to file to modify'),
+    old_str: z.string().optional().describe('Exact text to find (must be unique in file)'),
+    old_string: z.string().optional(),
+    new_str: z.string().optional().describe('Text to replace with'),
+    new_string: z.string().optional(),
+  })
+  .passthrough();
 
 const InsertCommand = z.object({
   command: z.literal('insert'),
