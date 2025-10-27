@@ -3,48 +3,49 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: e3add206-bf02-4381-93ad-8079a19f53ec
-Branch: feature/discriminated-union-schema (created this session)
-Previous work: dev branch - a04adf7 (memory system implementation)
-Context: ~97k tokens (approaching handoff)
-Status: Discriminated union research complete, implementation guide written, ready for next session
+Session: 16d4313a-89b5-4fe3-959d-cac81084062e
+Branch: feature/discriminated-union-schema
+Context: ~114k tokens (approaching handoff)
+Status: ✅ Discriminated union implementation COMPLETE and TESTED
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
 ### This Session Accomplished
-✅ Designed comprehensive evolutionary memory system combining all refinements
-✅ Replaced entire Memory section in CLAUDE.md (lines 364-492) with new system
-✅ Restructured long-term.md with 8 universal sections + extensibility note
-✅ Restructured short-term.md with Quick Notes at end for rapid capture
-✅ Emphasized memory as LEARNING system that evolves, not just storage
-✅ Implemented OPTIONAL emoji system: 0-3 emojis per memory line for multi-dimensional markers
-✅ Updated all examples showing flexibility: simple facts need no emojis, complex discoveries can use 1-3
+✅ Implemented discriminated union schema using low-level Server API
+✅ Created src/memory/schemas.ts with 6 command variants
+✅ Created src/memory/command-executor.ts with type-safe dispatch
+✅ Refactored src/server/mcp-server.ts to use Server instead of McpServer
+✅ Fixed MCP protocol validation by using $refStrategy: "none" and adding type: "object"
+✅ Added UX improvements: accept both number/string for insert_line
+✅ Added UX improvements: accept both snake_case and camelCase for str_replace parameters
+✅ All 6 commands tested and working perfectly
+✅ Updated docs/DISCRIMINATED-UNION-IMPLEMENTATION.md with complete results
+✅ GPT-5 consultation provided critical solution for MCP protocol compliance
 
 ### What Next Session Should Do
 
-**Priority 1: Implement Discriminated Union Schema (NEW)**
-Branch: feature/discriminated-union-schema
-Implementation guide: docs/DISCRIMINATED-UNION-IMPLEMENTATION.md
-
-After comprehensive research (GPT-5 + MCP SDK exploration), we identified Approach 2 (low-level Server API) as the optimal solution for implementing a top-level discriminated union in the memory tool's input schema.
+**Priority 1: Code Review and PR Preparation**
+Branch: feature/discriminated-union-schema (4 commits ready)
+Status: Implementation complete, all tests passing
 
 Tasks:
-1. Read docs/DISCRIMINATED-UNION-IMPLEMENTATION.md (complete self-contained guide)
-2. Implement the approach step-by-step
-3. Test with Claude Code via .mcp.json integration
-4. Document findings (success or issues) in the implementation guide
-5. If successful: merge to dev and update docs
-6. If issues: document problems and evaluate Approach 4 fallback
+1. Run code review to check for any issues
+2. Verify all tests still pass (npm test)
+3. Check linting (npm run lint)
+4. Review commit messages and squash if needed
+5. Merge feature/discriminated-union-schema → dev
+6. Update CLAUDE.md handoff section with latest status
+7. Consider if this warrants a new minor version (0.2.0)
 
-**Priority 2: Continue Public Beta Preparation (After Union Testing)**
-Continue Phase 2: Configure MCP for Project
-Create .mcp.json pointing to local build
-Create .mcp.example.json template for users
-Test memory system works with actual usage
+**Priority 2: Continue Public Beta Preparation**
+After merge to dev, continue with Phase 2-3:
+- Create .mcp.example.json template for users
+- Update README with discriminated union benefits
+- Consider creating GitHub release for v0.2.0
 
 ### Current Blockers
-None - discriminated union implementation ready, waiting for next session testing
+None - implementation complete and tested
 
 ## Active Plans
 _Current PlanAndTrack references_
@@ -55,13 +56,7 @@ Plan: public-release-beta (3% complete - 1/39 tasks)
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-[🔬📐] Discriminated union research session complete (GPT-5 consultation + MCP SDK deep dive)
-[⚠️] MCP SDK v1.0.4 registerTool cannot accept z.discriminatedUnion directly - expects ZodRawShape
-[✅] Approach 2 (low-level Server API) identified as optimal: proper oneOf JSON Schema, full type safety
-[📝] Complete implementation guide written: docs/DISCRIMINATED-UNION-IMPLEMENTATION.md
-[🌳] Branch created: feature/discriminated-union-schema - ready for next session
-[💡] Key finding: Production MCP servers use low-level Server API for complex schemas
-[⏳] Pending SDK PR #816 would enable direct discriminated union support (not merged yet)
-GPT-5 identified 14 different approaches - Approach 2 most technically correct
-[🎯] Testing plan: implement → test with Claude Code → document results → merge or fallback
-Context at ~96k tokens - approaching handoff point, docs updated for clean continuation
+Branch feature/discriminated-union-schema has 4 commits ready for review
+Commits: 1b085e2 (main impl), 92880a2 (insert_line fix), 4020b27 (docs), 1fa7ce9 (flexible naming)
+All 6 memory commands tested and working with actual Claude Code instance
+Test files in .memory/memories/ can be deleted after merge (discriminated-union-test.md, insert-test.txt)
