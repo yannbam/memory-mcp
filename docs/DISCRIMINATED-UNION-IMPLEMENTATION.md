@@ -512,4 +512,89 @@ If this approach doesn't work with Claude Code:
 
 **Created**: 2025-10-27
 **Branch**: `feature/discriminated-union-schema`
-**Status**: Ready for implementation and testing
+**Status**: ✅ **IMPLEMENTATION COMPLETE AND TESTED**
+
+## Implementation Results (2025-10-27)
+
+### Success ✅
+
+**The discriminated union implementation is fully working!**
+
+### Final Solution
+
+The key fix was using `$refStrategy: "none"` to inline the schema:
+
+```typescript
+const baseSchema = zodToJsonSchema(MemoryCommandSchema, {
+  name: 'MemoryCommand',
+  strictUnions: true,
+  $refStrategy: 'none',  // ← Critical: inline the union
+});
+
+const inputSchema = {
+  type: 'object',  // ← MCP protocol requirement
+  ...baseSchema,    // ← Spreads anyOf with discriminated union
+};
+```
+
+### Issues Encountered and Fixed
+
+1. **Initial Problem**: MCP protocol validation error
+   - Error: `"expected": "object"` at `inputSchema.type`
+   - Cause: zodToJsonSchema produced `$ref` at top level without `type: "object"`
+   - Solution: Use `$refStrategy: "none"` + add `type: "object"`
+
+2. **Claude Code Parameter Serialization**
+   - Issue: Numeric `insert_line` parameter received as string
+   - Fix: Accept `union([number, string])` in schema + normalize in handler
+   - This is a pragmatic compatibility fix for MCP client quirks
+
+### Test Results
+
+All 6 commands tested and working:
+- ✅ view (directories and files with optional line ranges)
+- ✅ create (file creation with content)
+- ✅ str_replace (text replacement)
+- ✅ insert (text insertion - accepts number or string for line number)
+- ✅ rename (file/directory renaming)
+- ✅ delete (file/directory deletion)
+
+### Schema Structure (Final)
+
+```json
+{
+  "type": "object",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "command": { "type": "string", "const": "view" },
+        "path": { "type": "string", "description": "..." },
+        "view_range": { "type": "array", ... }
+      },
+      "required": ["command", "path"],
+      "additionalProperties": false
+    },
+    // ... 5 more variants with exact required fields
+  ]
+}
+```
+
+### Key Learnings
+
+1. **MCP protocol DOES support discriminated unions** - just needs `type: "object"` at root
+2. **Use `$refStrategy: "none"`** to avoid `$ref` sibling issues
+3. **Production MCP servers use this pattern** (confirmed by GPT-5)
+4. **anyOf works fine** for discriminated unions (oneOf is more strict but anyOf is sufficient)
+5. **Be pragmatic about client compatibility** - accept string OR number for numeric params if needed
+
+### Commits
+
+- `1b085e2`: Initial discriminated union implementation
+- `92880a2`: Compatibility fix for insert_line parameter
+
+### References Used
+
+- GPT-5 consultation: Session 1761595236443-75uvjxnu (provided critical `$refStrategy: "none"` insight)
+- MCP-Debug for protocol inspection
+- mcp-inspector for validation testing
