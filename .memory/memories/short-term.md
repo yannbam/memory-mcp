@@ -3,11 +3,11 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 2fc38dee-528f-468e-9b5a-8194dedb4828
-Branch: dev
-Latest commit: a04adf7 - feat: Implement evolutionary memory system with optional emoji markers
-Context: ~93k tokens
-Status: Memory system implementation complete and committed
+Session: e3add206-bf02-4381-93ad-8079a19f53ec
+Branch: feature/discriminated-union-schema (created this session)
+Previous work: dev branch - a04adf7 (memory system implementation)
+Context: ~97k tokens (approaching handoff)
+Status: Discriminated union research complete, implementation guide written, ready for next session
 
 ## Session Handoff
 _What was done, what's next, blockers_
@@ -22,13 +22,29 @@ _What was done, what's next, blockers_
 ✅ Updated all examples showing flexibility: simple facts need no emojis, complex discoveries can use 1-3
 
 ### What Next Session Should Do
+
+**Priority 1: Implement Discriminated Union Schema (NEW)**
+Branch: feature/discriminated-union-schema
+Implementation guide: docs/DISCRIMINATED-UNION-IMPLEMENTATION.md
+
+After comprehensive research (GPT-5 + MCP SDK exploration), we identified Approach 2 (low-level Server API) as the optimal solution for implementing a top-level discriminated union in the memory tool's input schema.
+
+Tasks:
+1. Read docs/DISCRIMINATED-UNION-IMPLEMENTATION.md (complete self-contained guide)
+2. Implement the approach step-by-step
+3. Test with Claude Code via .mcp.json integration
+4. Document findings (success or issues) in the implementation guide
+5. If successful: merge to dev and update docs
+6. If issues: document problems and evaluate Approach 4 fallback
+
+**Priority 2: Continue Public Beta Preparation (After Union Testing)**
 Continue Phase 2: Configure MCP for Project
 Create .mcp.json pointing to local build
 Create .mcp.example.json template for users
 Test memory system works with actual usage
 
 ### Current Blockers
-None - systematic implementation in progress
+None - discriminated union implementation ready, waiting for next session testing
 
 ## Active Plans
 _Current PlanAndTrack references_
@@ -39,12 +55,13 @@ Plan: public-release-beta (3% complete - 1/39 tasks)
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-[💡🤯] Memory system philosophy fundamentally redesigned to emphasize learning and evolution
-[✅📝] Emoji system is OPTIONAL: use 0-3 emojis as needed, simple facts need no emojis
-Generic sections in long-term.md allow any project to use this template
-[💡] User emphasized: memory isn't just for surprises but also deferred work, reminders, partial progress
-[⚠️🔥] Emoji freedom critical - don't constrain future Claudes with limited examples
-Knowledge evolution: memories should be refined in place using str_replace, not just accumulated
-[💡✨] Key insight: Memory enables collective intelligence across Claude instances
-Memory workflow: Search → Refine → Synthesize (not just append)
-Context at ~89k tokens - good headroom remaining for Phase 2 work
+[🔬📐] Discriminated union research session complete (GPT-5 consultation + MCP SDK deep dive)
+[⚠️] MCP SDK v1.0.4 registerTool cannot accept z.discriminatedUnion directly - expects ZodRawShape
+[✅] Approach 2 (low-level Server API) identified as optimal: proper oneOf JSON Schema, full type safety
+[📝] Complete implementation guide written: docs/DISCRIMINATED-UNION-IMPLEMENTATION.md
+[🌳] Branch created: feature/discriminated-union-schema - ready for next session
+[💡] Key finding: Production MCP servers use low-level Server API for complex schemas
+[⏳] Pending SDK PR #816 would enable direct discriminated union support (not merged yet)
+GPT-5 identified 14 different approaches - Approach 2 most technically correct
+[🎯] Testing plan: implement → test with Claude Code → document results → merge or fallback
+Context at ~96k tokens - approaching handoff point, docs updated for clean continuation
