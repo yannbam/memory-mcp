@@ -1,0 +1,81 @@
+{
+  "uuid": "13d5ffff-8138-48f8-be92-c81e51e10b95",
+  "name": "discriminated-union-implementation",
+  "details": "Implement discriminated union schema for memory tool using low-level Server API instead of McpServer.registerTool(). This will provide proper JSON Schema with oneOf and exact required fields per command variant.",
+  "tasks": [
+    {
+      "name": "Create schemas.ts",
+      "details": "Create src/memory/schemas.ts with discriminated union for all 6 memory commands. Each command gets its own schema with exact required fields. Export MemoryCommand type and assertNever helper.",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "6544e361-cccc-44f3-a87b-13b84f8a7349",
+      "created_at": "2025-10-27T20:48:40.445Z",
+      "updated_at": "2025-10-27T20:49:31.211Z"
+    },
+    {
+      "name": "Create command-executor.ts",
+      "details": "Create src/memory/command-executor.ts with type-safe dispatch switch statement. Uses discriminated union for automatic type narrowing per command variant.",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "2f5ff399-c47f-4a65-bd4e-fe9320576a7a",
+      "created_at": "2025-10-27T20:48:40.446Z",
+      "updated_at": "2025-10-27T20:50:20.649Z"
+    },
+    {
+      "name": "Refactor mcp-server.ts",
+      "details": "Replace McpServer with low-level Server API. Manually register ListToolsRequestSchema and CallToolRequestSchema handlers. Use zodToJsonSchema to convert discriminated union to proper oneOf JSON Schema.",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "2c10ef82-212c-4abc-99c4-6e004eea39bb",
+      "created_at": "2025-10-27T20:48:40.446Z",
+      "updated_at": "2025-10-27T20:50:55.385Z"
+    },
+    {
+      "name": "Update operations.ts",
+      "details": "Update MemoryOperations method signatures to accept discriminated union command objects directly instead of extracting from params. Remove manual command string switches.",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "360cdf40-d563-4d49-925a-0c66e93b3aab",
+      "created_at": "2025-10-27T20:48:40.446Z",
+      "updated_at": "2025-10-27T20:50:55.539Z"
+    },
+    {
+      "name": "Update transports.ts",
+      "details": "Update transport initialization to work with Server instead of McpServer. Change type annotations and ensure server.connect() calls work correctly.",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "a2d1028f-056e-4a59-9016-3a90c47bdf02",
+      "created_at": "2025-10-27T20:48:40.446Z",
+      "updated_at": "2025-10-27T20:51:17.731Z"
+    },
+    {
+      "name": "Update index.ts",
+      "details": "Update entry point to import and use the new createMemoryServer function. Ensure all config passing works correctly.",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "8d4143b9-3c97-4846-b263-0baf6933c968",
+      "created_at": "2025-10-27T20:48:40.446Z",
+      "updated_at": "2025-10-27T20:51:31.654Z"
+    },
+    {
+      "name": "Build and test",
+      "details": "Run npm run build to compile TypeScript. Fix any compilation errors. Verify dist/ output is correct.",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "457b8ea1-9136-4cca-bd27-a8b15bb9d9d5",
+      "created_at": "2025-10-27T20:48:40.446Z",
+      "updated_at": "2025-10-27T20:52:59.139Z"
+    },
+    {
+      "name": "Test with Claude Code",
+      "details": "Test the MCP server with actual Claude Code instance via .mcp.json integration. Verify JSON Schema shows proper oneOf structure. Test each command variant.",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "6744e679-ea94-472d-beb1-fbb3c915c76a",
+      "created_at": "2025-10-27T20:48:40.446Z",
+      "updated_at": "2025-10-27T21:00:52.753Z"
+    }
+  ],
+  "created_at": "2025-10-27T20:48:40.446Z",
+  "updated_at": "2025-10-27T21:00:58.572Z"
+}

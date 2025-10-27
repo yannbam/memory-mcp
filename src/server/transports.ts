@@ -8,14 +8,14 @@ import express from 'express';
 import cors from 'cors';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { Server } from '@modelcontextprotocol/sdk/server/index.js';
 
 /**
  * Initialize stdio transport and connect to server
  *
- * @param server - MCP server instance
+ * @param server - MCP server instance (base Server class)
  */
-export async function initStdioTransport(server: McpServer): Promise<void> {
+export async function initStdioTransport(server: Server): Promise<void> {
   // Create stdio transport
   const transport = new StdioServerTransport();
 
@@ -29,10 +29,10 @@ export async function initStdioTransport(server: McpServer): Promise<void> {
 /**
  * Initialize HTTP transport with Express and connect to server
  *
- * @param server - MCP server instance
+ * @param server - MCP server instance (base Server class)
  * @param port - Port number to listen on
  */
-export async function initHttpTransport(server: McpServer, port: number): Promise<void> {
+export async function initHttpTransport(server: Server, port: number): Promise<void> {
   // Create Express app
   const app = express();
 
