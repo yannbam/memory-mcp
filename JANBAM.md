@@ -1,59 +1,77 @@
 # Human Notes - DONT EDIT!!!
 
-claude often uses old_str instead of the correct parameter old_string
-can we use oneOf in the tool input schema so the schema itself only allows the right combinations of command and the other parameters?
-now i'm confused - according to the anthropic api documentation the memory tool should be one tool with a command parameter and use the tool type memory_20250818
+TODO: change the input schema to a discriminated union schema
 
-import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+The memory tool has 6 different command types. You need a discriminated union schema. Here are both implementations:
 
-const message = await anthropic.beta.messages.create({
-  model: "claude-sonnet-4-5",
-  max_tokens: 2048,
-  messages: [
+  TypeScript / Zod Implementation:
+
+  import { z } from 'zod';
+
+  // Define each command as a separate Zod schema
+  const viewCommand = z.object({
+    command: z.literal('view'),
+    path: z.string(),
+    view_range: z.array(z.number()).length(2).optional(),
+  });
+
+  const createCommand = z.object({
+    command: z.literal('create'),
+    path: z.string(),
+    file_text: z.string(),
+  });
+
+  const strReplaceCommand = z.object({
+    command: z.literal('str_replace'),
+    path: z.string(),
+    old_str: z.string(),
+    new_str: z.string(),
+  });
+
+  const insertCommand = z.object({
+    command: z.literal('insert'),
+    path: z.string(),
+    insert_line: z.number().int(),
+    insert_text: z.string(),
+  });
+
+  const deleteCommand = z.object({
+    command: z.literal('delete'),
+    path: z.string(),
+  });
+
+  const renameCommand = z.object({
+    command: z.literal('rename'),
+    old_path: z.string(),
+    new_path: z.string(),
+  });
+
+  // Discriminated union: Zod will use 'command' field to narrow the type
+  const memoryCommandInput = z.discriminatedUnion('command', [
+    viewCommand,
+    createCommand,
+    strReplaceCommand,
+    insertCommand,
+    deleteCommand,
+    renameCommand,
+  ]);
+
+  // Register the tool
+  server.registerTool(
+    'memory',
     {
-      role: "user",
-      content: "I'm working on a Python web scraper that keeps crashing with a timeout error. Here's the problematic function:\n\n```python\ndef fetch_page(url, retries=3):\n    for i in range(retries):\n        try:\n            response = requests.get(url, timeout=5)\n            return response.text\n        except requests.exceptions.Timeout:\n            if i == retries - 1:\n                raise\n            time.sleep(1)\n```\n\nPlease help me debug this."
+      description: 'Manage persistent memory files with view, create, edit, delete, and rename operations',
+      inputSchema: memoryCommandInput,
+    },
+    async (input) => {
+      // input is strongly typed and narrowed by command field
+      switch (input.command) {
+        case 'view':
+          return await handleView(input);
+        case 'create':
+          return await handleCreate(input);
+        // ... etc
+      }
     }
-  ],
-  tools: [{
-    type: "memory_20250818",
-    name: "memory"
-  }],
-  betas: ["context-management-2025-06-27"]
-});
-
-but in the anthropic api sdk each command is a tool with individual types BetaMemoryTool20250818ViewCommand, etc.
-please double check in the anthropic-typescript-sdk and the official api docs what the ground truth and the correct way is, or if both are correct
-
-claude.ai uses this input schema for memory_user_edits:
-{
-  "command": {
-    "type": "string",
-    "enum": ["view", "add", "remove", "replace"],
-    "description": "The operation to perform on memory controls"
-  },
-  "control": {
-    "type": ["string", "null"],
-    "default": null,
-    "maxLength": 500,
-    "description": "For 'add': new control to add as a new line (max 500 chars)"
-  },
-  "line_number": {
-    "type": ["integer", "null"],
-    "default": null,
-    "minimum": 1,
-    "description": "For 'remove'/'replace': line number (1-indexed) of the control to modify"
-  },
-  "replacement": {
-    "type": ["string", "null"],
-    "default": null,
-    "maxLength": 500,
-    "description": "For 'replace': new control text to replace the line with (max 500 chars)"
-  }
-}
-
-also should be call the mcp server instances memory_system and memory_project instead? 
+  );

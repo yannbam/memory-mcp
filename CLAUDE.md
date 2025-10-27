@@ -431,9 +431,6 @@ Memory captures **evolving reality** discovered during development - NOT static 
 
 ## Project Memory
 
-**Session handoff and current context**: See `short-term.md` below
-**Evolving development discoveries**: See `long-term.md` below
-
 DO NOT EDIT MEMORY IN THIS FILE - USE THE project_memory TOOL INSTEAD.
 
 ## <project_memory>
