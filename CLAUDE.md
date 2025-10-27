@@ -360,72 +360,136 @@ node dist/index.js --transport http --port 3000
 **Philosophy Change**: CLAUDE.md becomes stable reference, memory system handles session-to-session info.
 
 ---
-[the whole memory section needs to be improved!!]
 
-## Memory 
+## 🧠 Memory System: Evolutionary Learning Across Sessions
 
-**Use project memory PROACTIVELY throughout development!**
+### Core Philosophy
 
-### Memory Philosophy
+**Memory is a LEARNING SYSTEM that evolves** - not just storage but active knowledge refinement across sessions. Each session doesn't just add memories; it improves, corrects, and synthesizes existing knowledge into deeper understanding.
 
-Memory is numbered and **line-based** for easy editing - each line is an independent fact.
-Use memory("cmd": "add") [cont...]
+Memory preserves what matters:
+- **Surprises** - Non-obvious behaviors that violate expectations
+- **Important facts** - Key information discovered during work
+- **Deferred tasks** - "TODO later: investigate why X fails intermittently"
+- **Reminders** - Things to check or revisit in future sessions
+- **Partial progress** - Where you left off on complex problems
+- **Contextual breadcrumbs** - Information that helps resume work
 
+The test: **"Is this worth preserving across sessions?"**
 
-Memory captures **evolving reality** discovered during development - NOT static documentation (that's in docs/).
+### The Three Memory Zones
 
-### What Goes Where
+1. **Plan** (via PlanAndTrack) - Structured tasks and current objectives
+2. **Short-term memory** (.memory/memories/short-term.md) - Active session discoveries + handoff
+3. **Long-term memory** (.memory/memories/long-term.md) - Evolving wisdom that transcends sessions
 
-[needs to be corrected! this is backwards]
-**short-term.md** - Session context and handoff:
-- Current session info, what was done, what's next
-- Active tasks and immediate blockers
-- Quick freeform notes
-- Updated at **END of session**
+### Session Lifecycle Workflow
 
-**long-term.md** - Cross-session wisdom:
-- Architecture insights (design discoveries, validation results)
-- Performance measurements (actual vs expected)
-- Runtime behavior (execution quirks, edge cases)
-- MCP SDK quirks and workarounds
-- Common mistakes (what NOT to try again!)
-- Proven patterns (what WORKS)
-- Testing insights, workflow commands
-- Updated **DURING session** when discovering important things
+#### 🌅 **SESSION START**
+1. Read memories to absorb context
+2. Create session plan from memories + new instructions
+3. Move plan-captured items out of short-term Quick Notes
+4. Space cleared for new discoveries
 
-### Critical Rules
+#### ⚡ **DURING SESSION**
+- Add to Quick Notes immediately when you discover/decide/defer something
+- Don't overthink categorization - just capture it
+- One line = one atomic memory (1-3 sentences for completeness)
+- Search existing memories before adding - maybe there's knowledge to refine?
 
-**PRESERVE structure**:
-- Never modify or delete section headers (lines starting with `##`)
-- Never modify or delete italic descriptions (lines with `_text_`)
-- These are template instructions that persist across sessions
+#### 🌙 **SESSION END**
+1. Review Quick Notes - what patterns emerged?
+2. Promote enduring insights to appropriate long-term sections
+3. Update/delete obsolete long-term entries (knowledge evolution!)
+4. Clean Quick Notes of session-only information
+5. Write clear handoff in short-term for next session
 
-**ADD sections when needed**:
-- You CAN add new sections if discoveries don't fit existing ones
-- New sections must have: header (`## Name`) + italic description (`_what goes here_`)
+### Memory Format & Operations
 
-**Edit content effectively**:
-- Use `str_replace` for updating specific lines
-- Each line is an independent fact
-- Be specific: include file paths, function names, exact errors, numbers
-- Remove outdated information when reality changes
+**Core Rules:**
+- **One line = one atomic memory** (can be 1-3 comprehensive sentences)
+- **No human formatting** - This is Claude's notepad, not a markdown document
+- **Self-contained clarity** - Each line must make sense without context
+- **Immediate capture** - Write memories when discovered, not batched later
 
-**Avoid duplication**:
-- Don't duplicate README.md or docs/ content
-- Memory is for **discovered reality**, not planned architecture
+**Evolution Operations:**
+- **SEARCH before adding** - Is there existing knowledge to refine?
+- **UPDATE in place** - Use str_replace to evolve existing memories
+- **ANNOTATE evolution** - "v2:", "Better:", "Correction:", "Also:"
+- **CONSOLIDATE related** - Merge observations into unified insights
+- **PRUNE obsolete** - Delete what's definitively wrong or superseded
 
-### When to Update
+### Knowledge Evolution Examples
 
-**During work**:
-- Use short-term.md as scratchpad for active session
+Watch how memory evolves through iterations (note: emoji use varies by need):
+```
+[💡🤯] HTTP transport fails sometimes (initial observation)
+[⚠️🔧] HTTP fails after 5 minutes idle (pattern recognized)
+[✅] HTTP needs keepalive every 4min to prevent timeout (solution found)
+All long-lived connections need keepalive < timeout/2 (principle discovered - simple fact)
+```
 
-- Add discoveries to long-term.md immediately
+Instead of accumulating redundant entries, refine knowledge in place using str_replace!
 
-**End of session**:
-- Review short-term discoveries - what's worth keeping forever?
-- Transfer important findings to long-term.md
-- Update short-term.md handoff for next session
-- Clean up outdated entries in both files
+### Emoji Markers: Optional Multi-Dimensional System
+
+**Emoji markers are OPTIONAL** - use them when they add meaningful dimensions to a memory. Simple facts often need no emojis at all.
+
+**Format (when used):** `[emoji1][emoji2][emoji3]` at the beginning of the line
+
+**Use 0 to 3 emojis as needed:**
+- **No emojis:** Simple facts - "Tests run with `npm test` and require NODE_ENV=test"
+- **One emoji:** Basic context - `[⚠️] Path validation must check resolved path stays within root`
+- **Two emojis:** More context - `[💀🔧] npm audit fix breaks @modelcontextprotocol/sdk peer dependencies`
+- **Three emojis:** Rich dimensions - `[⚠️🔧🤯] str_replace silently fails if old_str appears multiple times`
+
+**Suggested dimensions (use any emojis you want!):**
+1. **Kind** - Type of information (⚠️ warning, 💡 insight, 🔄 deferred, ✅ validated, 💀 fatal)
+2. **Object** - Domain/area (🔧 tool, 📦 dependency, 🏗️ architecture, 🧪 testing, 📝 docs)
+3. **Emotion** - Experience quality (🤯 surprising, 😅 relief, 🎯 clarity, 🔥 critical, 💪 hard-won)
+
+**The entire emoji space is available** - these are just examples. Create combinations that work for your project and context.
+
+### What Makes Memory Valuable?
+
+**KEEP memories that:**
+- Save future sessions from wasting time
+- Capture non-obvious behavior: `[⚠️🔧🤯] str_replace silently fails if old_str appears multiple times in file`
+- Record costly mistakes: `[💀📦] Never run npm audit fix - breaks @modelcontextprotocol/sdk peer deps`
+- Document workarounds: `Use path.resolve() + startsWith() check to prevent directory traversal`
+- Track deferred work: `[🔄] TODO later: investigate HTTP transport timeout after 5min idle`
+- Show evolution: `[✅🔥] v2: RW locks gave 38x speedup over mutex for concurrent reads`
+- Note simple facts: `Line 185-231 in operations.ts handles view range validation`
+
+**SKIP memories that are:**
+- Obvious from documentation
+- Temporary session state
+- Implementation details that change every commit
+- Commentary without actionable content
+
+### The Balance: Evolution Without Bloat
+
+Memory should become MORE VALUABLE over time, not just LARGER:
+- Refine vague observations into precise knowledge
+- Replace shallow understanding with deep insights
+- Keep the BEST solution (unless alternatives serve different contexts)
+- Consolidate related entries into comprehensive understanding
+- Delete definitively wrong information immediately
+
+### Critical Implementation Notes
+
+**For short-term.md:**
+- Quick Notes section at the END for rapid capture
+- Session handoff with clear continuation point
+- Current session ID, branch, context usage
+
+**For long-term.md:**
+- Generic sections that apply to ANY project
+- Add new sections as needed - don't be constrained!
+- Each section has italic description of what goes there
+- Prefer atomic line edits over multi-line replacements
+
+**Remember:** This is an evolving learning system. Each session builds on the last, creating collective intelligence that improves over time
 
 ---
 

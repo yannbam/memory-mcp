@@ -1,119 +1,49 @@
 # Short-Term Memory (Session Context)
 
 ## Current Session
-_Session ID, current phase, previous session reference_
+_Session ID, active branch, context usage_
 
-Session ecd189d2-8ac2-453e-85f6-f592dafcb84a
-Phase: Public Beta Release Preparation - IN PROGRESS (3% complete)
-Previous session: 36ff98ba-97e8-4c1b-a9b2-92918fbe0395 (E2E Testing Complete, PR #3 Created)
-Context at handoff: ~66k tokens
-
+Session: 2fc38dee-528f-468e-9b5a-8194dedb4828
+Branch: dev
+Context: ~62k tokens
+Working on: Memory system implementation and documentation
 
 ## Session Handoff
-_What was accomplished this session, what next session should do, current blockers_
+_What was done, what's next, blockers_
 
 ### This Session Accomplished
-
-**✅ Memory System Adoption Started (Phase 1)**
-- Studied mcp-ts-api memory structure (two-file approach: long-term.md + short-term.md)
-- Discovered simpler pattern than originally planned (no multi-directory structure)
-- Cleared test artifacts from .memory/memories/
-- Created long-term.md with sections for architecture, performance, patterns, etc.
-- Created short-term.md (this file) for session handoffs
-
-**Decision Made:**
-- Adopt two-file memory pattern from mcp-ts-api (proven in production)
-- Simplifies maintenance vs multi-directory approach
-- Still provides clear separation (persistent vs transient knowledge)
-
+✅ Designed comprehensive evolutionary memory system combining all refinements
+✅ Replaced entire Memory section in CLAUDE.md (lines 364-492) with new system
+✅ Restructured long-term.md with 8 universal sections + extensibility note
+✅ Restructured short-term.md with Quick Notes at end for rapid capture
+✅ Emphasized memory as LEARNING system that evolves, not just storage
+✅ Implemented OPTIONAL emoji system: 0-3 emojis per memory line for multi-dimensional markers
+✅ Updated all examples showing flexibility: simple facts need no emojis, complex discoveries can use 1-3
 
 ### What Next Session Should Do
-
-**IMMEDIATE: Complete Memory System Setup (Phase 1 - 5 tasks remaining)**
-1. Populate architecture memories in long-term.md
-2. Populate development memories in long-term.md
-3. Populate release memories in long-term.md
-4. Update .gitignore to remove /.memory/ line (so we commit memory as example)
-5. Complete Phase 1 tasks
-
-**THEN: Configure MCP for Project (Phase 2)**
-- Create .mcp.json pointing to local build
-- Create .mcp.example.json template for users
-- Test memory system works
-
-**THEN: Continue with Repository Cleanup (Phase 3)**
-- Handle remaining cleanup tasks
-- Rename reference files
-- Review plans for sensitive info
-
-**Philosophy:**
-- Use memory system to dogfood our own tool
-- CLAUDE.md becomes stable reference (rarely changes)
-- Memory system handles session-to-session information
-- Only update CLAUDE.md when static content genuinely needs changes
-
+Continue Phase 2: Configure MCP for Project
+Create .mcp.json pointing to local build
+Create .mcp.example.json template for users
+Test memory system works with actual usage
 
 ### Current Blockers
+None - systematic implementation in progress
 
-NONE - Memory adoption in progress, systematic work remaining
+## Active Plans
+_Current PlanAndTrack references_
 
-
-### Active Plans
-
+Plan: memory-system-implementation (75% complete - 12/16 tasks)
 Plan: public-release-beta (3% complete - 1/39 tasks)
-View: mcp__PlanAndTrack__ViewPlan(plan_name="public-release-beta")
-
-Current task: "Create memory directory hierarchy" (in_progress)
-Next task: "Populate architecture memories"
-
-
-## Next Tasks
-_Immediate tasks to tackle next_
-
-1. Populate long-term.md architecture section with key design decisions
-2. Populate long-term.md development section with TypeScript+ESM setup, testing strategy
-3. Populate long-term.md release section with v0.1.0 summary
-4. Update .gitignore to commit .memory/ directory
-5. Update CLAUDE.md with memory management section and @ references
-
 
 ## Quick Notes
-_Freeform space for important thoughts_
+_Rapid capture space - add memories here during work without categorization_
 
-**Memory Structure Adopted:**
-- long-term.md: Accumulating knowledge across ALL sessions
-  - Architecture insights, performance measurements, runtime behavior
-  - MCP SDK quirks, common mistakes, proven patterns
-  - Testing insights, development workflow, important files
-
-- short-term.md: Session-specific handoffs (rewritten each session)
-  - Current session info, what was accomplished
-  - What next session should do, blockers
-  - Quick notes for active session
-
-**Key Insight:**
-mcp-ts-api's two-file approach is cleaner than our original multi-directory plan. Sections within markdown files provide structure without file proliferation.
-
-**Current Status:**
-- All 85 unit tests passing ✅
-- All integration tests passing ✅
-- E2E validation complete ✅
-- PR #3 ready for merge ✅
-- Now preparing repository for public beta release
-
-
-## Repository Status
-_Git state: latest commit, branch, working tree status_
-
-GitHub: https://github.com/yannbam/memory-mcp (public)
-Latest commit: 5b953fb - Public beta release preparation (v0.1.0)
-Branch: dev
-Working tree: DIRTY - memory system files added
-
-Uncommitted changes:
-- .memory/memories/long-term.md (new)
-- .memory/memories/short-term.md (new)
-
-All tests passing: 85/85 unit tests ✅
-
-Next commit: "feat: Adopt memory system for project documentation"
+[💡🤯] Memory system philosophy fundamentally redesigned to emphasize learning and evolution
+[✅📝] Emoji system is OPTIONAL: use 0-3 emojis as needed, simple facts need no emojis
+Generic sections in long-term.md allow any project to use this template
+[💡] User emphasized: memory isn't just for surprises but also deferred work, reminders, partial progress
+[⚠️🔥] Emoji freedom critical - don't constrain future Claudes with limited examples
+Knowledge evolution: memories should be refined in place using str_replace, not just accumulated
+[💡✨] Key insight: Memory enables collective intelligence across Claude instances
+Memory workflow: Search → Refine → Synthesize (not just append)
+Context at ~89k tokens - good headroom remaining for Phase 2 work

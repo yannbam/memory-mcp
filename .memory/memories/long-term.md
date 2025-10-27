@@ -1,40 +1,36 @@
-# Long-Term Memory (Evolving Discoveries)
+# Long-Term Memory (Persistent Knowledge)
 
-## Architecture Insights
-_Design discoveries and validation results from actual development work_
-
-
-## Performance Measurements
-_Actual measurements vs expected performance. Specific numbers with context._
+## Architecture & Design
+_How the system actually works vs how it was intended to work_
 
 
-## Runtime Behavior
-_Execution environment quirks: limits, permissions, module loading edge cases_
+## Performance & Optimization
+_Measured performance characteristics, bottlenecks, successful optimizations_
 
 
-## MCP SDK Quirks
-_API behavior discoveries, bugs found, workarounds that work_
+## Environment & Dependencies
+_Runtime quirks, version sensitivities, configuration gotchas_
 
 
-## Schema Conversion Patterns
-_JSON Schema to TypeScript challenges discovered and how to handle them_
+## Mistakes to Avoid
+_Failed approaches, time sinks, what NOT to do (saves future sessions from repeating)_
 
 
-## Common Mistakes
-_Failed approaches and what NOT to try again. Critical for avoiding repeated errors._
+## Proven Solutions
+_Patterns that work, reliable approaches, validated fixes_
 
 
-## Proven Patterns
-_Successful approaches and reliable patterns discovered during development_
+## Testing & Debugging
+_Test strategies that work, debugging approaches, tools that help_
 
 
-## Testing Insights
-_Testing approaches that work, memory leak detection methods, adversarial patterns_
+## Deferred Work
+_Complex tasks or investigations postponed for future sessions_
 
 
-## Development Workflow
-_Commands that work, how to run/test/debug, interpreting output_
+## Project-Specific Knowledge
+_Unique aspects of this particular codebase/project_
 
 
-## Important Files
-_Key files discovered during development and their evolving purpose_
+---
+Note: These are starter sections - add new sections as your understanding evolves!

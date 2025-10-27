@@ -1,0 +1,20 @@
+🌳 "memory-system-implementation"
+📝 Implement the complete evolutionary memory system combining Memory System 2.0 (Refined) and 3.0 (Evolution) into CLAUDE.md and restructure the memory files to support learning across sessions.
+📊 ██████████ 100% (16/16 tasks)
+
+├── ✅ |Update CLAUDE.md Memory Section| "Replace the current memory section in CLAUDE.md with comprehensive guide including: Core Philosophy (memory preserves what matters + enables learning), What Goes in Memory (surprises, facts, deferred tasks, etc.), Three Memory Zones, Session Lifecycle Workflow, Memory Format Rules, Evolution Mechanisms, Emoji Freedom, and Key Principles" (🔴) (100%)
+│   ├── ✅ |Write Core Philosophy| "Document that memory preserves what matters across sessions AND enables evolutionary learning - not just storage but active knowledge refinement" (🔴)
+│   ├── ✅ |Document What Goes in Memory| "List all types: surprises, important facts, deferred tasks, reminders, partial progress, contextual breadcrumbs. Include the test: 'Is this worth preserving across sessions?'" (🔴)
+│   ├── ✅ |Explain Three Memory Zones| "Document the three zones: Plan (via PlanAndTrack), Short-term memory (active discoveries + handoff), Long-term memory (enduring wisdom)" (🔴)
+│   ├── ✅ |Write Session Lifecycle Workflow| "Document SESSION START (read, plan, clear space), DURING SESSION (immediate capture in Quick Notes), and SESSION END (reflect, promote, prune, handoff)" (🔴)
+│   ├── ✅ |Add Memory Format Rules| "One line = one atomic memory (1-3 sentences), no human formatting, Claude's notepad not a document, self-contained clarity" (🔴)
+│   ├── ✅ |Document Evolution Mechanisms| "Search before add, update in place, annotate evolution, consolidate related, prune obsolete. Show knowledge evolution example" (🔴)
+│   └── ✅ |Add Emoji Freedom Section| "Give 2-3 examples then emphasize ANY emoji can be used for creative expression. Different projects need different markers" (🟡)
+├── ✅ |Restructure long-term.md| "Replace MCP-specific sections with universal categories that apply to any project" (🔴) (100%)
+│   ├── ✅ |Delete old sections| "Remove MCP SDK Quirks, Schema Conversion Patterns, and other project-specific sections" (🔴)
+│   ├── ✅ |Add universal sections| "Add: Architecture & Design, Performance & Optimization, Environment & Dependencies, Mistakes to Avoid, Proven Solutions, Testing & Debugging, Deferred Work, Project-Specific Knowledge" (🔴)
+│   └── ✅ |Add extensibility note| "Note that these are starter sections - future Claudes should add new sections as needed" (🟡)
+└── ✅ |Restructure short-term.md| "Reorganize with Quick Notes moved to the end for rapid capture during sessions" (🔴) (100%)
+    ├── ✅ |Move Quick Notes to end| "Relocate Quick Notes section to the very end of the file as the main space for rapid memory capture" (🔴)
+    ├── ✅ |Simplify structure| "Keep only essential sections: Current Session, Session Handoff, Active Plans, Quick Notes" (🟡)
+    └── ✅ |Update descriptions| "Update section descriptions to emphasize rapid capture in Quick Notes and session-specific context" (🟡)
