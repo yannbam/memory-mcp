@@ -35,9 +35,21 @@ export async function executeMemoryCommand(
       // TypeScript knows: args has { command: 'str_replace', path: string, old_str: string, new_str: string }
       return await operations.str_replace(args, context);
 
-    case 'insert':
-      // TypeScript knows: args has { command: 'insert', path: string, insert_line: number, insert_text: string }
-      return await operations.insert(args, context);
+    case 'insert': {
+      // TypeScript knows: args has { command: 'insert', path: string, insert_line: number | string, insert_text: string }
+      // Normalize insert_line to number (handles Claude Code serialization issue)
+      const insertLine = typeof args.insert_line === 'string' ? parseInt(args.insert_line, 10) : args.insert_line;
+
+      // Validate the conversion
+      if (isNaN(insertLine) || !Number.isInteger(insertLine)) {
+        throw new Error(`Invalid insert_line: must be an integer, got "${args.insert_line}"`);
+      }
+
+      return await operations.insert(
+        { ...args, insert_line: insertLine },
+        context,
+      );
+    }
 
     case 'delete':
       // TypeScript knows: args has { command: 'delete', path: string }

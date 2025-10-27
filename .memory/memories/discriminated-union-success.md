@@ -33,6 +33,7 @@ Used `$refStrategy: "none"` in zodToJsonSchema to inline the union, then added `
 ✅ Tool registration works
 ✅ Command validation works
 ✅ All 6 command variants operational
+✅ Insert command accepts both number and string for insert_line (Claude Code compatibility)
 
 ## Credits
 - GPT-5 consultation (session 1761595236443-75uvjxnu)

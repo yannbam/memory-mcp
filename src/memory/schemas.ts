@@ -34,7 +34,9 @@ const StrReplaceCommand = z.object({
 const InsertCommand = z.object({
   command: z.literal('insert'),
   path: z.string().describe('Path to file to modify'),
-  insert_line: z.number().int().describe('Line number where text will be inserted (1-based)'),
+  insert_line: z
+    .union([z.number().int(), z.string()])
+    .describe('Line number where text will be inserted (1-based)'),
   insert_text: z.string().describe('Text to insert'),
 });
 
