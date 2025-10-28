@@ -29,7 +29,6 @@ _Runtime quirks, version sensitivities, configuration gotchas_
 _Failed approaches, time sinks, what NOT to do (saves future sessions from repeating)_
 
 [💀🔧] When adding new optional parameters to commands, MUST update BOTH locations: the discriminated union schema AND the unified tool inputSchema - missing from inputSchema causes parameters to be silently dropped, leading to incorrect behavior
-[⚠️🧪] MCP-Debug testing is NOT sufficient - Claude Code's MCP client implementation may differ - always test features with actual Claude Code MCP client before considering complete
 [💀🔧] Empty string split gives [''] not [] - when handling empty files with line operations, must check `content === '' ? [] : content.split('\n')` to avoid off-by-one errors in append logic
 
 
@@ -64,6 +63,7 @@ Can test different CLI flags by reconnecting with different args array
 [⚠️🧪] MCP-Debug is useful for quick iteration BUT always verify with actual Claude Code MCP client before marking complete
 Different MCP client implementations may handle schemas/parameters differently
 [✅🧪] Parameter combination testing strategy: Test BOTH tool modes (unified + one-tool-per-command), test with and without optional params, test error cases (multiple occurrences, parameter conflicts)
+[🔧💡] view command UX improvement needed: Empty file shows `1: ` and empty directory shows listing - should return friendly messages "Memory file is empty." and "Directory is empty." instead (src/memory/operations.ts view function)
 Comprehensive test matrix prevents edge case bugs
 
 
@@ -74,12 +74,13 @@ _Complex tasks or investigations postponed for future sessions_
 ## Project-Specific Knowledge
 _Unique aspects of this particular codebase/project_
 
-[📊💡] Parameter combinations feature implementation (Session f7051c6f, Oct 28 2025):
-4 features implemented: create empty file, insert append, delete unique text, str_replace deletion
-All require unique text for safety (delete/str_replace with text search)
-114 tests passing, fully documented in README/CHANGELOG
+[📊✅] Parameter combinations feature COMPLETE (Sessions f7051c6f + ff6a2f81, Oct 28 2025):
+4 features fully implemented AND tested: create empty file, insert append, delete unique text, str_replace deletion
+Comprehensive testing: 30+ test cases, both tool modes, edge cases, error conditions - ALL PASS
+Safety validated: Both delete and str_replace require unique text (fail fast if multiple occurrences)
+114 tests passing, fully documented in README/CHANGELOG/TEST-FINDINGS.md
 Commits: bbd1a83 (docs) + 4950c2e (implementation)
-IMPORTANT: Needs testing with actual Claude Code MCP client (only tested with MCP-Debug so far)
+Status: Ready for production 🚀
 [🏗️💡] Dual schema locations for parameter changes: When adding optional params, update BOTH MemoryCommandSchema (21-64) AND individual command schemas (76-119) in src/server/mcp-server.ts
 Also update TypeScript interfaces in src/memory/operations.ts
 [🔧💡] Empty file handling pattern: Check `content === ''` before splitting to avoid [''] array

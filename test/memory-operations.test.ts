@@ -41,7 +41,7 @@ describe('Memory Operations', () => {
   describe('view command', () => {
     it('should view empty directory', async () => {
       const result = await operations.view({ path: '/memories' }, context);
-      expect(result).toBe('Directory: /memories\n');
+      expect(result).toBe('Directory is empty.');
     });
 
     it('should view directory with files', async () => {
@@ -92,6 +92,14 @@ describe('Memory Operations', () => {
       expect(result).toContain('   2: line2');
       expect(result).toContain('   3: line3');
       expect(result).not.toContain('line1');
+    });
+
+    it('should view empty file with friendly message', async () => {
+      // Create empty file
+      await fs.writeFile(path.join(memoryRoot, 'empty.txt'), '');
+
+      const result = await operations.view({ path: '/memories/empty.txt' }, context);
+      expect(result).toBe('Memory file is empty.');
     });
 
     it('should skip hidden files in directory listing', async () => {
@@ -150,11 +158,23 @@ describe('Memory Operations', () => {
       expect(fileContent).toBe('updated');
     });
 
-    it('should create empty file', async () => {
-      await operations.create({ path: '/memories/empty.txt', file_text: '' }, context);
+    it('should create empty file with file_text=""', async () => {
+      const result = await operations.create({ path: '/memories/empty.txt', file_text: '' }, context);
+
+      expect(result).toBe('Created empty memory file.');
 
       // Verify empty file exists
       const fileContent = await fs.readFile(path.join(memoryRoot, 'empty.txt'), 'utf-8');
+      expect(fileContent).toBe('');
+    });
+
+    it('should create empty file without file_text parameter', async () => {
+      const result = await operations.create({ path: '/memories/empty2.txt' }, context);
+
+      expect(result).toBe('Created empty memory file.');
+
+      // Verify empty file exists
+      const fileContent = await fs.readFile(path.join(memoryRoot, 'empty2.txt'), 'utf-8');
       expect(fileContent).toBe('');
     });
   });
@@ -662,7 +682,7 @@ describe('Memory Operations', () => {
     it('should create empty file when file_text omitted', async () => {
       const result = await operations.create({ path: '/memories/empty.txt' }, context);
 
-      expect(result).toContain('created successfully');
+      expect(result).toBe('Created empty memory file.');
       const content = await fs.readFile(path.join(memoryRoot, 'empty.txt'), 'utf-8');
       expect(content).toBe('');
     });
@@ -673,7 +693,7 @@ describe('Memory Operations', () => {
         context,
       );
 
-      expect(result).toContain('created successfully');
+      expect(result).toBe('File created successfully at /memories/data.txt');
       const content = await fs.readFile(path.join(memoryRoot, 'data.txt'), 'utf-8');
       expect(content).toBe('content');
     });
@@ -684,7 +704,7 @@ describe('Memory Operations', () => {
         context,
       );
 
-      expect(result).toContain('created successfully');
+      expect(result).toBe('Created empty memory file.');
       const content = await fs.readFile(path.join(memoryRoot, 'empty2.txt'), 'utf-8');
       expect(content).toBe('');
     });

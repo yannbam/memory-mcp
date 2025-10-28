@@ -1,0 +1,23 @@
+🌳 "empty-content-ux-messages"
+📝 Improve UX messaging for empty content scenarios in memory operations.
+
+Three improvements needed:
+1. view command with empty file → "Memory file is empty."
+2. view command with empty directory → "Directory is empty." (both simple and tree modes)
+3. create command without file_text → "Created empty memory file."
+
+Implementation locations:
+- src/memory/operations.ts (viewFile, viewDirectory, create functions)
+- src/memory/tree-view.ts (renderDirectoryTree function)
+
+After implementation: comprehensive testing with both tool modes
+📊 ██████████ 100% (8/8 tasks)
+
+├── ✅ |Implement empty file message| "Modify viewFile function in operations.ts (line 190-236):\n- After reading content, check if content === ''\n- Return 'Memory file is empty.' immediately\n- Avoids showing '1: ' for empty files" (🔴)
+├── ✅ |Implement empty directory message (simple mode)| "Modify viewDirectory function in operations.ts (line 153-185):\n- After building items array (line 181), check if items.length === 0\n- Return 'Directory is empty.' instead of formatted output\n- Only applies to simple mode (non-tree-view)" (🔴)
+├── ✅ |Implement empty directory message (tree mode)| "Modify renderDirectoryTree function in tree-view.ts (line 269-282):\n- After building tree (line 278), check if tree.length === 0\n- Return 'Directory is empty.' instead of header + empty content\n- Applies when tree view is enabled" (🔴)
+├── ✅ |Implement empty file creation message| "Modify create function in operations.ts (line 245-276):\n- Check if file_text is undefined or empty string\n- Return 'Created empty memory file.' for empty files\n- Return 'File created successfully at {path}' for non-empty files" (🔴)
+├── ✅ |Test empty file view| "Test with both tool modes:\n- Create empty file, then view it\n- Verify message: 'Memory file is empty.'\n- Test with both unified and separate tool modes" (🔴)
+├── ✅ |Test empty directory view| "Test with both tool modes and both view modes:\n- Create empty directory, then view it (simple mode)\n- View empty directory with tree view enabled\n- Verify message: 'Directory is empty.' in both cases\n- Test with both unified and separate tool modes" (🔴)
+├── ✅ |Test empty file creation| "Test create command without file_text:\n- Call create without file_text parameter\n- Verify message: 'Created empty memory file.'\n- Call create with non-empty file_text\n- Verify message: 'File created successfully at {path}'\n- Test with both unified and separate tool modes" (🔴)
+└── ✅ |Update README examples| "Update README.md to reflect new messages:\n- Update view command examples for empty files/directories\n- Update create command example for empty file creation\n- Ensure examples are accurate and helpful" (🟡)

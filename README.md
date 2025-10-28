@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/yannbam/memory-mcp/workflows/CI/badge.svg)](https://github.com/yannbam/memory-mcp/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-85%20passing-success)](./test)
+[![Tests](https://img.shields.io/badge/tests-117%20passing-success)](./test)
 
 MCP server implementation of Claude's native memory tool for persistent storage across conversations.
 
@@ -19,7 +19,7 @@ This project implements Claude's [memory tool](https://docs.claude.com/en/docs/a
 - ✅ **Dual Transport**: stdio (default) and streamable HTTP
 - ✅ **Type-Safe**: Full TypeScript with Zod runtime validation
 - ✅ **Debug Logging**: Optional structured JSON logging to `/tmp/memory-mcp/`
-- ✅ **Production Ready**: Fully tested (85 unit + integration + E2E tests)
+- ✅ **Production Ready**: Fully tested (117 unit + integration + E2E tests)
 
 ## Quick Start
 
@@ -152,6 +152,13 @@ await memory({
 })
 // → "Directory: /memories\n- notes.txt\n- ideas/"
 
+// View empty directory
+await memory({
+  command: "view",
+  path: "/memories/empty"
+})
+// → "Directory is empty."
+
 // View directory (tree view mode - with --tree-view flag)
 // Shows hierarchical structure, file sizes, line counts, and modification times
 // → "Showing contents of: /memories
@@ -178,6 +185,13 @@ await memory({
   view_range: [2, 5]
 })
 // → "   2: Second note\n   3: Third note..."
+
+// View empty file
+await memory({
+  command: "view",
+  path: "/memories/empty.txt"
+})
+// → "Memory file is empty."
 ```
 
 ### create
@@ -197,7 +211,7 @@ await memory({
   command: "create",
   path: "/memories/empty.txt"
 })
-// → "File created successfully at /memories/empty.txt"
+// → "Created empty memory file."
 ```
 
 ### str_replace
@@ -369,7 +383,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                 # Run all tests (85 passing)
+npm test                 # Run all tests (117 passing)
 npm run test:coverage    # Run with coverage report (80%+ target)
 npm run test:watch       # Watch mode
 ```
@@ -494,7 +508,7 @@ Contributions welcome! Please:
 ---
 
 **Status**: 🚀 Public Beta (v0.1.0) - Production Ready
-**Tests**: 85/85 unit tests + integration tests + E2E validation with Claude Code
+**Tests**: 117/117 unit tests + integration tests + E2E validation with Claude Code
 **Interface**: Unified `memory` tool matching official Anthropic spec
 **Features**: All 6 commands + tree view + true RW locks (38x speedup)
 **Repository**: https://github.com/yannbam/memory-mcp

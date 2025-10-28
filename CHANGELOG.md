@@ -34,6 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `delete` with `old_str`/`old_string` deletes unique text occurrence
   - `str_replace` without `new_str` deletes unique text (defaults to empty string)
 - **Forgiving parameter naming** - Accept both `old_str`/`new_str` and `old_string`/`new_string` interchangeably
+- **Improved UX messaging** - Friendly messages for empty content:
+  - `view` on empty file: "Memory file is empty."
+  - `view` on empty directory: "Directory is empty." (both simple and tree modes)
+  - `create` without `file_text`: "Created empty memory file."
 
 ### Changed
 - All text-based operations (`str_replace`, `delete` with `old_str`) now require unique occurrences

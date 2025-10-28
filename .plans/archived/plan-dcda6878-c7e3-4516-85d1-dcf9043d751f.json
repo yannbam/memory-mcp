@@ -1,0 +1,247 @@
+{
+  "uuid": "dcda6878-c7e3-4516-85d1-dcf9043d751f",
+  "name": "memory-tools-comprehensive-testing",
+  "details": "Comprehensive testing of memory MCP tools after parameter combinations implementation. Focus: verification, edge cases, error handling.",
+  "tasks": [
+    {
+      "name": "Setup",
+      "details": "Create test directory structure and prepare test files for comprehensive testing",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "4e94e30c-02f6-4066-bd0d-d83034d0fe5b",
+      "created_at": "2025-10-28T18:49:58.327Z",
+      "updated_at": "2025-10-28T18:50:16.249Z"
+    },
+    {
+      "name": "Test Unified Tool Mode",
+      "details": "Test test-memory-default (unified tool with command parameter)",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Feature 1: Create Empty File",
+          "details": "Test create without file_text parameter creates empty file",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "7cd1c327-583c-4ced-8b9e-52324210a432",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:51:00.975Z"
+        },
+        {
+          "name": "Feature 2: Insert Append",
+          "details": "Test insert without insert_line parameter appends to end",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "6577c81a-1d48-4ef8-aaf3-da5e6f2d7c9e",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:51:15.721Z"
+        },
+        {
+          "name": "Feature 3: Delete Unique Text",
+          "details": "Test delete with old_str parameter deletes matching text + empty lines",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "ad8e5de7-70a3-4190-9631-95a3e9127308",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:52:18.640Z"
+        },
+        {
+          "name": "Feature 4: str_replace Deletion",
+          "details": "Test str_replace without new_str parameter deletes text",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "5fa18538-4210-435b-9e90-bed348a3e78d",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:52:34.973Z"
+        }
+      ],
+      "uuid": "15aa29a6-d361-44bc-912d-28dce1272a1b",
+      "created_at": "2025-10-28T18:49:58.327Z",
+      "updated_at": "2025-10-28T18:49:58.327Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Test Separate Tools Mode",
+      "details": "Test test-memory-separate (one tool per command)",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Feature 1: memory_create Empty",
+          "details": "Test memory_create without file_text",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "82d86d8d-293b-4211-8abb-164fc3989279",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:53:45.325Z"
+        },
+        {
+          "name": "Feature 2: memory_insert Append",
+          "details": "Test memory_insert without insert_line",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "11749d44-bdef-440f-bb42-c8dea5d29448",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:53:45.325Z"
+        },
+        {
+          "name": "Feature 3: memory_delete Text",
+          "details": "Test memory_delete with old_str",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "3f3874a4-aa3b-4116-b96b-b6a30bc9a48b",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:53:45.325Z"
+        },
+        {
+          "name": "Feature 4: memory_str_replace Deletion",
+          "details": "Test memory_str_replace without new_str",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "8eed8cd2-8f3c-4355-ad46-8afabbffe90e",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:53:45.325Z"
+        }
+      ],
+      "uuid": "a910ee00-cf80-4768-8865-07c82daa0a63",
+      "created_at": "2025-10-28T18:49:58.327Z",
+      "updated_at": "2025-10-28T18:49:58.327Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Edge Cases",
+      "details": "Test edge cases and boundary conditions",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Empty Files",
+          "details": "Test operations on empty files",
+          "status": "completed",
+          "priority": "medium",
+          "sub_tasks": [],
+          "uuid": "9c1ea0fb-2193-47da-9a71-d16768351b00",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:16.882Z"
+        },
+        {
+          "name": "Special Characters",
+          "details": "Test regex special characters in text search",
+          "status": "completed",
+          "priority": "medium",
+          "sub_tasks": [],
+          "uuid": "f36cd6c6-f858-4dfa-85c6-c67e26d28466",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:16.882Z"
+        },
+        {
+          "name": "Unicode and Whitespace",
+          "details": "Test unicode characters and various whitespace",
+          "status": "completed",
+          "priority": "medium",
+          "sub_tasks": [],
+          "uuid": "44f1e766-ed02-4e84-b5ea-9e6e24533bb5",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:16.882Z"
+        },
+        {
+          "name": "Large Files",
+          "details": "Test with larger file content",
+          "status": "completed",
+          "priority": "low",
+          "sub_tasks": [],
+          "uuid": "b9c24a77-45a0-438e-b7cb-3995ec25de19",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:58.569Z"
+        }
+      ],
+      "uuid": "0e316061-1d05-41d5-bca8-1e8d8e0bc62a",
+      "created_at": "2025-10-28T18:49:58.327Z",
+      "updated_at": "2025-10-28T18:49:58.327Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Error Conditions",
+      "details": "Test error handling and validation",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Multiple Occurrences",
+          "details": "Test that old_str with multiple matches fails properly",
+          "status": "completed",
+          "priority": "urgent",
+          "sub_tasks": [],
+          "uuid": "a0a6c8ba-fa96-4b1d-96f7-5334cd14ef20",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:58.367Z"
+        },
+        {
+          "name": "Invalid Parameter Combos",
+          "details": "Test nonsensical parameter combinations fail",
+          "status": "completed",
+          "priority": "high",
+          "sub_tasks": [],
+          "uuid": "f783a80e-5d0a-4443-a4f5-1b8d92563d97",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:58.367Z"
+        },
+        {
+          "name": "Path Validation",
+          "details": "Test path traversal attacks are blocked",
+          "status": "completed",
+          "priority": "urgent",
+          "sub_tasks": [],
+          "uuid": "c9f5621a-8606-4f94-8e38-8969761dd47c",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:58.367Z"
+        },
+        {
+          "name": "File Not Found",
+          "details": "Test operations on non-existent files",
+          "status": "completed",
+          "priority": "medium",
+          "sub_tasks": [],
+          "uuid": "c7647794-5972-427a-a813-4eccd89eb8ea",
+          "created_at": "2025-10-28T18:49:58.327Z",
+          "updated_at": "2025-10-28T18:54:58.367Z"
+        }
+      ],
+      "uuid": "d73e83aa-55ba-4e83-b74d-339aadec31b4",
+      "created_at": "2025-10-28T18:49:58.327Z",
+      "updated_at": "2025-10-28T18:49:58.327Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Forgiving Parameter Naming",
+      "details": "Test both old_str/new_str and old_string/new_string work",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "a2827977-773c-41c3-bc88-f4a908bde61e",
+      "created_at": "2025-10-28T18:49:58.327Z",
+      "updated_at": "2025-10-28T18:54:58.569Z"
+    },
+    {
+      "name": "Document Results",
+      "details": "Document all test results and any bugs found",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "f1cca3f7-0000-4751-b909-960072e938ce",
+      "created_at": "2025-10-28T18:49:58.327Z",
+      "updated_at": "2025-10-28T18:54:58.569Z"
+    }
+  ],
+  "created_at": "2025-10-28T18:49:58.328Z",
+  "updated_at": "2025-10-28T18:55:51.445Z"
+}

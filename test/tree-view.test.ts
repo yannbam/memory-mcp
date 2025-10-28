@@ -259,6 +259,20 @@ describe('Tree View Module', () => {
       expect(result).toContain('empty/');
     });
 
+    it('should show friendly message for completely empty directory', async () => {
+      // Create a new empty directory (not the testDir with files)
+      const emptyDir = await fs.mkdtemp(path.join(os.tmpdir(), 'empty-tree-test-'));
+
+      try {
+        const result = await renderDirectoryTree(emptyDir, '/memories');
+
+        // Should return friendly message instead of header
+        expect(result).toBe('Directory is empty.');
+      } finally {
+        await fs.rm(emptyDir, { recursive: true, force: true });
+      }
+    });
+
     it('should sort directories before files', async () => {
       const result = await renderDirectoryTree(testDir, '/memories');
 

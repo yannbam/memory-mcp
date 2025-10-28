@@ -180,6 +180,11 @@ async function viewDirectory(
     items.push(itemStat.isDirectory() ? `${item}/` : item);
   }
 
+  // Check if directory is empty (after filtering hidden files)
+  if (items.length === 0) {
+    return 'Directory is empty.';
+  }
+
   // Format output
   return `Directory: ${memoryPath}\n` + items.map((item) => `- ${item}`).join('\n');
 }
@@ -190,6 +195,12 @@ async function viewDirectory(
 async function viewFile(fullPath: string, viewRange?: [number, number]): Promise<string> {
   // Read file content
   const content = await fs.readFile(fullPath, 'utf-8');
+
+  // Check if file is empty
+  if (content === '') {
+    return 'Memory file is empty.';
+  }
+
   const lines = content.split('\n');
 
   // Determine which lines to display
@@ -272,7 +283,9 @@ export async function create(command: CreateCommand, context: OperationsContext)
     success: true,
   });
 
-  return `File created successfully at ${command.path}`;
+  // Return appropriate message based on whether file has content
+  const isEmpty = !command.file_text || command.file_text === '';
+  return isEmpty ? 'Created empty memory file.' : `File created successfully at ${command.path}`;
 }
 
 /**
