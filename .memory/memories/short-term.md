@@ -3,34 +3,42 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 2fc38dee-528f-468e-9b5a-8194dedb4828
+Session: cfdab755-d0f1-447a-922f-65d9cd947ccf
 Branch: dev
-Context: ~88k tokens
-Working on: Switchable tool exposure implementation
+Context: ~72k tokens
+Working on: Feature implementation planning for public release
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
 ### This Session Accomplished
-✅ Implemented switchable tool exposure with --one-tool-per-command flag
-✅ Added CLI flag parsing and help text updates
-✅ Created 6 individual Zod schemas for separate tool mode
-✅ Implemented conditional registration logic in createMemoryServer()
-✅ Default mode: single 'memory' tool (backward compatible)
-✅ New mode: 6 separate tools (memory_view, memory_create, memory_str_replace, memory_insert, memory_delete, memory_rename)
-✅ All TypeScript errors resolved with type assertions
-✅ Build succeeds, both modes tested and working
-✅ Created test-tool-modes.sh verification script
-✅ WIP commit: 62f4ea6
+✅ Created new plan: public-release-beta-v2 with 4 feature implementations
+✅ Added "Feature Implementation" section before "Optional Professional Touches"
+✅ Identified 4 features for pre-release: insert_line fix, forgiving params, delete_line, param combinations
+✅ Archived old public-release-beta plan
+✅ Plan now at 59% complete (26/44 tasks)
+✅ 6 commits ahead of origin/dev
 
 ### What Next Session Should Do
-**Change insert_line behavior:**
-- Make insert_line 1-based (currently 0-based)
-- Insert AT the line (pushing existing line down)
-- Example: insert_line=5 should insert at line 5, pushing old line 5 to line 6
-- Update schema descriptions
-- Update implementation in src/memory/operations.ts
-- Update tests if any
+**Start Feature Implementation section** - work through these 4 features in order:
+
+1. ☞ **Fix insert_line behavior** (HIGH) - Quick UX win
+   - Change from 0-based to 1-based indexing
+   - Insert AT the line (pushing existing line down)
+   - Update schema, implementation, tests
+   
+2. **Implement forgiving parameter naming** (HIGH) - Most useful
+   - Accept both old_str/new_str AND old_string/new_string
+   - Allow mixed usage, fail if both variants for same param
+   
+3. **Add delete_line parameter** (MEDIUM) - Nice improvement
+   - Efficient single-line deletion
+   
+4. **Implement parameter combinations** (LOW) - Can skip if time pressure
+   - Analyze combinatorial matrix
+   - Implement sensible combinations
+
+After features: Pre-Release Verification → Comprehensive Code Review → Done!
 
 ### Current Blockers
 None
@@ -38,14 +46,15 @@ None
 ## Active Plans
 _Current PlanAndTrack references_
 
-Plan: memory-system-implementation (75% complete - 12/16 tasks)
-Plan: public-release-beta (3% complete - 1/39 tasks)
+Plan: public-release-beta-v2 (59% complete - 26/44 tasks)
+- Feature Implementation: 0% (4 features to implement)
+- Pre-Release Verification: 0% (4 checks)
+- Comprehensive Code Review: 0% (4 reviews)
+- Optional Professional Touches: 0% (2 docs)
 
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-[✅🔧] Switchable tool exposure fully implemented and tested
-[💡] Used .shape to extract raw Zod schema for MCP SDK inputSchema
-[🔧] Type assertions needed when constructing command objects (command field not in individual schemas)
-[✅] MCP-Debug tool excellent for testing tool registration
-Both tool exposure modes work perfectly - verified with live testing
+[📋] Plan restructured to include 4 deferred features before release verification
+[🎯] Feature priority: insert_line fix and forgiving params are most important
+[💡] "Shoemaker's children have no shoes" = professionals neglecting their own needs (like us missing insertTask/deleteTask in PlanAndTrack!)
