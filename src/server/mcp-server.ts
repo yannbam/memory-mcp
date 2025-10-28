@@ -62,14 +62,58 @@ const MemoryCommandSchema = z.discriminatedUnion('command', [
 export type MemoryCommand = z.infer<typeof MemoryCommandSchema>;
 
 /**
+ * Individual command schemas for one-tool-per-command mode
+ * These schemas omit the 'command' field since each tool is command-specific
+ */
+const ViewCommandSchema = z.object({
+  path: z.string().describe('Memory path starting with /memories'),
+  view_range: z
+    .tuple([z.number(), z.number()])
+    .optional()
+    .describe('Optional line range [start, end]. Use -1 for end to read until EOF'),
+});
+
+const CreateCommandSchema = z.object({
+  path: z.string().describe('Memory path starting with /memories'),
+  file_text: z.string().describe('File content to write'),
+});
+
+const StrReplaceCommandSchema = z.object({
+  path: z.string().describe('Memory path starting with /memories'),
+  old_str: z.string().describe('Text to find (must be unique in file)'),
+  new_str: z.string().describe('Replacement text'),
+});
+
+const InsertCommandSchema = z.object({
+  path: z.string().describe('Memory path starting with /memories'),
+  insert_line: z.number().describe('Line number where text should be inserted (0-based)'),
+  insert_text: z.string().describe('Text to insert'),
+});
+
+const DeleteCommandSchema = z.object({
+  path: z.string().describe('Memory path starting with /memories'),
+});
+
+const RenameCommandSchema = z.object({
+  old_path: z.string().describe('Current memory path'),
+  new_path: z.string().describe('New memory path'),
+});
+
+/**
  * Create and configure MCP server with memory tools
  *
  * @param memoryRoot - Absolute filesystem path to memory root directory
  * @param logger - Debug logger instance
  * @param treeView - Enable tree view for directory listings
+ * @param oneToolPerCommand - Expose each command as separate tool (default: single unified tool)
  * @returns Configured McpServer instance
  */
-export function createMemoryServer(memoryRoot: string, logger: Logger, treeView: boolean): McpServer {
+export function createMemoryServer(
+  memoryRoot: string,
+  logger: Logger,
+  treeView: boolean,
+  oneToolPerCommand: boolean,
+): McpServer {
   // Create MCP server instance
   const server = new McpServer({
     name: 'memory-mcp',
@@ -83,7 +127,25 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
     treeView,
   };
 
-  // Register unified memory tool with discriminated union schema
+  // Conditional tool registration based on mode
+  if (oneToolPerCommand) {
+    // Register separate tools for each command
+    registerIndividualTools(server, context);
+  } else {
+    // Register unified memory tool with discriminated union schema
+    registerUnifiedTool(server, context);
+  }
+
+  return server;
+}
+
+/**
+ * Register unified memory tool (default mode)
+ *
+ * Single tool with command parameter that dispatches to appropriate operation.
+ * This matches the official Anthropic Memory tool specification.
+ */
+function registerUnifiedTool(server: McpServer, context: operations.OperationsContext): void {
   // Note: MCP SDK's inputSchema expects ZodRawShape, but we use a discriminated union
   // for proper type safety. We validate using MemoryCommandSchema in the handler.
   server.registerTool(
@@ -162,6 +224,189 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
       }
     },
   );
+}
 
-  return server;
+/**
+ * Register individual tools (one-tool-per-command mode)
+ *
+ * Exposes 6 separate tools: memory_view, memory_create, memory_str_replace,
+ * memory_insert, memory_delete, memory_rename
+ */
+function registerIndividualTools(server: McpServer, context: operations.OperationsContext): void {
+  // Register memory_view tool
+  server.registerTool(
+    'memory_view',
+    {
+      title: 'memory_view',
+      description: 'View directory contents or file contents with optional line ranges',
+      inputSchema: ViewCommandSchema.shape,
+    },
+    async (params) => {
+      try {
+        // Validate and parse params
+        const parsed = ViewCommandSchema.parse(params);
+
+        // Execute view operation with command field
+        const result = await operations.view({ command: 'view', ...parsed } as operations.ViewCommand, context);
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: errorMessage }],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  // Register memory_create tool
+  server.registerTool(
+    'memory_create',
+    {
+      title: 'memory_create',
+      description: 'Create or overwrite a file with given content',
+      inputSchema: CreateCommandSchema.shape,
+    },
+    async (params) => {
+      try {
+        // Validate and parse params
+        const parsed = CreateCommandSchema.parse(params);
+
+        // Execute create operation with command field
+        const result = await operations.create({ command: 'create', ...parsed } as operations.CreateCommand, context);
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: errorMessage }],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  // Register memory_str_replace tool
+  server.registerTool(
+    'memory_str_replace',
+    {
+      title: 'memory_str_replace',
+      description: 'Replace unique text in a file',
+      inputSchema: StrReplaceCommandSchema.shape,
+    },
+    async (params) => {
+      try {
+        // Validate and parse params
+        const parsed = StrReplaceCommandSchema.parse(params);
+
+        // Execute str_replace operation with command field
+        const result = await operations.str_replace(
+          { command: 'str_replace', ...parsed } as operations.StrReplaceCommand,
+          context,
+        );
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: errorMessage }],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  // Register memory_insert tool
+  server.registerTool(
+    'memory_insert',
+    {
+      title: 'memory_insert',
+      description: 'Insert text at a specific line number',
+      inputSchema: InsertCommandSchema.shape,
+    },
+    async (params) => {
+      try {
+        // Validate and parse params
+        const parsed = InsertCommandSchema.parse(params);
+
+        // Execute insert operation with command field
+        const result = await operations.insert({ command: 'insert', ...parsed } as operations.InsertCommand, context);
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: errorMessage }],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  // Register memory_delete tool
+  server.registerTool(
+    'memory_delete',
+    {
+      title: 'memory_delete',
+      description: 'Delete a file or directory',
+      inputSchema: DeleteCommandSchema.shape,
+    },
+    async (params) => {
+      try {
+        // Validate and parse params
+        const parsed = DeleteCommandSchema.parse(params);
+
+        // Execute delete operation with command field
+        const result = await operations.deleteOp({ command: 'delete', ...parsed } as operations.DeleteCommand, context);
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: errorMessage }],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  // Register memory_rename tool
+  server.registerTool(
+    'memory_rename',
+    {
+      title: 'memory_rename',
+      description: 'Rename or move a file or directory',
+      inputSchema: RenameCommandSchema.shape,
+    },
+    async (params) => {
+      try {
+        // Validate and parse params
+        const parsed = RenameCommandSchema.parse(params);
+
+        // Execute rename operation with command field
+        const result = await operations.rename({ command: 'rename', ...parsed } as operations.RenameCommand, context);
+
+        return {
+          content: [{ type: 'text', text: result }],
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        return {
+          content: [{ type: 'text', text: errorMessage }],
+          isError: true,
+        };
+      }
+    },
+  );
 }
