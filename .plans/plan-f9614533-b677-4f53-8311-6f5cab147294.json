@@ -1,0 +1,174 @@
+{
+  "uuid": "f9614533-b677-4f53-8311-6f5cab147294",
+  "name": "phase2-test-coverage",
+  "details": "Phase 2 implementation: Add ~55 new tests for validation layer\n\nCurrent: 85 tests passing\nTarget: 140 tests (85 + 55 new)\n\nTest files to create:\n1. test/schema-validation.test.ts (~25 tests)\n2. test/command-executor.test.ts (~30 tests)\n3. Extend tests/integration/test-error-detection.js (~10 tests)\n\nFollow e/test principles: adversarial testing to catch real problems",
+  "tasks": [
+    {
+      "name": "Schema Validation Tests",
+      "details": "Create test/schema-validation.test.ts with ~25 tests\n\nCategories:\n- Valid commands (12 tests): All 6 commands + both naming styles\n- Invalid commands (13 tests): Wrong types, missing fields, invalid values\n\nTest all edge cases from PR review",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Valid command tests",
+          "details": "Test all 6 command types accept valid input:\n- view (with/without view_range)\n- create\n- str_replace (both old_str/new_str AND old_string/new_string)\n- insert (number and string insert_line)\n- delete\n- rename",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "c5065ed4-6bcc-43b8-82e3-54ba164507e4",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:51:35.368Z"
+        },
+        {
+          "name": "Invalid command tests",
+          "details": "Test schema rejects invalid input:\n- Invalid command name\n- Missing required fields (path)\n- Wrong field types (path as number)\n- Invalid view_range (not tuple, non-numeric)\n- Invalid insert_line format",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "485b4c0f-c832-4e71-970b-8884a58266ae",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:51:35.368Z"
+        },
+        {
+          "name": "Verify schema tests pass",
+          "details": "Run npm test and verify:\n- All new schema tests pass\n- No regressions in existing 85 tests\n- Test count increases as expected",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "2c666021-a247-4053-9e03-3841ac699a27",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:51:35.368Z"
+        }
+      ],
+      "uuid": "8901d8c6-baf4-49af-a3ed-a8c67bcb683d",
+      "created_at": "2025-10-28T01:48:44.329Z",
+      "updated_at": "2025-10-28T01:48:44.329Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Command Executor Tests",
+      "details": "Create test/command-executor.test.ts with ~30 tests\n\nCategories:\n- insert_line normalization (8 tests)\n- str_replace naming flexibility (6 tests) \n- Command dispatch (6 tests)\n- Error handling (8 tests)\n- Fail-fast validation (2 tests)",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "insert_line normalization tests",
+          "details": "Test all insert_line type handling:\n- Accept number: 5\n- Accept numeric string: \"5\"\n- Reject non-numeric: \"abc\" → clear error\n- Reject float: \"2.5\" → clear error\n- Reject negative: \"-1\" → clear error\n- Accept with whitespace: \" 5 \"\n- Large numbers\n- Zero edge case",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "d37a465c-3f50-4091-b764-bde445ca1a88",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:54:52.946Z"
+        },
+        {
+          "name": "str_replace naming tests",
+          "details": "Test parameter flexibility:\n- Accept old_str/new_str only\n- Accept old_string/new_string only\n- Accept mixed: old_str + new_string\n- Accept mixed: old_string + new_str\n- Fail fast when BOTH old_str AND old_string provided\n- Fail fast when BOTH new_str AND new_string provided",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "b36563e7-b2d1-479c-a8b9-644aa163d094",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:54:52.946Z"
+        },
+        {
+          "name": "Command dispatch tests",
+          "details": "Verify executor dispatches correctly:\n- Each of 6 commands calls correct operation\n- Parameters passed through correctly\n- Context passed to operations\n- Return values propagated",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "41f0809a-062d-49e7-b2d0-a82ef5c6aaf0",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:54:52.946Z"
+        },
+        {
+          "name": "Error handling tests",
+          "details": "Test error scenarios produce clear messages:\n- Invalid insert_line → helpful error\n- Missing required str_replace fields → clear message\n- File not found propagates\n- Path validation errors propagate\n- Errors include command context",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "0ccc5853-4554-463d-be93-37ac119679c0",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:54:52.946Z"
+        },
+        {
+          "name": "Verify executor tests pass",
+          "details": "Run npm test and verify:\n- All new executor tests pass\n- No regressions\n- Test count ~115 (85 + 25 schema + ~30 executor)",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "ed5ea2cb-145b-404e-b2d9-e8969494ae70",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:54:52.946Z"
+        }
+      ],
+      "uuid": "34267480-cb34-4ccc-b5c7-b62eb818d4e0",
+      "created_at": "2025-10-28T01:48:44.329Z",
+      "updated_at": "2025-10-28T01:48:44.329Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Integration Error Tests",
+      "details": "Extend tests/integration/test-error-detection.js with ~10 new tests\n\nAdd schema validation error cases:\n- Invalid command name\n- Missing required fields\n- Wrong field types\n- Invalid parameter values",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Add schema error tests",
+          "details": "Add to test-error-detection.js:\n- Invalid command name test\n- Missing path test\n- Wrong type tests (path as number)\n- Invalid insert_line tests\n- Verify all return isError: true",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "9eca1cec-02cf-4227-9bc4-625131255f6c",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:56:32.965Z"
+        },
+        {
+          "name": "Run integration tests",
+          "details": "Execute integration test suite:\n- Build project first (npm run build)\n- Run test-error-detection.js\n- Verify all new tests pass\n- Check error messages are clear",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "2518ffaa-292f-4d29-a966-29d935b5c348",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:56:32.965Z"
+        }
+      ],
+      "uuid": "5a690d44-ccb7-4e89-9a46-e59af1fe65a5",
+      "created_at": "2025-10-28T01:48:44.329Z",
+      "updated_at": "2025-10-28T01:48:44.329Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Final Verification",
+      "details": "Verify Phase 2 complete and update plan tracking",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run full test suite",
+          "details": "Execute all tests:\n- npm test → verify ~140 tests pass\n- npm run lint → verify 0 errors\n- npm run build → verify clean build",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "13c2321e-8a10-4499-ba34-f68379c78cfe",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:57:09.243Z"
+        },
+        {
+          "name": "Update pr-review-fixes plan",
+          "details": "Mark Phase 2 tasks complete in pr-review-fixes plan:\n- Schema validation tests ✅\n- Command executor tests ✅\n- MCP error handling tests ✅\n- Verify test coverage ✅",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "719c3918-fb83-49c5-9a87-0c49f75d391f",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:57:09.243Z"
+        },
+        {
+          "name": "Update memory and handoff",
+          "details": "Update short-term.md:\n- Phase 2 complete\n- Test count: 85 → ~140\n- Ready for Phase 3 (documentation) or merge",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "b0af1204-c7c4-4c16-a77d-e86e3da93467",
+          "created_at": "2025-10-28T01:48:44.329Z",
+          "updated_at": "2025-10-28T01:57:09.243Z"
+        }
+      ],
+      "uuid": "3cf47021-a781-48ce-91ab-e947c4b0af92",
+      "created_at": "2025-10-28T01:48:44.329Z",
+      "updated_at": "2025-10-28T01:48:44.329Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-10-28T01:48:44.329Z",
+  "updated_at": "2025-10-28T01:57:09.243Z"
+}

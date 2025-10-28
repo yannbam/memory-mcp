@@ -4,7 +4,7 @@
 Five specialized agents identified issues across type safety, error handling, test coverage, and documentation.
 
 Detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
-📊 ███░░░░░░░ 30% (9/30 tasks)
+📊 ████░░░░░░ 47% (14/30 tasks)
 
 ├── ✅ |Phase 1: Critical Fixes| "REQUIRED before merge. Fix type safety, linting, and error handling gaps.\n\nEstimated: 4-6 hours\nGoal: Clean lint (0 errors), no type casts, proper error logging\n\nSee docs/PR-REVIEW-ACTION-PLAN.md for detailed code changes" (🚨) (100%)
 │   ├── ✅ |Fix str_replace schema| "Remove .passthrough() and use basic .object() with all 4 optional fields.\n\n**SOLUTION IMPLEMENTED:**\nAll naming combinations are ALLOWED (including mixed):\n- ✅ {old_str, new_str}\n- ✅ {old_string, new_string}\n- ✅ {old_str, new_string}\n- ✅ {old_string, new_str}\n\nSchema accepts all 4 fields as optional, validation happens in executor.\nPrecedence: underscore variants (old_str, new_str) take priority if multiple provided.\n\nFile: src/memory/schemas.ts (lines 27-37)" (🚨)
@@ -15,11 +15,11 @@ Detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
 │   ├── ✅ |Fix transport cleanup| "Add .catch() to transport.close() to prevent unhandled promise rejection.\n\nFile: src/server/transports.ts:62" (🚨)
 │   ├── ✅ |Improve HTTP errors| "Include error message details in HTTP error responses.\n\nFile: src/server/transports.ts:71-85" (🔴)
 │   └── ✅ |Verify clean build| "Verified all Phase 1 fixes:\n\n✅ npm run lint - 0 errors (down from 14)\n✅ npm test - 85/85 passing\n✅ npm run build - Success, no TypeScript errors\n\nAll critical fixes complete and verified." (🚨)
-├── ⏸️ |Phase 2: Test Coverage| "RECOMMENDED before merge. Add ~55 tests for new validation layer.\n\nEstimated: 4-6 hours\nGoal: 85 → 140 tests (comprehensive coverage)\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 2 for test templates" (🔴) (0%)
-│   ├── ⏸️ |Schema validation tests| "New file: tests/unit/schema-validation.test.ts\n\n~25 tests covering:\n- Valid commands (all 6 variants)\n- Both naming conventions\n- Invalid inputs\n- Missing fields\n- Wrong types" (🔴)
-│   ├── ⏸️ |Command executor tests| "New file: tests/unit/command-executor.test.ts\n\n~30 tests covering:\n- insert_line normalization (number/string)\n- str_replace naming (snake/camel)\n- Error messages\n- Edge cases" (🔴)
-│   ├── ⏸️ |MCP error handling tests| "Extend: tests/integration/test-error-detection.js\n\n~10 tests covering:\n- Schema validation errors return isError: true\n- Error messages are clear\n- Invalid inputs handled gracefully" (🟡)
-│   └── ⏸️ |Verify test coverage| "Run test suite and verify:\n- npm test shows ~140/140 passing\n- All edge cases from review covered\n- Claude Code compatibility validated" (🔴)
+├── ✅ |Phase 2: Test Coverage| "RECOMMENDED before merge. Add ~55 tests for new validation layer.\n\nEstimated: 4-6 hours\nGoal: 85 → 140 tests (comprehensive coverage)\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 2 for test templates" (🔴) (100%)
+│   ├── ✅ |Schema validation tests| "New file: tests/unit/schema-validation.test.ts\n\n~25 tests covering:\n- Valid commands (all 6 variants)\n- Both naming conventions\n- Invalid inputs\n- Missing fields\n- Wrong types" (🔴)
+│   ├── ✅ |Command executor tests| "New file: tests/unit/command-executor.test.ts\n\n~30 tests covering:\n- insert_line normalization (number/string)\n- str_replace naming (snake/camel)\n- Error messages\n- Edge cases" (🔴)
+│   ├── ✅ |MCP error handling tests| "Extend: tests/integration/test-error-detection.js\n\n~10 tests covering:\n- Schema validation errors return isError: true\n- Error messages are clear\n- Invalid inputs handled gracefully" (🟡)
+│   └── ✅ |Verify test coverage| "Run test suite and verify:\n- npm test shows ~140/140 passing\n- All edge cases from review covered\n- Claude Code compatibility validated" (🔴)
 ├── ⏸️ |Phase 3: Documentation| "RECOMMENDED cleanup. Fix misleading/contradictory comments.\n\nEstimated: 1-2 hours\nGoal: Accurate, helpful documentation\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 3 for specific changes" (🟡) (0%)
 │   ├── ⏸️ |Fix critical comment issues| "Fix 3 misleading comments:\n- Schema passthrough explanation\n- Session management contradiction\n- Type safety claim" (🟡)
 │   ├── ⏸️ |Improve workaround docs| "Add context to workarounds:\n- When can they be removed?\n- What version introduced them?\n- How to test if still needed?" (🟡)

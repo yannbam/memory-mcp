@@ -26,7 +26,7 @@ async function createClient() {
   return client;
 }
 
-async function testCommand(client, testName, commandArgs, shouldFail = true) {
+async function testCommand(client, testName, commandArgs, shouldFail = true, expectSchemaError = false) {
   try {
     const result = await client.callTool({
       name: 'memory',
@@ -50,6 +50,13 @@ async function testCommand(client, testName, commandArgs, shouldFail = true) {
       return true;
     }
   } catch (error) {
+    // Schema validation errors throw MCP protocol exceptions (error -32602)
+    // These are expected for schema validation tests
+    if (expectSchemaError && shouldFail && error.message.includes('-32602')) {
+      console.log(`✅ PASS: ${testName} (schema validation error as expected)`);
+      return true;
+    }
+
     console.error(`❌ ERROR: ${testName} - Unexpected exception:`, error.message);
     return false;
   }
@@ -186,6 +193,82 @@ async function runErrorDetectionTests() {
       command: 'delete',
       path: '/memories/../../../etc/passwd'
     }, true));
+
+    console.log('\n--- SCHEMA VALIDATION ERRORS ---');
+    // Schema validation errors throw MCP protocol exceptions (-32602)
+    // Pass expectSchemaError=true to treat these as expected failures
+    results.push(await testCommand(client, 'invalid command name', {
+      command: 'invalid_command',
+      path: '/memories/test.txt'
+    }, true, true));
+
+    results.push(await testCommand(client, 'missing path field in view', {
+      command: 'view'
+    }, true, true));
+
+    results.push(await testCommand(client, 'missing file_text in create', {
+      command: 'create',
+      path: '/memories/test.txt'
+    }, true, true));
+
+    results.push(await testCommand(client, 'missing insert_line in insert', {
+      command: 'insert',
+      path: '/memories/error-test.txt',
+      insert_text: 'text'
+    }, true, true));
+
+    results.push(await testCommand(client, 'missing insert_text in insert', {
+      command: 'insert',
+      path: '/memories/error-test.txt',
+      insert_line: 1
+    }, true, true));
+
+    results.push(await testCommand(client, 'missing old_path in rename', {
+      command: 'rename',
+      new_path: '/memories/new.txt'
+    }, true, true));
+
+    results.push(await testCommand(client, 'missing new_path in rename', {
+      command: 'rename',
+      old_path: '/memories/old.txt'
+    }, true, true));
+
+    results.push(await testCommand(client, 'path as number instead of string', {
+      command: 'view',
+      path: 12345
+    }, true, true));
+
+    results.push(await testCommand(client, 'file_text as number instead of string', {
+      command: 'create',
+      path: '/memories/test.txt',
+      file_text: 123
+    }, true, true));
+
+    results.push(await testCommand(client, 'invalid view_range format (single number)', {
+      command: 'view',
+      path: '/memories/error-test.txt',
+      view_range: 5
+    }, true, true));
+
+    results.push(await testCommand(client, 'invalid view_range format (wrong length)', {
+      command: 'view',
+      path: '/memories/error-test.txt',
+      view_range: [1, 2, 3]
+    }, true, true));
+
+    results.push(await testCommand(client, 'invalid view_range format (non-numeric)', {
+      command: 'view',
+      path: '/memories/error-test.txt',
+      view_range: ['1', '10']
+    }, true, true));
+
+    // This one returns isError (not schema error) because string passes schema but fails executor
+    results.push(await testCommand(client, 'non-numeric insert_line string', {
+      command: 'insert',
+      path: '/memories/error-test.txt',
+      insert_line: 'not-a-number',
+      insert_text: 'text'
+    }, true, false));
 
     // Summary
     console.log('\n' + '='.repeat(60));

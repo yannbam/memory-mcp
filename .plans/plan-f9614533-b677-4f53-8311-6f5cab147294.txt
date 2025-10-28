@@ -1,0 +1,31 @@
+🌳 "phase2-test-coverage"
+📝 Phase 2 implementation: Add ~55 new tests for validation layer
+
+Current: 85 tests passing
+Target: 140 tests (85 + 55 new)
+
+Test files to create:
+1. test/schema-validation.test.ts (~25 tests)
+2. test/command-executor.test.ts (~30 tests)
+3. Extend tests/integration/test-error-detection.js (~10 tests)
+
+Follow e/test principles: adversarial testing to catch real problems
+📊 ██████████ 100% (17/17 tasks)
+
+├── ✅ |Schema Validation Tests| "Create test/schema-validation.test.ts with ~25 tests\n\nCategories:\n- Valid commands (12 tests): All 6 commands + both naming styles\n- Invalid commands (13 tests): Wrong types, missing fields, invalid values\n\nTest all edge cases from PR review" (🚨) (100%)
+│   ├── ✅ |Valid command tests| "Test all 6 command types accept valid input:\n- view (with/without view_range)\n- create\n- str_replace (both old_str/new_str AND old_string/new_string)\n- insert (number and string insert_line)\n- delete\n- rename" (🚨)
+│   ├── ✅ |Invalid command tests| "Test schema rejects invalid input:\n- Invalid command name\n- Missing required fields (path)\n- Wrong field types (path as number)\n- Invalid view_range (not tuple, non-numeric)\n- Invalid insert_line format" (🚨)
+│   └── ✅ |Verify schema tests pass| "Run npm test and verify:\n- All new schema tests pass\n- No regressions in existing 85 tests\n- Test count increases as expected" (🚨)
+├── ✅ |Command Executor Tests| "Create test/command-executor.test.ts with ~30 tests\n\nCategories:\n- insert_line normalization (8 tests)\n- str_replace naming flexibility (6 tests) \n- Command dispatch (6 tests)\n- Error handling (8 tests)\n- Fail-fast validation (2 tests)" (🚨) (100%)
+│   ├── ✅ |insert_line normalization tests| "Test all insert_line type handling:\n- Accept number: 5\n- Accept numeric string: "5"\n- Reject non-numeric: "abc" → clear error\n- Reject float: "2.5" → clear error\n- Reject negative: "-1" → clear error\n- Accept with whitespace: " 5 "\n- Large numbers\n- Zero edge case" (🚨)
+│   ├── ✅ |str_replace naming tests| "Test parameter flexibility:\n- Accept old_str/new_str only\n- Accept old_string/new_string only\n- Accept mixed: old_str + new_string\n- Accept mixed: old_string + new_str\n- Fail fast when BOTH old_str AND old_string provided\n- Fail fast when BOTH new_str AND new_string provided" (🚨)
+│   ├── ✅ |Command dispatch tests| "Verify executor dispatches correctly:\n- Each of 6 commands calls correct operation\n- Parameters passed through correctly\n- Context passed to operations\n- Return values propagated" (🚨)
+│   ├── ✅ |Error handling tests| "Test error scenarios produce clear messages:\n- Invalid insert_line → helpful error\n- Missing required str_replace fields → clear message\n- File not found propagates\n- Path validation errors propagate\n- Errors include command context" (🚨)
+│   └── ✅ |Verify executor tests pass| "Run npm test and verify:\n- All new executor tests pass\n- No regressions\n- Test count ~115 (85 + 25 schema + ~30 executor)" (🚨)
+├── ✅ |Integration Error Tests| "Extend tests/integration/test-error-detection.js with ~10 new tests\n\nAdd schema validation error cases:\n- Invalid command name\n- Missing required fields\n- Wrong field types\n- Invalid parameter values" (🔴) (100%)
+│   ├── ✅ |Add schema error tests| "Add to test-error-detection.js:\n- Invalid command name test\n- Missing path test\n- Wrong type tests (path as number)\n- Invalid insert_line tests\n- Verify all return isError: true" (🔴)
+│   └── ✅ |Run integration tests| "Execute integration test suite:\n- Build project first (npm run build)\n- Run test-error-detection.js\n- Verify all new tests pass\n- Check error messages are clear" (🔴)
+└── ✅ |Final Verification| "Verify Phase 2 complete and update plan tracking" (🚨) (100%)
+    ├── ✅ |Run full test suite| "Execute all tests:\n- npm test → verify ~140 tests pass\n- npm run lint → verify 0 errors\n- npm run build → verify clean build" (🚨)
+    ├── ✅ |Update pr-review-fixes plan| "Mark Phase 2 tasks complete in pr-review-fixes plan:\n- Schema validation tests ✅\n- Command executor tests ✅\n- MCP error handling tests ✅\n- Verify test coverage ✅" (🚨)
+    └── ✅ |Update memory and handoff| "Update short-term.md:\n- Phase 2 complete\n- Test count: 85 → ~140\n- Ready for Phase 3 (documentation) or merge" (🚨)
