@@ -25,17 +25,16 @@ const CreateCommand = z.object({
 });
 
 // UX: Accept both old_str/new_str and old_string/new_string parameter naming
-// Use passthrough to allow both field names, normalize in command executor
-const StrReplaceCommand = z
-  .object({
-    command: z.literal('str_replace'),
-    path: z.string().describe('Path to file to modify'),
-    old_str: z.string().optional().describe('Exact text to find (must be unique in file)'),
-    old_string: z.string().optional(),
-    new_str: z.string().optional().describe('Text to replace with'),
-    new_string: z.string().optional(),
-  })
-  .passthrough();
+// Supports all combinations including mixed (e.g., old_str + new_string)
+// At least one "old" field and one "new" field required (validated in executor)
+const StrReplaceCommand = z.object({
+  command: z.literal('str_replace'),
+  path: z.string().describe('Path to file to modify'),
+  old_str: z.string().optional().describe('Exact text to find (must be unique in file)'),
+  old_string: z.string().optional(),
+  new_str: z.string().optional().describe('Text to replace with'),
+  new_string: z.string().optional(),
+});
 
 const InsertCommand = z.object({
   command: z.literal('insert'),

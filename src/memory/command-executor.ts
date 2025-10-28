@@ -32,10 +32,11 @@ export async function executeMemoryCommand(
       return await operations.create(args, context);
 
     case 'str_replace': {
-      // Normalize field names: accept both old_str/new_str and old_string/new_string
-      const argsAny = args as any;
-      const oldStr = args.old_str || argsAny.old_string;
-      const newStr = args.new_str || argsAny.new_string;
+      // TypeScript knows: args has { command: 'str_replace', path: string, old_str?: string, old_string?: string, new_str?: string, new_string?: string }
+      // Normalize field names: accept both old_str/new_str and old_string/new_string (or mixed)
+      // Precedence: underscore variants (old_str, new_str) take priority if both provided
+      const oldStr = args.old_str ?? args.old_string;
+      const newStr = args.new_str ?? args.new_string;
 
       if (!oldStr) {
         throw new Error('Missing required field: old_str (or old_string)');
@@ -49,7 +50,7 @@ export async function executeMemoryCommand(
           path: args.path,
           old_str: oldStr,
           new_str: newStr,
-        } as any,
+        },
         context,
       );
     }
