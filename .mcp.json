@@ -7,6 +7,12 @@
     "memory-separate": {
       "command": "node",
       "args": ["/home/jan/projects/memory-mcp/dist/index.js", "--one-tool-per-command", "-m", "/tmp/test-memory"]
+    },
+    "MCP-Debug": {
+      "command": "node",
+      "args": [
+        "/home/jan/projects/mcp-debug-mcp/mcp-debug-server-client-server.js"
+      ]
     }
   }
 }
