@@ -69,7 +69,7 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
   };
 
   // Register tools/list handler
-  server.setRequestHandler(ListToolsRequestSchema, async (): Promise<ListToolsResult> => {
+  server.setRequestHandler(ListToolsRequestSchema, (): ListToolsResult => {
     return {
       tools: [
         {
@@ -86,6 +86,7 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
             'Claude MUST use the memory tool *proactively* and *regularly* to read and write important facts and insights into persistent memory shared across all conversations!',
           // Cast to any to bypass SDK's overly strict type constraint
           // The actual MCP protocol supports any valid JSON Schema, including oneOf
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
           inputSchema: memoryToolInputSchema as any, // ← Top-level oneOf with discriminated union!
         },
       ],
@@ -126,6 +127,15 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+
+      // Log error for server-side debugging and monitoring
+      await context.logger.debug('command-execution-error', {
+        command: args.command,
+        path: 'path' in args ? args.path : undefined,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
       return {
         content: [
           {

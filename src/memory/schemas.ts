@@ -24,7 +24,7 @@ const CreateCommand = z.object({
   file_text: z.string().describe('Content to write to the file'),
 });
 
-// UX: Accept both snake_case and camelCase naming for str_replace parameters
+// UX: Accept both old_str/new_str and old_string/new_string parameter naming
 // Use passthrough to allow both field names, normalize in command executor
 const StrReplaceCommand = z
   .object({

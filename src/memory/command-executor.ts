@@ -5,7 +5,7 @@
  * Provides automatic type narrowing based on command field.
  */
 
-import { MemoryCommandSchema, type MemoryCommand, assertNever } from './schemas.js';
+import { type MemoryCommand, assertNever } from './schemas.js';
 import * as operations from './operations.js';
 import type { OperationsContext } from './operations.js';
 
@@ -32,7 +32,7 @@ export async function executeMemoryCommand(
       return await operations.create(args, context);
 
     case 'str_replace': {
-      // Normalize field names: accept both snake_case and camelCase
+      // Normalize field names: accept both old_str/new_str and old_string/new_string
       const argsAny = args as any;
       const oldStr = args.old_str || argsAny.old_string;
       const newStr = args.new_str || argsAny.new_string;

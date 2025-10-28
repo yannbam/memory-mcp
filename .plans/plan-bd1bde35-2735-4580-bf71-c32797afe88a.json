@@ -6,17 +6,17 @@
     {
       "name": "Phase 1: Critical Fixes",
       "details": "REQUIRED before merge. Fix type safety, linting, and error handling gaps.\n\nEstimated: 4-6 hours\nGoal: Clean lint (0 errors), no type casts, proper error logging\n\nSee docs/PR-REVIEW-ACTION-PLAN.md for detailed code changes",
-      "status": "pending",
+      "status": "in_progress",
       "priority": "urgent",
       "sub_tasks": [
         {
           "name": "Fix str_replace schema",
-          "details": "Replace .passthrough() with union of SnakeCase/CamelCase schemas.\n\nMaintains Claude Code compatibility while enforcing required fields.\n\nFile: src/memory/schemas.ts",
+          "details": "Replace .passthrough() with proper validation that enforces required fields.\n\n**CRITICAL - Previous Solution FLAWED:**\nFlattening discriminated union to include both StrReplaceCommandSnakeCase and StrReplaceCommandCamelCase as separate command variants would allow mixing conventions in a single call (e.g., old_str with new_string), which is INVALID.\n\n**Potential Solution to Explore:**\nUse a union type for the property itself, not the whole object. Example:\n```typescript\nold_str: z.union([z.literal('old_str'), z.literal('old_string')])\n```\n\n**Next Steps:**\n1. Consult GPT-5 in NEW conversation about proper Zod schema for flexible field naming\n2. Ask specifically about discriminated unions with flexible parameter naming\n3. Ensure solution prevents mixing conventions in single command\n4. Test with both naming styles separately\n\nFile: src/memory/schemas.ts",
           "status": "pending",
           "priority": "urgent",
           "uuid": "ebfc76b8-22e2-462e-bcdb-545e99ebba99",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T00:57:31.195Z"
         },
         {
           "name": "Remove type safety escapes",
@@ -30,47 +30,47 @@
         {
           "name": "Remove unused import",
           "details": "Remove MemoryCommandSchema from command-executor imports.\n\nFile: src/memory/command-executor.ts:8\nFixes: 1 linting error",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "uuid": "4b5db7ab-c714-40aa-aed4-dedfff8ece04",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T00:59:44.253Z"
         },
         {
           "name": "Fix unnecessary async",
           "details": "Remove async keyword from ListToolsRequestSchema handler.\n\nFile: src/server/mcp-server.ts:72\nFixes: 1 linting error",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "uuid": "6c22a3d1-1f4a-49cd-b818-cf2401e3539d",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T00:59:45.480Z"
         },
         {
           "name": "Add error logging",
           "details": "Log command execution errors to debug log before returning to client.\n\nEnables server-side monitoring and debugging.\n\nFile: src/server/mcp-server.ts:116-138",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "uuid": "17751d86-8683-45f0-9b08-fb33691b0e1e",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T00:59:47.099Z"
         },
         {
           "name": "Fix transport cleanup",
           "details": "Add .catch() to transport.close() to prevent unhandled promise rejection.\n\nFile: src/server/transports.ts:62",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "uuid": "62efe22a-3ee1-45c2-8a3c-f3e6830fdd2d",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T00:59:48.869Z"
         },
         {
           "name": "Improve HTTP errors",
           "details": "Include error message details in HTTP error responses.\n\nFile: src/server/transports.ts:71-85",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "uuid": "542168c1-98ff-4894-b82d-78272400ca5a",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T00:59:50.874Z"
         },
         {
           "name": "Verify clean build",
@@ -85,7 +85,7 @@
       "uuid": "c4ddb098-c4c2-4831-9dc6-14ab229abb3d",
       "created_at": "2025-10-28T00:16:24.259Z",
       "updated_at": "2025-10-28T00:16:24.259Z",
-      "completion_percentage": 0
+      "completion_percentage": 63
     },
     {
       "name": "Phase 2: Test Coverage",
@@ -290,5 +290,5 @@
     }
   ],
   "created_at": "2025-10-28T00:16:24.260Z",
-  "updated_at": "2025-10-28T00:16:24.260Z"
+  "updated_at": "2025-10-28T00:59:50.874Z"
 }

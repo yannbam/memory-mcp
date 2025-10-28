@@ -59,7 +59,10 @@ export async function initHttpTransport(server: Server, port: number): Promise<v
 
     // Clean up transport when connection closes
     res.on('close', () => {
-      void transport.close();
+      transport.close().catch((error) => {
+        // Log but don't throw - connection already closing
+        console.error('Error closing transport:', error);
+      });
     });
 
     try {
@@ -69,7 +72,8 @@ export async function initHttpTransport(server: Server, port: number): Promise<v
       // Handle the request
       await transport.handleRequest(req, res, req.body);
     } catch (error) {
-      console.error('Error handling MCP request:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Error handling MCP request:', errorMessage);
 
       // Send error response if headers not sent
       if (!res.headersSent) {
@@ -78,6 +82,11 @@ export async function initHttpTransport(server: Server, port: number): Promise<v
           error: {
             code: -32603,
             message: 'Internal server error',
+            data: {
+              detail: errorMessage,
+              // Include stack trace in debug mode only
+              stack: process.env.DEBUG ? (error instanceof Error ? error.stack : undefined) : undefined,
+            },
           },
           id: null,
         });

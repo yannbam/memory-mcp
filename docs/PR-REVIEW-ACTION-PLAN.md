@@ -25,7 +25,7 @@
 
 **Current Code** (lines 27-38):
 ```typescript
-// UX: Accept both snake_case and camelCase naming for str_replace parameters
+// UX: Accept both old_str/new_str and old_string/new_string parameter naming
 // Use passthrough to allow both field names, normalize in command executor
 const StrReplaceCommand = z
   .object({
@@ -41,33 +41,26 @@ const StrReplaceCommand = z
 
 **New Code**:
 ```typescript
-// UX: Accept both snake_case and camelCase naming for str_replace parameters
-// Use union to support both conventions with proper validation
-const StrReplaceCommandSnakeCase = z.object({
-  command: z.literal('str_replace'),
-  path: z.string().describe('Path to file to modify'),
-  old_str: z.string().describe('Exact text to find (must be unique in file)'),
-  new_str: z.string().describe('Text to replace with'),
-});
-
-const StrReplaceCommandCamelCase = z.object({
-  command: z.literal('str_replace'),
-  path: z.string().describe('Path to file to modify'),
-  old_string: z.string().describe('Exact text to find (must be unique in file)'),
-  new_string: z.string().describe('Text to replace with'),
-});
-
-const StrReplaceCommand = z.union([
-  StrReplaceCommandSnakeCase,
-  StrReplaceCommandCamelCase,
-]);
+// UX: Accept both old_str/new_str and old_string/new_string parameter naming
+// TODO: Next session - find proper solution that prevents mixing conventions
+// Current .passthrough() allows invalid combinations like {old_str, new_string}
+// See task details for GPT-5 consultation plan
+const StrReplaceCommand = z
+  .object({
+    command: z.literal('str_replace'),
+    path: z.string().describe('Path to file to modify'),
+    old_str: z.string().optional().describe('Exact text to find (must be unique in file)'),
+    old_string: z.string().optional(),
+    new_str: z.string().optional().describe('Text to replace with'),
+    new_string: z.string().optional(),
+  })
+  .passthrough();
 ```
 
-**Benefits**:
-- ✅ No passthrough = stricter validation
-- ✅ Required fields enforced at schema level
-- ✅ Both naming conventions work (maintains Claude Code compatibility)
-- ✅ No `as any` casts needed in executor
+**Status**: ⚠️ DEFERRED - Initial solution was flawed
+- Flattening union allows mixing conventions (e.g., {old_str, new_string})
+- Need GPT-5 consultation for proper Zod schema approach
+- See updated task details in pr-review-fixes plan
 
 ---
 
@@ -80,7 +73,7 @@ const StrReplaceCommand = z.union([
 **Current Code** (lines 33-54):
 ```typescript
 case 'str_replace': {
-  // Normalize field names: accept both snake_case and camelCase
+  // Normalize field names: accept both old_str/new_str and old_string/new_string
   const argsAny = args as any;  // ❌ Type safety escape #1
   const oldStr = args.old_str || argsAny.old_string;
   const newStr = args.new_str || argsAny.new_string;
@@ -360,7 +353,7 @@ If any unfixable errors remain, address manually.
 **Test Categories**:
 1. **Valid Commands** (~12 tests)
    - One test per command with valid input
-   - Test both snake_case and camelCase for str_replace
+   - Test both old_str/new_str and old_string/new_string naming for str_replace
    - Test optional fields (view_range)
 
 2. **Invalid Commands** (~13 tests)
@@ -396,7 +389,7 @@ describe('Schema Validation', () => {
       expect(result).toHaveProperty('old_str', 'foo');
     });
 
-    it('should accept str_replace with camelCase', () => {
+    it('should accept str_replace with old_string/new_string', () => {
       const result = MemoryCommandSchema.parse({
         command: 'str_replace',
         path: '/memories/test.txt',
@@ -453,7 +446,7 @@ describe('Schema Validation', () => {
 
 2. **Parameter Normalization - str_replace** (~6 tests)
    - Accept snake_case only
-   - Accept camelCase only
+   - Accept old_string/new_string only
    - With union schema, mixing is impossible (validated by schema)
 
 3. **Command Dispatch** (~6 tests)
@@ -560,7 +553,7 @@ describe('Command Executor', () => {
       expect(result).toContain('qux');
     });
 
-    it('should accept camelCase (old_string/new_string)', async () => {
+    it('should accept old_string/new_string naming', async () => {
       const result = await executeMemoryCommand(
         {
           command: 'str_replace',
@@ -647,11 +640,11 @@ results.push(await testCommand(client, 'insert_line non-numeric', {
 **Change**:
 ```typescript
 // Before:
-// UX: Accept both snake_case and camelCase naming for str_replace parameters
+// UX: Accept both old_str/new_str and old_string/new_string parameter naming
 // Use passthrough to allow both field names, normalize in command executor
 
 // After:
-// UX: Accept both snake_case and camelCase naming for str_replace parameters
+// UX: Accept both old_str/new_str and old_string/new_string parameter naming
 // Union schema allows users to use either convention naturally
 // Both styles validated identically, normalized to snake_case in executor
 ```

@@ -4,16 +4,16 @@
 Five specialized agents identified issues across type safety, error handling, test coverage, and documentation.
 
 Detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
-📊 ░░░░░░░░░░ 0% (0/30 tasks)
+📊 █░░░░░░░░░ 17% (5/30 tasks)
 
-├── ⏸️ |Phase 1: Critical Fixes| "REQUIRED before merge. Fix type safety, linting, and error handling gaps.\n\nEstimated: 4-6 hours\nGoal: Clean lint (0 errors), no type casts, proper error logging\n\nSee docs/PR-REVIEW-ACTION-PLAN.md for detailed code changes" (🚨) (0%)
-│   ├── ⏸️ |Fix str_replace schema| "Replace .passthrough() with union of SnakeCase/CamelCase schemas.\n\nMaintains Claude Code compatibility while enforcing required fields.\n\nFile: src/memory/schemas.ts" (🚨)
+├── 🔄 |Phase 1: Critical Fixes| "REQUIRED before merge. Fix type safety, linting, and error handling gaps.\n\nEstimated: 4-6 hours\nGoal: Clean lint (0 errors), no type casts, proper error logging\n\nSee docs/PR-REVIEW-ACTION-PLAN.md for detailed code changes" (🚨) (63%)
+│   ├── ⏸️ |Fix str_replace schema| "Replace .passthrough() with proper validation that enforces required fields.\n\n**CRITICAL - Previous Solution FLAWED:**\nFlattening discriminated union to include both StrReplaceCommandSnakeCase and StrReplaceCommandCamelCase as separate command variants would allow mixing conventions in a single call (e.g., old_str with new_string), which is INVALID.\n\n**Potential Solution to Explore:**\nUse a union type for the property itself, not the whole object. Example:\n```typescript\nold_str: z.union([z.literal('old_str'), z.literal('old_string')])\n```\n\n**Next Steps:**\n1. Consult GPT-5 in NEW conversation about proper Zod schema for flexible field naming\n2. Ask specifically about discriminated unions with flexible parameter naming\n3. Ensure solution prevents mixing conventions in single command\n4. Test with both naming styles separately\n\nFile: src/memory/schemas.ts" (🚨)
 │   ├── ⏸️ |Remove type safety escapes| "Eliminate all 'as any' casts in command executor.\n\nWith union schema, normalization becomes type-safe.\n\nFile: src/memory/command-executor.ts\nFixes: 11 linting errors" (🚨)
-│   ├── ⏸️ |Remove unused import| "Remove MemoryCommandSchema from command-executor imports.\n\nFile: src/memory/command-executor.ts:8\nFixes: 1 linting error" (🔴)
-│   ├── ⏸️ |Fix unnecessary async| "Remove async keyword from ListToolsRequestSchema handler.\n\nFile: src/server/mcp-server.ts:72\nFixes: 1 linting error" (🔴)
-│   ├── ⏸️ |Add error logging| "Log command execution errors to debug log before returning to client.\n\nEnables server-side monitoring and debugging.\n\nFile: src/server/mcp-server.ts:116-138" (🚨)
-│   ├── ⏸️ |Fix transport cleanup| "Add .catch() to transport.close() to prevent unhandled promise rejection.\n\nFile: src/server/transports.ts:62" (🚨)
-│   ├── ⏸️ |Improve HTTP errors| "Include error message details in HTTP error responses.\n\nFile: src/server/transports.ts:71-85" (🔴)
+│   ├── ✅ |Remove unused import| "Remove MemoryCommandSchema from command-executor imports.\n\nFile: src/memory/command-executor.ts:8\nFixes: 1 linting error" (🔴)
+│   ├── ✅ |Fix unnecessary async| "Remove async keyword from ListToolsRequestSchema handler.\n\nFile: src/server/mcp-server.ts:72\nFixes: 1 linting error" (🔴)
+│   ├── ✅ |Add error logging| "Log command execution errors to debug log before returning to client.\n\nEnables server-side monitoring and debugging.\n\nFile: src/server/mcp-server.ts:116-138" (🚨)
+│   ├── ✅ |Fix transport cleanup| "Add .catch() to transport.close() to prevent unhandled promise rejection.\n\nFile: src/server/transports.ts:62" (🚨)
+│   ├── ✅ |Improve HTTP errors| "Include error message details in HTTP error responses.\n\nFile: src/server/transports.ts:71-85" (🔴)
 │   └── ⏸️ |Verify clean build| "Run linting, tests, and build to verify all fixes.\n\nCommands:\n- npm run lint (expect 0 errors)\n- npm test (expect 85/85 passing)\n- npm run build" (🚨)
 ├── ⏸️ |Phase 2: Test Coverage| "RECOMMENDED before merge. Add ~55 tests for new validation layer.\n\nEstimated: 4-6 hours\nGoal: 85 → 140 tests (comprehensive coverage)\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 2 for test templates" (🔴) (0%)
 │   ├── ⏸️ |Schema validation tests| "New file: tests/unit/schema-validation.test.ts\n\n~25 tests covering:\n- Valid commands (all 6 variants)\n- Both naming conventions\n- Invalid inputs\n- Missing fields\n- Wrong types" (🔴)
