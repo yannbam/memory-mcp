@@ -246,6 +246,16 @@ Long-term memory should become MORE VALUABLE over time, not just LARGER:
 - Consolidate related entries into comprehensive understanding
 - Delete definitively wrong information immediately
 
+**⚠️ CRITICAL - Avoid Forced Overdoing:**
+When processing/managing long-term memory, make MINIMAL targeted changes after thoughtful reflection and consideration:
+- **DON'T** add information that's already obvious in README/code/docs
+- **DON'T** duplicate knowledge across multiple sections
+- **DON'T** invent new details out of the blue
+- **DON'T** reorganize or "improve" structure unnecessarily
+- **DO** simply remove obsolete entries
+- **DO** update memories when reality has changed
+- **DO** consolidate memories when possible without losing relevant information
+
 ### Critical Implementation Notes
 
 **For short-term.md:**

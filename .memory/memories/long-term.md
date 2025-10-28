@@ -44,13 +44,6 @@ Can test different CLI flags by reconnecting with different args array
 ## Deferred Work
 _Complex tasks or investigations postponed for future sessions_
 
-[🔄💡] Implement forgiving parameter naming: accept both "old_str"/"new_str" AND "old_string"/"new_string" with optional parameters
-- Allow mixed usage (old_str + new_string) but fail early if both variants provided for same param (old_str + old_string)
-- Schema validation should catch conflicts before operation execution
-
-[🔄🔧] Add "delete_line" parameter to delete command for targeted single-line deletion
-- Alternative to reading file, removing line, writing back - more efficient and atomic
-
 [🔄🎯] Create combinatorial matrix of ALL command+parameter combinations and implement sensible ones
 - Example: delete with path+old_str => replace old_str with "" (delete matching text)
 - Example: str_replace with path+old_str => replace old_str with "" (delete matching text)
