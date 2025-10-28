@@ -63,8 +63,10 @@ Can test different CLI flags by reconnecting with different args array
 [⚠️🧪] MCP-Debug is useful for quick iteration BUT always verify with actual Claude Code MCP client before marking complete
 Different MCP client implementations may handle schemas/parameters differently
 [✅🧪] Parameter combination testing strategy: Test BOTH tool modes (unified + one-tool-per-command), test with and without optional params, test error cases (multiple occurrences, parameter conflicts)
-[🔧💡] view command UX improvement needed: Empty file shows `1: ` and empty directory shows listing - should return friendly messages "Memory file is empty." and "Directory is empty." instead (src/memory/operations.ts view function)
-Comprehensive test matrix prevents edge case bugs
+[✅🎨] Empty content UX messaging implemented (Session e0d8aaf1, Oct 28 2025):
+Empty file view returns "Memory file is empty.", empty directory returns "Directory is empty." (both tree and simple modes), empty file creation returns "Created empty memory file."
+Implementation: operations.ts (viewFile L194-197, viewDirectory L183-186, create L286-288) + tree-view.ts (renderDirectoryTree L273-276)
+Tested: 117 unit tests + MCP-Debug integration (all pass)
 
 
 ## Deferred Work
@@ -73,6 +75,11 @@ _Complex tasks or investigations postponed for future sessions_
 
 ## Project-Specific Knowledge
 _Unique aspects of this particular codebase/project_
+
+[📖💡] Parameter combinations quick reference added to README.md (table format) and src/memory/operations.ts (code comments)
+Shows required vs optional parameters for all 6 commands with usage notes
+Highlights flexible usage: create empty file, append to end, delete text with str_replace, etc.
+Key location: README line 140-151, operations.ts line 14-43
 
 [📊✅] Parameter combinations feature COMPLETE (Sessions f7051c6f + ff6a2f81, Oct 28 2025):
 4 features fully implemented AND tested: create empty file, insert append, delete unique text, str_replace deletion

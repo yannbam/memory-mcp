@@ -79,8 +79,9 @@ Next steps: Pre-Release Verification and Code Review
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-[✅🎨💯] Empty content UX messaging COMPLETE - 3 features, 117 tests pass (Session e0d8aaf1, commit fce4cbf)
+[✅🎨💯] Empty content UX messaging COMPLETE - 3 features, 117 tests pass (commits fce4cbf, 61dae27)
 [📝] Updated README examples and test count (85→117), documented in CHANGELOG
 [💾] Plan archived: empty-content-ux-messages (8/8 tasks completed)
+[🧪] MCP-Debug testing: All 7 tests pass (empty dir, empty file view/create, subdirectory)
+[📖] Added parameter combinations quick reference to README + operations.ts (commit f3119a9)
 [🚀] Ready for: Pre-Release Verification (4 checks) → Code Review (4 agents) → Beta Release
-[🧪] Test additions: 4 new tests + 2 updated tests for empty content scenarios
