@@ -10,6 +10,37 @@
  * - rename: Rename or move files/directories
  *
  * All operations use file locking for concurrent access safety.
+ *
+ * ## Parameter Combinations Reference
+ *
+ * **view:**
+ * - path (required)
+ * - view_range (optional) - only for files, e.g., [1, 10] or [5, -1] for EOF
+ *
+ * **create:**
+ * - path (required)
+ * - file_text (optional) - omit or use "" to create empty file
+ *
+ * **str_replace:**
+ * - path (required)
+ * - old_str/old_string (required, use either variant)
+ * - new_str/new_string (optional) - omit or use "" to delete text
+ *
+ * **insert:**
+ * - path (required)
+ * - insert_text (required)
+ * - insert_line (optional) - omit to append to end of file
+ *
+ * **delete:**
+ * - path (required)
+ * - delete_line (optional) - delete specific line number
+ * - old_str/old_string (optional) - delete unique text occurrence
+ * - Note: Cannot mix delete_line with old_str (choose one approach)
+ * - Note: Without either, deletes entire file/directory
+ *
+ * **rename:**
+ * - old_path (required)
+ * - new_path (required)
  */
 
 import * as fs from 'fs/promises';

@@ -137,6 +137,19 @@ The server exposes a single unified **`memory`** tool with a `command` parameter
 
 This matches the [official Anthropic Memory tool specification](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool).
 
+### Parameter Combinations Quick Reference
+
+| Command | Required | Optional | Notes |
+|---------|----------|----------|-------|
+| **view** | `path` | `view_range` | `view_range` only for files: `[start, end]` or `[start, -1]` for EOF |
+| **create** | `path` | `file_text` | Omit `file_text` to create empty file |
+| **str_replace** | `path`<br>`old_str` or `old_string` | `new_str` or `new_string` | Omit `new_str` to delete text. Text must be unique. |
+| **insert** | `path`<br>`insert_text` | `insert_line` | Omit `insert_line` to append to end |
+| **delete** | `path` | `delete_line`<br>`old_str` or `old_string` | Choose one: line number, text match, or neither (deletes file/dir). Text must be unique. |
+| **rename** | `old_path`<br>`new_path` | - | Creates parent directories as needed |
+
+**Forgiving parameter naming:** Both `old_str`/`new_str` and `old_string`/`new_string` are accepted interchangeably.
+
 ### view
 Show directory contents or file contents with optional line ranges.
 
