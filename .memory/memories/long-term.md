@@ -24,8 +24,10 @@ _Failed approaches, time sinks, what NOT to do (saves future sessions from repea
 Don't use McpServer.registerTool for discriminated unions - it always wraps inputSchema in z.object() making top-level unions impossible
 Don't use zodToJsonSchema with default settings - produces $ref at top level which some validators reject when mixed with type: "object"
 Don't use z.refine() on discriminated union schemas - breaks the discriminated union structure for Zod's discriminatedUnion type
-Don't use .passthrough() for flexible parameter naming - security risk (accepts ANY fields) and requires type casts - use union of schemas instead
+Don't use .passthrough() for flexible parameter naming - security risk (accepts ANY fields) and requires type casts
+Don't flatten discriminated union with multiple variants of same command - allows mixing conventions in single call (e.g., {old_str, new_string})
 Never skip PR review for "working" code - Session 0bb07c86 found 6 critical issues in fully functional E2E-tested implementation
+Terminology: old_string is NOT camelCase (uses underscores) - true camelCase would be oldString
 
 
 ## Proven Solutions
@@ -45,6 +47,11 @@ _Test strategies that work, debugging approaches, tools that help_
 
 ## Deferred Work
 _Complex tasks or investigations postponed for future sessions_
+
+[URGENT] str_replace schema fix - requires GPT-5 consultation before implementation (Session 280f8ab4)
+Challenge: Accept EITHER {old_str, new_str} OR {old_string, new_string} but prevent mixing
+Flawed approaches: .passthrough() (security risk), flattened union (allows mixing)
+Need: Proper Zod schema that enforces exactly one style per call within discriminated union
 
 
 ## Project-Specific Knowledge

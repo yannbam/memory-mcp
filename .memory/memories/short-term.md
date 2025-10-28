@@ -12,12 +12,15 @@ Status: ⚠️ Phase 1 attempted - CRITICAL FLAW DISCOVERED - need GPT-5 consult
 _What was done, what's next, blockers_
 
 ### This Session Accomplished
-✅ Conducted comprehensive 5-agent PR review for merge to main
-✅ Agents used: code-reviewer, type-design-analyzer, silent-failure-hunter, comment-analyzer, pr-test-analyzer
-✅ Created detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
-✅ Created PlanAndTrack plan "pr-review-fixes" (30 tasks across 4 phases)
-✅ Identified critical issues: type safety escapes, test coverage gaps, error handling
-✅ Designed union schema solution to maintain Claude Code compatibility
+✅ Applied valid Phase 1 fixes (5 of 8 tasks):
+  - Removed unused import
+  - Fixed unnecessary async  
+  - Added server-side error logging
+  - Fixed transport cleanup error handling
+  - Improved HTTP error responses with details
+⚠️ DEFERRED str_replace schema fix - initial solution was critically flawed
+✅ Fixed terminology: "camelCase" → "old_string/new_string notation"
+✅ Updated pr-review-fixes plan with GPT-5 consultation requirement
 
 ### PR Review Findings Summary
 
@@ -38,30 +41,48 @@ _What was done, what's next, blockers_
 
 ### What Next Session Should Do
 
-**IMMEDIATE: Implement Phase 1 Fixes** (4-6 hours, REQUIRED)
-Use plan: `pr-review-fixes` 
-Reference: `docs/PR-REVIEW-ACTION-PLAN.md`
+**CRITICAL FIRST STEP: Consult GPT-5 about str_replace schema** (30 min)
 
-Key fixes:
-1. Replace .passthrough() with union of SnakeCase/CamelCase schemas
-2. Remove all `as any` casts (becomes type-safe with union schema)
-3. Add error logging to command execution
-4. Fix transport cleanup error handling
-5. Remove unused imports, fix unnecessary async
+**Problem**: Need Zod schema that:
+- Accepts EITHER {old_str, new_str} OR {old_string, new_string}
+- PREVENTS mixing (e.g., {old_str, new_string} must be invalid)
+- Works within discriminated union (MemoryCommandSchema)
+- Eliminates need for `as any` casts
 
-**Result**: Clean lint (0 errors), full type safety, proper error handling
+**Flawed approaches tried**:
+1. `.passthrough()` - allows ANY fields (security risk)
+2. Flattening union - allows mixing conventions
 
-**STRONGLY RECOMMENDED: Phase 2 Tests** (4-6 hours)
-Add ~55 tests for schema validation and command executor
-Coverage: 85 → 140 tests
+**Potential solution to explore with GPT-5**:
+- Union type for property itself?
+- Custom Zod refinement?
+- Conditional schema based on which fields are present?
 
-**RECOMMENDED: Phase 3 Docs** (1-2 hours)
-Fix misleading comments, add protocol references
+**GPT-5 Consultation Format**:
+```
+Context: MCP server with discriminated union schema for memory commands
+Environment: Zod v3.23.8, TypeScript, strict type safety required
+Challenge: str_replace command accepts two parameter naming conventions
+- Style A: {old_str, new_str} 
+- Style B: {old_string, new_string}
+- INVALID: {old_str, new_string} or {old_string, new_str}
 
-**After all fixes**: Create PR to main with review summary
+Current approach (.passthrough()) allows any fields - security issue
+Need: Zod schema that enforces exactly one style per call
+Must work in: z.discriminatedUnion('command', [...])
+```
+
+**After schema solution found**:
+1. Implement fix in src/memory/schemas.ts
+2. Remove `as any` casts from src/memory/command-executor.ts
+3. Run lint, tests, build
+4. Complete Phase 1 remaining tasks (see pr-review-fixes plan)
+
+**Then consider**: Phase 2 tests (recommended), Phase 3 docs, Phase 4 polish
 
 ### Current Blockers
-None - clear path forward documented
+⚠️ str_replace schema fix requires GPT-5 consultation (see "What Next Session Should Do")
+Otherwise: clear path forward documented
 
 ## Active Plans
 _Current PlanAndTrack references_
@@ -73,7 +94,8 @@ Plan: public-release-beta (3% complete - 1/39 tasks) - resume after PR merge
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-PR review revealed union schema pattern better than .passthrough() for flexible naming
-Union approach: StrReplaceCommandSnakeCase | StrReplaceCommandCamelCase
-Maintains Claude Code compatibility while enforcing required fields at schema level
-With union schema, type casts become unnecessary - full type safety restored
+⚠️ Terminology error corrected: old_string/new_string is NOT camelCase (uses underscores)
+True camelCase would be: oldString, newString
+Current implementation uses .passthrough() - allows {old_str, new_string} which is INVALID
+Flattening discriminated union to include both variants separately also flawed - still allows mixing
+Need proper Zod schema approach from GPT-5 consultation
