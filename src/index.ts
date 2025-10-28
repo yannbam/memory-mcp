@@ -208,17 +208,40 @@ async function main(): Promise<void> {
     // Handle graceful shutdown
     process.on('SIGINT', async () => {
       console.error('\nShutting down...');
-      await logger.close();
-      process.exit(0);
+      try {
+        await logger.close();
+        process.exit(0);
+      } catch (error) {
+        console.error('Error during shutdown:', error);
+        process.exit(1);
+      }
     });
 
     process.on('SIGTERM', async () => {
-      console.error('\nShutting down...');
-      await logger.close();
-      process.exit(0);
+      console.error('Received SIGTERM, shutting down...');
+      try {
+        await logger.close();
+        process.exit(0);
+      } catch (error) {
+        console.error('Error during shutdown:', error);
+        process.exit(1);
+      }
     });
   } catch (error) {
-    console.error('Fatal error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error('Fatal startup error:', errorMessage);
+    if (errorStack && config.debug) {
+      console.error('Stack trace:', errorStack);
+    }
+
+    console.error('\nTroubleshooting:');
+    console.error('- Check memory root path exists and is writable:', config.memoryRootPath);
+    console.error('- Check port is available (HTTP mode):', config.port);
+    console.error('- Enable debug mode: --debug flag');
+    console.error('- View debug logs: /tmp/memory-mcp/<instance-id>.log');
+
     process.exit(1);
   }
 }

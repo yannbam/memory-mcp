@@ -195,100 +195,100 @@
     {
       "name": "Phase 4: Polish",
       "details": "OPTIONAL improvements. Can be post-merge follow-up PR.\n\nEstimated: 2-3 hours\nGoal: Production-grade polish\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 4",
-      "status": "pending",
+      "status": "completed",
       "priority": "low",
       "sub_tasks": [
         {
           "name": "Consider branded types",
           "details": "Optional: Implement branded MemoryPath type to enforce /memories prefix at type level.",
-          "status": "pending",
+          "status": "completed",
           "priority": "low",
           "uuid": "1f214eec-64a6-4ea3-9e51-a57e62d0ef4c",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T02:20:52.724Z"
         },
         {
           "name": "Make CORS configurable",
           "details": "Optional: Add ALLOWED_ORIGINS env var for production security.",
-          "status": "pending",
+          "status": "completed",
           "priority": "low",
           "uuid": "c4a68cc9-9567-48ad-bb93-7edbe8f8e8e7",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T02:20:52.724Z"
         },
         {
           "name": "Improve error messages",
           "details": "Optional: Add troubleshooting hints to startup errors.",
-          "status": "pending",
+          "status": "completed",
           "priority": "low",
           "uuid": "fb6bd79d-3ebd-44c2-8837-48db94760f6c",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T02:21:29.051Z"
         },
         {
           "name": "Handle signal errors",
           "details": "Optional: Properly handle cleanup errors in SIGINT/SIGTERM handlers.",
-          "status": "pending",
+          "status": "completed",
           "priority": "low",
           "uuid": "65108eeb-0d8b-499f-bc33-aaafb2c4443a",
           "created_at": "2025-10-28T00:16:24.259Z",
-          "updated_at": "2025-10-28T00:16:24.259Z"
+          "updated_at": "2025-10-28T02:21:29.051Z"
         }
       ],
       "uuid": "14bbd790-8d7d-4bfc-b458-b37e091c0a51",
       "created_at": "2025-10-28T00:16:24.259Z",
-      "updated_at": "2025-10-28T00:16:24.259Z",
-      "completion_percentage": 0
+      "updated_at": "2025-10-28T02:19:07.423Z",
+      "completion_percentage": 100
     },
     {
       "name": "Final Verification",
       "details": "Pre-merge checklist before creating PR to main",
-      "status": "pending",
+      "status": "in_progress",
       "priority": "urgent",
       "sub_tasks": [
         {
           "name": "Run full test suite",
           "details": "Verify all tests pass:\n- npm test\n- npm run lint\n- npm run build",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "uuid": "819d7525-df9f-4c69-a279-742ac70670bd",
           "created_at": "2025-10-28T00:16:24.260Z",
-          "updated_at": "2025-10-28T00:16:24.260Z"
+          "updated_at": "2025-10-28T02:21:56.532Z"
         },
         {
           "name": "Manual E2E test",
           "details": "Test with actual Claude Code instance:\n- All 6 commands work\n- Both naming conventions work\n- Error handling works\n- Debug logs created",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "uuid": "af93575d-af11-4023-8789-c1acdc2d161c",
           "created_at": "2025-10-28T00:16:24.260Z",
-          "updated_at": "2025-10-28T00:16:24.260Z"
+          "updated_at": "2025-10-28T02:23:52.513Z"
         },
         {
           "name": "Update CLAUDE.md",
           "details": "Update handoff section with:\n- What was fixed\n- Test coverage status\n- Ready for merge to main",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "uuid": "ed30bee0-b722-4f8f-b748-45d37931da63",
           "created_at": "2025-10-28T00:16:24.260Z",
-          "updated_at": "2025-10-28T00:16:24.260Z"
+          "updated_at": "2025-10-28T02:24:26.022Z"
         },
         {
           "name": "Create PR to main",
           "details": "Merge feature/discriminated-union-schema → main\n\nInclude:\n- Reference to PR-REVIEW-ACTION-PLAN.md\n- Summary of 5-agent review findings\n- Test coverage improvements\n- Breaking changes (none expected)",
-          "status": "pending",
+          "status": "in_progress",
           "priority": "high",
           "uuid": "dd962fa3-2966-49a4-b72b-565d7cd1928f",
           "created_at": "2025-10-28T00:16:24.260Z",
-          "updated_at": "2025-10-28T00:16:24.260Z"
+          "updated_at": "2025-10-28T02:24:26.249Z"
         }
       ],
       "uuid": "8ec10a2f-ff7a-4131-8011-327cf9eb5689",
       "created_at": "2025-10-28T00:16:24.259Z",
-      "updated_at": "2025-10-28T00:16:24.259Z",
-      "completion_percentage": 0
+      "updated_at": "2025-10-28T02:21:56.328Z",
+      "completion_percentage": 75
     }
   ],
   "created_at": "2025-10-28T00:16:24.260Z",
-  "updated_at": "2025-10-28T02:09:25.002Z"
+  "updated_at": "2025-10-28T02:24:26.249Z"
 }

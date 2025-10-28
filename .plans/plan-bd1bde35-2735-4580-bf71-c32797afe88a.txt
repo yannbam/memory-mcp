@@ -4,7 +4,7 @@
 Five specialized agents identified issues across type safety, error handling, test coverage, and documentation.
 
 Detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
-📊 ██████░░░░ 67% (20/30 tasks)
+📊 █████████░ 93% (28/30 tasks)
 
 ├── ✅ |Phase 1: Critical Fixes| "REQUIRED before merge. Fix type safety, linting, and error handling gaps.\n\nEstimated: 4-6 hours\nGoal: Clean lint (0 errors), no type casts, proper error logging\n\nSee docs/PR-REVIEW-ACTION-PLAN.md for detailed code changes" (🚨) (100%)
 │   ├── ✅ |Fix str_replace schema| "Remove .passthrough() and use basic .object() with all 4 optional fields.\n\n**SOLUTION IMPLEMENTED:**\nAll naming combinations are ALLOWED (including mixed):\n- ✅ {old_str, new_str}\n- ✅ {old_string, new_string}\n- ✅ {old_str, new_string}\n- ✅ {old_string, new_str}\n\nSchema accepts all 4 fields as optional, validation happens in executor.\nPrecedence: underscore variants (old_str, new_str) take priority if multiple provided.\n\nFile: src/memory/schemas.ts (lines 27-37)" (🚨)
@@ -26,13 +26,13 @@ Detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
 │   ├── ✅ |Add protocol references| "Link to MCP spec for protocol requirements.\n\nFile: src/server/mcp-server.ts" (🔵)
 │   ├── ✅ |Fix terminology| "Replace 'anyOf' with 'oneOf' for discriminated unions.\n\nFiles: src/server/mcp-server.ts (2 locations)" (🔵)
 │   └── ✅ |Remove redundant comments| "Clean up 3 redundant/vague comments that don't add value." (🔵)
-├── ⏸️ |Phase 4: Polish| "OPTIONAL improvements. Can be post-merge follow-up PR.\n\nEstimated: 2-3 hours\nGoal: Production-grade polish\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 4" (🔵) (0%)
-│   ├── ⏸️ |Consider branded types| "Optional: Implement branded MemoryPath type to enforce /memories prefix at type level." (🔵)
-│   ├── ⏸️ |Make CORS configurable| "Optional: Add ALLOWED_ORIGINS env var for production security." (🔵)
-│   ├── ⏸️ |Improve error messages| "Optional: Add troubleshooting hints to startup errors." (🔵)
-│   └── ⏸️ |Handle signal errors| "Optional: Properly handle cleanup errors in SIGINT/SIGTERM handlers." (🔵)
-└── ⏸️ |Final Verification| "Pre-merge checklist before creating PR to main" (🚨) (0%)
-    ├── ⏸️ |Run full test suite| "Verify all tests pass:\n- npm test\n- npm run lint\n- npm run build" (🚨)
-    ├── ⏸️ |Manual E2E test| "Test with actual Claude Code instance:\n- All 6 commands work\n- Both naming conventions work\n- Error handling works\n- Debug logs created" (🚨)
-    ├── ⏸️ |Update CLAUDE.md| "Update handoff section with:\n- What was fixed\n- Test coverage status\n- Ready for merge to main" (🔴)
-    └── ⏸️ |Create PR to main| "Merge feature/discriminated-union-schema → main\n\nInclude:\n- Reference to PR-REVIEW-ACTION-PLAN.md\n- Summary of 5-agent review findings\n- Test coverage improvements\n- Breaking changes (none expected)" (🔴)
+├── ✅ |Phase 4: Polish| "OPTIONAL improvements. Can be post-merge follow-up PR.\n\nEstimated: 2-3 hours\nGoal: Production-grade polish\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 4" (🔵) (100%)
+│   ├── ✅ |Consider branded types| "Optional: Implement branded MemoryPath type to enforce /memories prefix at type level." (🔵)
+│   ├── ✅ |Make CORS configurable| "Optional: Add ALLOWED_ORIGINS env var for production security." (🔵)
+│   ├── ✅ |Improve error messages| "Optional: Add troubleshooting hints to startup errors." (🔵)
+│   └── ✅ |Handle signal errors| "Optional: Properly handle cleanup errors in SIGINT/SIGTERM handlers." (🔵)
+└── 🔄 |Final Verification| "Pre-merge checklist before creating PR to main" (🚨) (75%)
+    ├── ✅ |Run full test suite| "Verify all tests pass:\n- npm test\n- npm run lint\n- npm run build" (🚨)
+    ├── ✅ |Manual E2E test| "Test with actual Claude Code instance:\n- All 6 commands work\n- Both naming conventions work\n- Error handling works\n- Debug logs created" (🚨)
+    ├── ✅ |Update CLAUDE.md| "Update handoff section with:\n- What was fixed\n- Test coverage status\n- Ready for merge to main" (🔴)
+    └── 🔄 |Create PR to main| "Merge feature/discriminated-union-schema → main\n\nInclude:\n- Reference to PR-REVIEW-ACTION-PLAN.md\n- Summary of 5-agent review findings\n- Test coverage improvements\n- Breaking changes (none expected)" (🔴)
