@@ -152,7 +152,7 @@ function registerUnifiedTool(server: McpServer, context: operations.OperationsCo
     'memory',
     {
       title: 'memory',
-      description: 'File-based persistant memory tool. Line numbers are 1-based.',
+      description: 'File-based persistant memory tool. Line numbers are 1-based. Path must start with \'/memories/\'',
       // description:
       //   'File-based memory storage tool' +
       //   'Perform memory operations with command parameter: ' +
