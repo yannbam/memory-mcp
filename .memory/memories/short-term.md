@@ -16,18 +16,16 @@ _What was done, what's next, blockers_
 ✅ Added "Feature Implementation" section before "Optional Professional Touches"
 ✅ Identified 4 features for pre-release: insert_line fix, forgiving params, delete_line, param combinations
 ✅ Archived old public-release-beta plan
-✅ Plan now at 59% complete (26/44 tasks)
-✅ 6 commits ahead of origin/dev
+✅ Fixed insert_line behavior: Changed from 0-based to 1-based indexing
+✅ All tests pass (85/85), manual verification confirms correct behavior
+✅ Plan now at 61% complete (27/44 tasks)
 
 ### What Next Session Should Do
-**Start Feature Implementation section** - work through these 4 features in order:
+**Continue Feature Implementation section** - work through remaining 3 features:
 
-1. ☞ **Fix insert_line behavior** (HIGH) - Quick UX win
-   - Change from 0-based to 1-based indexing
-   - Insert AT the line (pushing existing line down)
-   - Update schema, implementation, tests
+1. ✅ **Fix insert_line behavior** (HIGH) - COMPLETED
    
-2. **Implement forgiving parameter naming** (HIGH) - Most useful
+2. ☞ **Implement forgiving parameter naming** (HIGH) - Most useful
    - Accept both old_str/new_str AND old_string/new_string
    - Allow mixed usage, fail if both variants for same param
    
@@ -57,4 +55,5 @@ _Rapid capture space - add memories here during work without categorization_
 
 [📋] Plan restructured to include 4 deferred features before release verification
 [🎯] Feature priority: insert_line fix and forgiving params are most important
+[✅🔧] insert_line now uses 1-based indexing (line 2 = insert AT line 2, pushing old line 2 down)
 [💡] "Shoemaker's children have no shoes" = professionals neglecting their own needs (like us missing insertTask/deleteTask in PlanAndTrack!)

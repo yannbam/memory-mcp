@@ -359,14 +359,14 @@ export async function insert(command: InsertCommand, context: OperationsContext)
     const content = await fs.readFile(fullPath, 'utf-8');
     const lines = content.split('\n');
 
-    // Validate insert_line
-    if (command.insert_line < 0 || command.insert_line > lines.length) {
-      throw new Error(`Invalid insert_line ${command.insert_line}. Must be 0-${lines.length}`);
+    // Validate insert_line (1-based indexing)
+    if (command.insert_line < 1 || command.insert_line > lines.length + 1) {
+      throw new Error(`Invalid insert_line ${command.insert_line}. Must be 1-${lines.length + 1}`);
     }
 
-    // Insert text at specified line
+    // Insert text at specified line (convert from 1-based to 0-based array index)
     // Remove trailing newline from insert_text to avoid double newlines
-    lines.splice(command.insert_line, 0, command.insert_text.replace(/\n$/, ''));
+    lines.splice(command.insert_line - 1, 0, command.insert_text.replace(/\n$/, ''));
 
     // Write updated content
     await fs.writeFile(fullPath, lines.join('\n'), 'utf-8');

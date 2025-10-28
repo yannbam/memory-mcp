@@ -41,7 +41,7 @@ const MemoryCommandSchema = z.discriminatedUnion('command', [
   z.object({
     command: z.literal('insert'),
     path: z.string().describe('Memory path starting with /memories'),
-    insert_line: z.number().describe('Line number where text should be inserted (0-based)'),
+    insert_line: z.number().describe('Line number where text should be inserted (1-based, inserts AT this line pushing existing line down)'),
     insert_text: z.string().describe('Text to insert'),
   }),
   z.object({
@@ -152,7 +152,7 @@ function registerUnifiedTool(server: McpServer, context: operations.OperationsCo
     'memory',
     {
       title: 'memory',
-      description: 'File-based persistant memory tool. Line numbers are 1-based.'
+      description: 'File-based persistant memory tool. Line numbers are 1-based.',
       // description:
       //   'File-based memory storage tool' +
       //   'Perform memory operations with command parameter: ' +

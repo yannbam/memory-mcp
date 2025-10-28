@@ -231,13 +231,13 @@ describe('Memory Operations', () => {
   });
 
   describe('insert command', () => {
-    it('should insert text at line 0 (beginning)', async () => {
+    it('should insert text at line 1 (beginning)', async () => {
       // Create test file
       await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line2\nline3');
 
-      // Insert at beginning
+      // Insert at beginning (line 1)
       await operations.insert(
-        { path: '/memories/test.txt', insert_line: 0, insert_text: 'line1' },
+        { path: '/memories/test.txt', insert_line: 1, insert_text: 'line1' },
         context,
       );
 
@@ -250,9 +250,9 @@ describe('Memory Operations', () => {
       // Create test file
       await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line1\nline3');
 
-      // Insert in middle
+      // Insert in middle (line 2)
       await operations.insert(
-        { path: '/memories/test.txt', insert_line: 1, insert_text: 'line2' },
+        { path: '/memories/test.txt', insert_line: 2, insert_text: 'line2' },
         context,
       );
 
@@ -265,9 +265,9 @@ describe('Memory Operations', () => {
       // Create test file
       await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line1\nline2');
 
-      // Insert at end
+      // Insert at end (line 3)
       await operations.insert(
-        { path: '/memories/test.txt', insert_line: 2, insert_text: 'line3' },
+        { path: '/memories/test.txt', insert_line: 3, insert_text: 'line3' },
         context,
       );
 
@@ -276,13 +276,13 @@ describe('Memory Operations', () => {
       expect(content).toBe('line1\nline2\nline3');
     });
 
-    it('should throw error for invalid line number (negative)', async () => {
+    it('should throw error for invalid line number (zero)', async () => {
       // Create test file
       await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'content');
 
       await expect(
         operations.insert(
-          { path: '/memories/test.txt', insert_line: -1, insert_text: 'text' },
+          { path: '/memories/test.txt', insert_line: 0, insert_text: 'text' },
           context,
         ),
       ).rejects.toThrow('Invalid insert_line');
@@ -303,7 +303,7 @@ describe('Memory Operations', () => {
     it('should throw error for non-existent file', async () => {
       await expect(
         operations.insert(
-          { path: '/memories/nonexistent.txt', insert_line: 0, insert_text: 'text' },
+          { path: '/memories/nonexistent.txt', insert_line: 1, insert_text: 'text' },
           context,
         ),
       ).rejects.toThrow('File not found');

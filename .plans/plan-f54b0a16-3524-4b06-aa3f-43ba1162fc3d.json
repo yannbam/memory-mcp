@@ -255,17 +255,17 @@
     {
       "name": "Feature Implementation",
       "details": "Implement 4 deferred features from long-term memory and session handoff before public release. These enhance usability, parameter flexibility, and fix UX issues.",
-      "status": "pending",
+      "status": "in_progress",
       "priority": "urgent",
       "sub_tasks": [
         {
           "name": "Fix insert_line behavior",
           "details": "Change insert_line from 0-based to 1-based indexing and insert AT the line:\n- Make insert_line 1-based (currently 0-based)\n- Insert AT the specified line (pushing existing line down)\n- Example: insert_line=5 should insert at line 5, pushing old line 5 to line 6\n- Update Zod schema description\n- Update implementation in src/memory/operations.ts\n- Update tests to reflect new behavior\n- Consider edge cases: insert_line=1 (beginning), insert_line > file length (append)",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
           "created_at": "2025-10-28T14:48:34.344Z",
-          "updated_at": "2025-10-28T14:48:34.344Z"
+          "updated_at": "2025-10-28T15:32:37.169Z"
         },
         {
           "name": "Implement forgiving parameter naming",
@@ -298,7 +298,7 @@
       "uuid": "35e5d954-b53d-42b4-a869-66d2c4d4ef8f",
       "created_at": "2025-10-28T14:48:34.344Z",
       "updated_at": "2025-10-28T14:58:58.525Z",
-      "completion_percentage": 0
+      "completion_percentage": 25
     },
     {
       "name": "Optional Professional Touches",
@@ -428,5 +428,5 @@
     }
   ],
   "created_at": "2025-10-28T14:48:34.344Z",
-  "updated_at": "2025-10-28T14:59:29.938Z"
+  "updated_at": "2025-10-28T15:32:37.169Z"
 }
