@@ -6,6 +6,8 @@ _How the system actually works vs how it was intended to work_
 [🏗️💡] MCP server supports dual tool exposure modes: unified tool with command parameter (default) vs separate tools per command
 Conditional registration in createMemoryServer() controlled by oneToolPerCommand boolean flag
 Both modes use identical underlying operations - only tool registration differs
+[🧪💡] Unified tool description is intentionally minimal/commented out - experiment to test if Claude uses commands intuitively without detailed manual
+This is NOT incomplete - it's deliberate UX testing for future session analysis
 
 
 ## Performance & Optimization
