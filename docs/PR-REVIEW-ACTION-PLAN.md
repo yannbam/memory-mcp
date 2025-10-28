@@ -55,12 +55,19 @@ const StrReplaceCommand = z.object({
 
 **File**: `src/memory/command-executor.ts`
 
-**Implemented Code** (lines 34-56):
+**Implemented Code** (lines 34-63):
 ```typescript
 case 'str_replace': {
   // TypeScript knows: args has { command: 'str_replace', path: string, old_str?: string, old_string?: string, new_str?: string, new_string?: string }
   // Normalize field names: accept both old_str/new_str and old_string/new_string (or mixed)
-  // Precedence: underscore variants (old_str, new_str) take priority if both provided
+  // Fail fast if both variants provided (likely user error)
+  if (args.old_str && args.old_string) {
+    throw new Error('Cannot provide both old_str and old_string. Use one or the other.');
+  }
+  if (args.new_str && args.new_string) {
+    throw new Error('Cannot provide both new_str and new_string. Use one or the other.');
+  }
+
   const oldStr = args.old_str ?? args.old_string;
   const newStr = args.new_str ?? args.new_string;
 
@@ -84,7 +91,7 @@ case 'str_replace': {
 
 **Status**: ✅ COMPLETED
 - ✅ No type casts = full type safety restored
-- ✅ Uses nullish coalescing (??) for clean precedence handling
+- ✅ Fail-fast validation when both variants provided (better UX than silent precedence)
 - ✅ Fixes 11 linting errors
 - ✅ Runtime validation ensures at least one field from each pair is present
 

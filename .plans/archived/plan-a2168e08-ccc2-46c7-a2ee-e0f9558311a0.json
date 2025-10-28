@@ -1,0 +1,72 @@
+{
+  "uuid": "a2168e08-ccc2-46c7-a2ee-e0f9558311a0",
+  "name": "str-replace-testing",
+  "details": "Test str_replace parameter flexibility after server restart.\n\nVerify all 4 naming combinations work:\n1. {old_str, new_str}\n2. {old_string, new_string}\n3. {old_str, new_string} - mixed\n4. {old_string, new_str} - mixed\n\nAlso test precedence when both provided.",
+  "tasks": [
+    {
+      "name": "Setup test file",
+      "details": "Create temporary test file for str_replace operations",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "50f09fb1-0c2f-4c0e-bb69-4f1726c9aacd",
+      "created_at": "2025-10-28T01:36:52.522Z",
+      "updated_at": "2025-10-28T01:37:08.987Z"
+    },
+    {
+      "name": "Test snake_case params",
+      "details": "Test {old_str, new_str} combination",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "5e7939a6-37db-425c-bce1-57cbe8d888d6",
+      "created_at": "2025-10-28T01:36:52.522Z",
+      "updated_at": "2025-10-28T01:37:16.715Z"
+    },
+    {
+      "name": "Test alternative params",
+      "details": "Test {old_string, new_string} combination",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "e391ed00-e30a-4810-826c-9565d19214fa",
+      "created_at": "2025-10-28T01:36:52.522Z",
+      "updated_at": "2025-10-28T01:37:23.756Z"
+    },
+    {
+      "name": "Test mixed combination 1",
+      "details": "Test {old_str, new_string} combination",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "4f5078b1-62b1-4858-8b7c-0d7c8abbd746",
+      "created_at": "2025-10-28T01:36:52.522Z",
+      "updated_at": "2025-10-28T01:37:31.319Z"
+    },
+    {
+      "name": "Test mixed combination 2",
+      "details": "Test {old_string, new_str} combination",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "9d27548e-171f-4a14-9849-07deea2889e6",
+      "created_at": "2025-10-28T01:36:52.522Z",
+      "updated_at": "2025-10-28T01:37:50.148Z"
+    },
+    {
+      "name": "Test precedence rule",
+      "details": "Verify underscore variants take priority when multiple provided",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "540d86db-3f11-4621-802e-6efa3b628886",
+      "created_at": "2025-10-28T01:36:52.522Z",
+      "updated_at": "2025-10-28T01:37:56.872Z"
+    },
+    {
+      "name": "Cleanup test file",
+      "details": "Remove temporary test file",
+      "status": "completed",
+      "priority": "low",
+      "uuid": "a9ee2ffc-eaef-4edd-ae8a-46d202491f64",
+      "created_at": "2025-10-28T01:36:52.522Z",
+      "updated_at": "2025-10-28T01:38:04.740Z"
+    }
+  ],
+  "created_at": "2025-10-28T01:36:52.522Z",
+  "updated_at": "2025-10-28T01:38:04.740Z"
+}

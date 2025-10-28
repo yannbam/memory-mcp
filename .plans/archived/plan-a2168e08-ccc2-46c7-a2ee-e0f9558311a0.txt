@@ -1,0 +1,19 @@
+🌳 "str-replace-testing"
+📝 Test str_replace parameter flexibility after server restart.
+
+Verify all 4 naming combinations work:
+1. {old_str, new_str}
+2. {old_string, new_string}
+3. {old_str, new_string} - mixed
+4. {old_string, new_str} - mixed
+
+Also test precedence when both provided.
+📊 ██████████ 100% (7/7 tasks)
+
+├── ✅ |Setup test file| "Create temporary test file for str_replace operations" (🔴)
+├── ✅ |Test snake_case params| "Test {old_str, new_str} combination" (🔴)
+├── ✅ |Test alternative params| "Test {old_string, new_string} combination" (🔴)
+├── ✅ |Test mixed combination 1| "Test {old_str, new_string} combination" (🔴)
+├── ✅ |Test mixed combination 2| "Test {old_string, new_str} combination" (🔴)
+├── ✅ |Test precedence rule| "Verify underscore variants take priority when multiple provided" (🟡)
+└── ✅ |Cleanup test file| "Remove temporary test file" (🔵)

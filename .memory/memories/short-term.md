@@ -75,6 +75,7 @@ Plan: public-release-beta (3% complete - 1/39 tasks) - resume after PR merge
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-✅ str_replace schema fixed: removed .passthrough(), all naming combinations now explicitly allowed (including mixed)
-✅ Precedence rule: underscore variants (old_str, new_str) take priority via nullish coalescing (??)
+✅ str_replace schema fixed: removed .passthrough(), all naming combinations explicitly allowed (including mixed)
+✅ Fail-fast validation: providing both variants (e.g., old_str AND old_string) now throws clear error
+✅ Better UX: errors immediately on likely user mistakes instead of silent precedence behavior
 Previous confusion: mixing was thought to be INVALID but is actually REQUIRED feature

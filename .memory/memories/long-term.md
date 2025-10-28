@@ -37,7 +37,7 @@ Discriminated union pattern: Use Server class with manual setRequestHandler for 
 Schema conversion: zodToJsonSchema(schema, { $refStrategy: "none", strictUnions: true }) then add type: "object"
 UX flexibility: Accept union of types (number | string) in schema then normalize in command executor
 Parameter naming flexibility for ALL combinations: Define all optional fields in schema, normalize in executor with nullish coalescing (field1 ?? field2)
-Type-safe normalization: Use nullish coalescing (??) for precedence without type casts - eliminates all `as any`
+Fail-fast validation for ambiguous input: Check if BOTH variants provided and throw clear error before normalization (better UX than silent precedence)
 GPT-5 consultation effective for complex architectural decisions - sessions 1761595236443-75uvjxnu, 1761614167846-h0zpcyho provided solutions
 Multi-agent PR review highly effective: code-reviewer, type-design-analyzer, silent-failure-hunter, comment-analyzer, pr-test-analyzer each found unique issues
 
