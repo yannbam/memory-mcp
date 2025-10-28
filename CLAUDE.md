@@ -194,32 +194,21 @@ The test: **"Is this worth preserving across sessions?"**
 - **One line = one atomic memory** (can be 1-3 comprehensive sentences)
 - **No human formatting** - This is Claude's notepad, not a markdown document
 - **Self-contained clarity** - Each line must make sense without context
-- **Immediate capture** - Write memories when discovered, not batched later
+- **Immediate capture** - Write short-term memories when discovered, not batched later
 
-**Evolution Operations:**
+**Long-term Memory Evolution Operations:**
 - **SEARCH before adding** - Is there existing knowledge to refine?
 - **UPDATE in place** - Use str_replace to evolve existing memories
-- **ANNOTATE evolution** - "v2:", "Better:", "Correction:", "Also:"
 - **CONSOLIDATE related** - Merge observations into unified insights
 - **PRUNE obsolete** - Delete what's definitively wrong or superseded
 
-### Knowledge Evolution Examples
-
-Watch how memory evolves through iterations (note: emoji use varies by need):
-```
-[💡🤯] HTTP transport fails sometimes (initial observation)
-[⚠️🔧] HTTP fails after 5 minutes idle (pattern recognized)
-[✅] HTTP needs keepalive every 4min to prevent timeout (solution found)
-All long-lived connections need keepalive < timeout/2 (principle discovered - simple fact)
-```
-
 Instead of accumulating redundant entries, refine knowledge in place using str_replace!
 
-### Emoji Markers: Optional Multi-Dimensional System
+### Emoji Markers: Multi-Dimensional System
 
-**Emoji markers are OPTIONAL** - use them when they add meaningful dimensions to a memory. Simple facts often need no emojis at all.
+**Emoji markers per memory** - use them when they add meaningful dimensions to a memory.
 
-**Format (when used):** `[emoji1][emoji2][emoji3]` at the beginning of the line
+**Format (when used):** `[[emoji1][emoji2][emoji3]]` at the beginning of the line
 
 **Use 0 to 3 emojis as needed:**
 - **No emojis:** Simple facts - "Tests run with `npm test` and require NODE_ENV=test"
@@ -242,18 +231,15 @@ Instead of accumulating redundant entries, refine knowledge in place using str_r
 - Record costly mistakes: `[💀📦] Never run npm audit fix - breaks @modelcontextprotocol/sdk peer deps`
 - Document workarounds: `Use path.resolve() + startsWith() check to prevent directory traversal`
 - Track deferred work: `[🔄] TODO later: investigate HTTP transport timeout after 5min idle`
-- Show evolution: `[✅🔥] v2: RW locks gave 38x speedup over mutex for concurrent reads`
 - Note simple facts: `Line 185-231 in operations.ts handles view range validation`
 
 **SKIP memories that are:**
 - Obvious from documentation
-- Temporary session state
-- Implementation details that change every commit
 - Commentary without actionable content
 
 ### The Balance: Evolution Without Bloat
 
-Memory should become MORE VALUABLE over time, not just LARGER:
+Long-term memory should become MORE VALUABLE over time, not just LARGER:
 - Refine vague observations into precise knowledge
 - Replace shallow understanding with deep insights
 - Keep the BEST solution (unless alternatives serve different contexts)
@@ -265,7 +251,8 @@ Memory should become MORE VALUABLE over time, not just LARGER:
 **For short-term.md:**
 - Quick Notes section at the END for rapid capture
 - Session handoff with clear continuation point
-- Current session ID, branch, context usage
+- Current sessions goals, session ID, branch 
+- Prefer atomic line edits over multi-line replacements
 
 **For long-term.md:**
 - Generic sections that apply to ANY project
