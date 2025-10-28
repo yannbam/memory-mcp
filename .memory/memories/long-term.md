@@ -40,10 +40,17 @@ Parameter naming flexibility for ALL combinations: Define all optional fields in
 Fail-fast validation for ambiguous input: Check if BOTH variants provided and throw clear error before normalization (better UX than silent precedence)
 GPT-5 consultation effective for complex architectural decisions - sessions 1761595236443-75uvjxnu, 1761614167846-h0zpcyho provided solutions
 Multi-agent PR review highly effective: code-reviewer, type-design-analyzer, silent-failure-hunter, comment-analyzer, pr-test-analyzer each found unique issues
+Test coverage strategy: Schema tests (38) + Executor tests (32) + Integration tests (13) = comprehensive validation layer coverage exceeding 55-test target by 27%
 
 
 ## Testing & Debugging
 _Test strategies that work, debugging approaches, tools that help_
+
+Adversarial test design: Write tests that FAIL when bugs exist, not just validate happy paths
+JavaScript parseInt behavior: "2.5" → 2, "2a" → 2 (stops at non-digit), "abc" → NaN - executor validates format, operations validates semantics
+MCP schema errors throw protocol exceptions (-32602) not isError responses - integration tests need expectSchemaError flag
+Test organization: Group by behavior layer (schema validation, executor normalization, command dispatch, error handling) not by command type
+Test names should complete: "This test will FAIL if..." - makes debugging obvious when tests break
 
 
 ## Deferred Work

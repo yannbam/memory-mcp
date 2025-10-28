@@ -3,10 +3,10 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 3a75b52e-afbf-4a42-aee4-076a217f55da
+Session: 3a75b52e-afbf-4a42-aee4-076a217f55da (COMPLETED)
 Branch: feature/discriminated-union-schema
-Context: ~106k tokens
-Status: ✅ Phase 1 & 2 COMPLETED - ready for Phase 3 (docs) or merge
+Context: ~124k tokens at handoff
+Status: ✅ Phase 1 & 2 COMPLETED - 🎯 NEXT: Phase 3 (documentation fixes)
 
 ## Session Handoff
 _What was done, what's next, blockers_
@@ -65,25 +65,41 @@ No commits yet - all test files ready for commit
 
 ### What Next Session Should Do
 
-**Phases 1 & 2 COMPLETED** ✅
+**🎯 CONTINUE WITH PHASE 3: Documentation Fixes**
 
-**Option A: Continue with Phase 3 (RECOMMENDED, 1-2 hours)**
-Fix documentation issues:
-- Fix 3 misleading comments (schema passthrough, session management, type safety)
-- Improve workaround documentation with version context
-- Add MCP protocol references
-- Fix terminology (anyOf → oneOf)
-- Remove redundant comments
+**Phases 1 & 2 are COMPLETE** ✅
+- Phase 1: All critical fixes done (type safety, linting, error handling)
+- Phase 2: Test coverage complete (85 → 155 tests, all passing)
+- Commit: ae7c465 "feat: Add comprehensive Phase 2 test coverage"
 
-See docs/PR-REVIEW-ACTION-PLAN.md section 3 for specific file locations and changes.
+**Phase 3 Tasks** (RECOMMENDED, 1-2 hours):
 
-**Option B: Skip to merge** (Phase 3 & 4 can be post-merge cleanup)
-- Commit Phase 2 test files
-- Run manual E2E test with Claude Code
-- Update CLAUDE.md handoff
-- Create PR to main
+Read `docs/PR-REVIEW-ACTION-PLAN.md` section 3 for detailed instructions.
 
-**Phase 4 (Polish)** is optional and can be done post-merge as separate PR
+1. **Fix 3 Critical Comment Issues** (see section 3.1):
+   - `src/memory/schemas.ts:27-28` - Remove passthrough reference
+   - `src/server/transports.ts:46` - Fix session management comment
+   - `src/server/mcp-server.ts:115` - Update type safety claim
+
+2. **Improve Workaround Documentation** (see section 3.2):
+   - `src/memory/command-executor.ts:59` - Add version context
+   - `src/memory/schemas.ts:43-45` - Improve Claude Code compatibility note
+
+3. **Add Protocol References** (see section 3.3):
+   - `src/server/mcp-server.ts:64-69` - Link to MCP spec
+
+4. **Fix Terminology** (see section 3.4):
+   - Replace "anyOf" with "oneOf" in 2 locations
+
+5. **Remove Redundant Comments** (see section 3.5):
+   - Clean up vague comments that don't add value
+
+**After Phase 3:**
+- Run verification: `npm test`, `npm run lint`, `npm run build`
+- Create commit for Phase 3 changes
+- Decide: Phase 4 (optional polish) or skip to Final Verification
+
+**Phase 4 is OPTIONAL** - can be done post-merge as separate PR
 
 ### Current Blockers
 None - Phases 1 & 2 complete, clear path for Phase 3 or merge
