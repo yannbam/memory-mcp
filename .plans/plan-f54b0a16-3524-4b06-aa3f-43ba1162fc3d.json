@@ -270,20 +270,20 @@
         {
           "name": "Implement forgiving parameter naming",
           "details": "Accept both old_str/new_str AND old_string/new_string with optional parameters:\n- Update Zod schemas to accept both variants\n- Allow mixed usage (old_str + new_string)\n- Fail early if both variants provided for same param (old_str + old_string)\n- Schema validation should catch conflicts before operation execution\n- Update schema descriptions to document both forms\n- Add tests for both naming conventions and conflict detection",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "uuid": "e679cd32-ce4a-4f85-9447-d105a366fe70",
           "created_at": "2025-10-28T14:48:34.344Z",
-          "updated_at": "2025-10-28T14:48:34.344Z"
+          "updated_at": "2025-10-28T15:55:08.030Z"
         },
         {
           "name": "Add delete_line parameter to delete command",
           "details": "Targeted single-line deletion - more efficient than read/remove/write:\n- Add delete_line parameter to delete command schema\n- Implement atomic single-line deletion in operations.ts\n- Update command description and parameter docs\n- Add tests for delete_line functionality\n- Consider edge cases: line out of range, empty file, last line",
-          "status": "pending",
+          "status": "completed",
           "priority": "medium",
           "uuid": "37bda57a-6263-4bb6-b7a9-4216af798b65",
           "created_at": "2025-10-28T14:48:34.344Z",
-          "updated_at": "2025-10-28T14:48:34.344Z"
+          "updated_at": "2025-10-28T16:26:41.729Z"
         },
         {
           "name": "Implement useful parameter combinations",
@@ -298,7 +298,7 @@
       "uuid": "35e5d954-b53d-42b4-a869-66d2c4d4ef8f",
       "created_at": "2025-10-28T14:48:34.344Z",
       "updated_at": "2025-10-28T14:58:58.525Z",
-      "completion_percentage": 25
+      "completion_percentage": 75
     },
     {
       "name": "Optional Professional Touches",
@@ -428,5 +428,5 @@
     }
   ],
   "created_at": "2025-10-28T14:48:34.344Z",
-  "updated_at": "2025-10-28T15:40:33.617Z"
+  "updated_at": "2025-10-28T16:26:48.239Z"
 }

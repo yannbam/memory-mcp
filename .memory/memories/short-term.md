@@ -5,40 +5,38 @@ _Session ID, active branch, context usage_
 
 Session: cfdab755-d0f1-447a-922f-65d9cd947ccf
 Branch: dev
-Context: ~79k tokens
-Working on: Completed insert_line fix with comprehensive testing
+Context: ~80k tokens
+Working on: Completed delete_line parameter feature - 3 of 4 features done!
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
 ### This Session Accomplished
-✅ Created new plan: public-release-beta-v2 with 4 feature implementations
-✅ Added "Feature Implementation" section before "Optional Professional Touches"
-✅ Identified 4 features for pre-release: insert_line fix, forgiving params, delete_line, param combinations
-✅ Archived old public-release-beta plan
-✅ Fixed insert_line behavior: Changed from 0-based to 1-based indexing
-✅ All tests pass (85/85), manual verification confirms correct behavior
-✅ Comprehensive live testing with project_memory tool - all edge cases verified
-✅ Plan now at 61% complete (27/44 tasks)
-✅ Server restarted and tested successfully
+✅ **Implemented delete_line parameter for delete command:**
+  - Added optional delete_line parameter to DeleteCommand interface
+  - Updated Zod schemas in BOTH unified and one-tool-per-command modes
+  - Implements efficient single-line deletion (1-based indexing)
+  - Handles edge cases: empty file result, line validation, file vs directory
+  - Fixed critical bug: unified tool inputSchema was missing delete_line
+✅ Added 8 comprehensive unit tests - all pass (100/100 total tests)
+✅ Manual testing verified both tool modes work perfectly
+✅ Plan now at 66% complete (29/44 tasks)
+✅ Feature Implementation: 75% complete (3 of 4 features done)
 
 ### What Next Session Should Do
-**Continue Feature Implementation section** - work through remaining 3 features:
+**Option 1 - Complete last feature then release:**
+- Implement parameter combinations (LOW priority, can skip)
+- Run Pre-Release Verification (4 checks)
+- Run Comprehensive Code Review (4 reviews)
+- Ready for public beta release!
 
-1. ✅ **Fix insert_line behavior** (HIGH) - COMPLETED
-   
-2. ☞ **Implement forgiving parameter naming** (HIGH) - Most useful
-   - Accept both old_str/new_str AND old_string/new_string
-   - Allow mixed usage, fail if both variants for same param
-   
-3. **Add delete_line parameter** (MEDIUM) - Nice improvement
-   - Efficient single-line deletion
-   
-4. **Implement parameter combinations** (LOW) - Can skip if time pressure
-   - Analyze combinatorial matrix
-   - Implement sensible combinations
+**Option 2 - Skip param combinations, proceed to release:**
+- The 3 high/medium priority features are DONE
+- Parameter combinations is optional (LOW priority)
+- Go straight to Pre-Release Verification
+- Faster path to public beta
 
-After features: Pre-Release Verification → Comprehensive Code Review → Done!
+**Recommend Option 2** - 3 solid features complete, ready for release checks!
 
 ### Current Blockers
 None
@@ -46,8 +44,13 @@ None
 ## Active Plans
 _Current PlanAndTrack references_
 
-Plan: public-release-beta-v2 (59% complete - 26/44 tasks)
-- Feature Implementation: 0% (4 features to implement)
+Plan: public-release-beta-v2 (66% complete - 29/44 tasks)
+Plan: delete-line-session (100% complete - 7/7 tasks)
+- Feature Implementation: 50% complete (2 of 4 features done)
+  ✅ insert_line fix
+  ✅ forgiving parameter naming
+  ⏸️ delete_line parameter
+  ⏸️ parameter combinations
 - Pre-Release Verification: 0% (4 checks)
 - Comprehensive Code Review: 0% (4 reviews)
 - Optional Professional Touches: 0% (2 docs)
@@ -55,7 +58,8 @@ Plan: public-release-beta-v2 (59% complete - 26/44 tasks)
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-[📋] Plan restructured to include 4 deferred features before release verification
-[🎯] Feature priority: insert_line fix and forgiving params are most important
-[✅🔧] insert_line now uses 1-based indexing (line 2 = insert AT line 2, pushing old line 2 down)
-[💡] "Shoemaker's children have no shoes" = professionals neglecting their own needs (like us missing insertTask/deleteTask in PlanAndTrack!)
+[✅🎯] 3 of 4 features complete: insert_line fix, forgiving params, delete_line parameter
+[🐛💀] Critical bug found during testing: unified tool inputSchema missing delete_line caused entire file deletion instead of single line
+[🔧] delete_line works in BOTH tool modes after fixing inputSchema
+[🧪] All 100 tests passing (8 new tests for delete_line)
+[📊] Only 1 LOW priority feature remains (param combinations) - can skip and proceed to release

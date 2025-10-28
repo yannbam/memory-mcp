@@ -35,8 +35,10 @@ const MemoryCommandSchema = z.discriminatedUnion('command', [
   z.object({
     command: z.literal('str_replace'),
     path: z.string().describe('Memory path starting with /memories'),
-    old_str: z.string().describe('Text to find (must be unique in file)'),
-    new_str: z.string().describe('Replacement text'),
+    old_str: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
+    old_string: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
+    new_str: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
+    new_string: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
   }),
   z.object({
     command: z.literal('insert'),
@@ -47,6 +49,12 @@ const MemoryCommandSchema = z.discriminatedUnion('command', [
   z.object({
     command: z.literal('delete'),
     path: z.string().describe('Memory path starting with /memories'),
+    delete_line: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .describe('Optional: Delete specific line number (1-based indexing). If provided, only that line is deleted from the file.'),
   }),
   z.object({
     command: z.literal('rename'),
@@ -80,8 +88,10 @@ const CreateCommandSchema = z.object({
 
 const StrReplaceCommandSchema = z.object({
   path: z.string().describe('Memory path starting with /memories'),
-  old_str: z.string().describe('Text to find (must be unique in file)'),
-  new_str: z.string().describe('Replacement text'),
+  old_str: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
+  old_string: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
+  new_str: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
+  new_string: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
 });
 
 const InsertCommandSchema = z.object({
@@ -92,6 +102,12 @@ const InsertCommandSchema = z.object({
 
 const DeleteCommandSchema = z.object({
   path: z.string().describe('Memory path starting with /memories'),
+  delete_line: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Optional: Delete specific line number (1-based indexing). If provided, only that line is deleted from the file.'),
 });
 
 const RenameCommandSchema = z.object({
@@ -169,9 +185,12 @@ function registerUnifiedTool(server: McpServer, context: operations.OperationsCo
         view_range: z.tuple([z.number(), z.number()]).optional(),
         file_text: z.string().optional(),
         old_str: z.string().optional(),
+        old_string: z.string().optional(),
         new_str: z.string().optional(),
+        new_string: z.string().optional(),
         insert_line: z.number().optional(),
         insert_text: z.string().optional(),
+        delete_line: z.number().optional(),
         old_path: z.string().optional(),
         new_path: z.string().optional(),
       },

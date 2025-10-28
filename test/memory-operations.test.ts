@@ -230,6 +230,133 @@ describe('Memory Operations', () => {
     });
   });
 
+  describe('str_replace command - forgiving parameter naming', () => {
+    it('should accept old_string and new_string parameters', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Original text\nSecond line');
+
+      // Replace using old_string/new_string variant
+      await operations.str_replace(
+        {
+          path: '/memories/test.txt',
+          old_string: 'Original text',
+          new_string: 'Modified text',
+        },
+        context,
+      );
+
+      // Verify replacement
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('Modified text\nSecond line');
+    });
+
+    it('should accept mixed old_str and new_string parameters', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Line one\nLine two');
+
+      // Replace using mixed naming
+      await operations.str_replace(
+        {
+          path: '/memories/test.txt',
+          old_str: 'Line one',
+          new_string: 'First line',
+        },
+        context,
+      );
+
+      // Verify replacement
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('First line\nLine two');
+    });
+
+    it('should accept mixed old_string and new_str parameters', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Alpha\nBeta');
+
+      // Replace using mixed naming (reverse combination)
+      await operations.str_replace(
+        {
+          path: '/memories/test.txt',
+          old_string: 'Alpha',
+          new_str: 'Gamma',
+        },
+        context,
+      );
+
+      // Verify replacement
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('Gamma\nBeta');
+    });
+
+    it('should throw error when both old_str and old_string are provided', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Some text');
+
+      // Attempt to use both old_str and old_string
+      await expect(
+        operations.str_replace(
+          {
+            path: '/memories/test.txt',
+            old_str: 'Some text',
+            old_string: 'Some text',
+            new_str: 'New text',
+          },
+          context,
+        ),
+      ).rejects.toThrow('Cannot provide both old_str and old_string');
+    });
+
+    it('should throw error when both new_str and new_string are provided', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Some text');
+
+      // Attempt to use both new_str and new_string
+      await expect(
+        operations.str_replace(
+          {
+            path: '/memories/test.txt',
+            old_str: 'Some text',
+            new_str: 'New text',
+            new_string: 'Another text',
+          },
+          context,
+        ),
+      ).rejects.toThrow('Cannot provide both new_str and new_string');
+    });
+
+    it('should throw error when neither old_str nor old_string is provided', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Some text');
+
+      // Attempt without old parameter
+      await expect(
+        operations.str_replace(
+          {
+            path: '/memories/test.txt',
+            new_str: 'New text',
+          },
+          context,
+        ),
+      ).rejects.toThrow('Must provide either old_str or old_string');
+    });
+
+    it('should throw error when neither new_str nor new_string is provided', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Some text');
+
+      // Attempt without new parameter
+      await expect(
+        operations.str_replace(
+          {
+            path: '/memories/test.txt',
+            old_str: 'Some text',
+          },
+          context,
+        ),
+      ).rejects.toThrow('Must provide either new_str or new_string');
+    });
+  });
+
   describe('insert command', () => {
     it('should insert text at line 1 (beginning)', async () => {
       // Create test file
@@ -347,6 +474,91 @@ describe('Memory Operations', () => {
       await expect(operations.deleteOp({ path: '/memories/nonexistent.txt' }, context)).rejects.toThrow(
         'Path not found',
       );
+    });
+
+    it('should delete a line from middle of file', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line1\nline2\nline3');
+
+      // Delete line 2
+      const result = await operations.deleteOp(
+        { path: '/memories/test.txt', delete_line: 2 },
+        context,
+      );
+      expect(result).toBe('Line 2 deleted from /memories/test.txt');
+
+      // Verify line deleted
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('line1\nline3');
+    });
+
+    it('should delete first line', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line1\nline2\nline3');
+
+      // Delete line 1
+      await operations.deleteOp({ path: '/memories/test.txt', delete_line: 1 }, context);
+
+      // Verify first line deleted
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('line2\nline3');
+    });
+
+    it('should delete last line', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line1\nline2\nline3');
+
+      // Delete line 3
+      await operations.deleteOp({ path: '/memories/test.txt', delete_line: 3 }, context);
+
+      // Verify last line deleted
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('line1\nline2');
+    });
+
+    it('should delete from single-line file resulting in empty file', async () => {
+      // Create single-line file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'only line');
+
+      // Delete the only line
+      await operations.deleteOp({ path: '/memories/test.txt', delete_line: 1 }, context);
+
+      // Verify file is now empty
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('');
+    });
+
+    it('should throw error for delete_line out of range (too high)', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line1\nline2');
+
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', delete_line: 10 }, context),
+      ).rejects.toThrow('Invalid delete_line');
+    });
+
+    it('should throw error for delete_line less than 1', async () => {
+      // Create test file
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'line1\nline2');
+
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', delete_line: 0 }, context),
+      ).rejects.toThrow('Invalid delete_line');
+    });
+
+    it('should throw error for delete_line on directory', async () => {
+      // Create test directory
+      await fs.mkdir(path.join(memoryRoot, 'test-dir'));
+
+      await expect(
+        operations.deleteOp({ path: '/memories/test-dir', delete_line: 1 }, context),
+      ).rejects.toThrow('Cannot delete line from directory');
+    });
+
+    it('should throw error for delete_line on non-existent file', async () => {
+      await expect(
+        operations.deleteOp({ path: '/memories/nonexistent.txt', delete_line: 1 }, context),
+      ).rejects.toThrow('File not found');
     });
   });
 

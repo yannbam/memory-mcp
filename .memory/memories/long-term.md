@@ -13,6 +13,8 @@ This is NOT incomplete - it's deliberate UX testing for future session analysis
 ## Performance & Optimization
 _Measured performance characteristics, bottlenecks, successful optimizations_
 
+[⚠️🔧] Zod .refine() creates ZodEffects wrapper which breaks discriminated unions and .shape property access - for discriminated unions, move validation logic into the handler function instead of schema refinement
+[✅🎯] Forgiving parameter naming implementation: Accept both old_str/new_str AND old_string/new_string by making all optional in schema, then validate in function - allows flexible mixed usage while detecting conflicts
 
 ## Environment & Dependencies
 _Runtime quirks, version sensitivities, configuration gotchas_
@@ -20,6 +22,8 @@ _Runtime quirks, version sensitivities, configuration gotchas_
 
 ## Mistakes to Avoid
 _Failed approaches, time sinks, what NOT to do (saves future sessions from repeating)_
+
+[💀🔧] When adding new optional parameters to commands, MUST update BOTH locations: the discriminated union schema AND the unified tool inputSchema - missing from inputSchema causes parameters to be silently dropped, leading to incorrect behavior
 
 
 ## Proven Solutions

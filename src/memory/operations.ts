@@ -35,8 +35,10 @@ export interface CreateCommand {
 
 export interface StrReplaceCommand {
   path: string;
-  old_str: string;
-  new_str: string;
+  old_str?: string;
+  old_string?: string;
+  new_str?: string;
+  new_string?: string;
 }
 
 export interface InsertCommand {
@@ -47,6 +49,7 @@ export interface InsertCommand {
 
 export interface DeleteCommand {
   path: string;
+  delete_line?: number;
 }
 
 export interface RenameCommand {
@@ -282,6 +285,26 @@ export async function str_replace(
 ): Promise<string> {
   const startTime = Date.now();
 
+  // Normalize parameter names: accept both old_str/new_str and old_string/new_string
+  // Validate that only one variant of each parameter is provided
+  if (command.old_str && command.old_string) {
+    throw new Error('Cannot provide both old_str and old_string - use one or the other');
+  }
+  if (command.new_str && command.new_string) {
+    throw new Error('Cannot provide both new_str and new_string - use one or the other');
+  }
+
+  const oldStr = command.old_str ?? command.old_string;
+  const newStr = command.new_str ?? command.new_string;
+
+  // Validate that at least one variant of each parameter is provided
+  if (!oldStr) {
+    throw new Error('Must provide either old_str or old_string');
+  }
+  if (!newStr) {
+    throw new Error('Must provide either new_str or new_string');
+  }
+
   // Validate and convert path
   const fullPath = validatePath(command.path, context.memoryRoot);
 
@@ -302,7 +325,7 @@ export async function str_replace(
     const content = await fs.readFile(fullPath, 'utf-8');
 
     // Count occurrences of old_str
-    const count = content.split(command.old_str).length - 1;
+    const count = content.split(oldStr).length - 1;
 
     if (count === 0) {
       throw new Error(`Text not found in ${command.path}`);
@@ -311,7 +334,7 @@ export async function str_replace(
     }
 
     // Replace text
-    const newContent = content.replace(command.old_str, command.new_str);
+    const newContent = content.replace(oldStr, newStr);
 
     // Write updated content
     await fs.writeFile(fullPath, newContent, 'utf-8');
@@ -320,8 +343,8 @@ export async function str_replace(
   // Log operation
   await context.logger.debug('str_replace', {
     path: command.path,
-    old_str_length: command.old_str.length,
-    new_str_length: command.new_str.length,
+    old_str_length: oldStr.length,
+    new_str_length: newStr.length,
     duration_ms: Date.now() - startTime,
     success: true,
   });
@@ -405,10 +428,55 @@ export async function deleteOp(
   // Validate and convert path
   const fullPath = validatePath(command.path, context.memoryRoot);
 
+  // Handle line-specific deletion
+  if (command.delete_line !== undefined) {
+    const deleteLine = command.delete_line;
+
+    // Execute with write lock and concurrency check for line deletion
+    await withWriteLock(fullPath, true, async () => {
+      // Check if file exists
+      if (!(await exists(fullPath))) {
+        throw new Error(`File not found: ${command.path}`);
+      }
+
+      // Verify it's a file, not a directory
+      const stat = await fs.stat(fullPath);
+      if (!stat.isFile()) {
+        throw new Error(`Cannot delete line from directory: ${command.path}`);
+      }
+
+      // Read file content
+      const content = await fs.readFile(fullPath, 'utf-8');
+      const lines = content.split('\n');
+
+      // Validate delete_line (1-based indexing)
+      if (deleteLine < 1 || deleteLine > lines.length) {
+        throw new Error(`Invalid delete_line ${deleteLine}. Must be 1-${lines.length}`);
+      }
+
+      // Delete the specified line (convert from 1-based to 0-based array index)
+      lines.splice(deleteLine - 1, 1);
+
+      // Write updated content
+      await fs.writeFile(fullPath, lines.join('\n'), 'utf-8');
+    });
+
+    // Log operation
+    await context.logger.debug('delete', {
+      path: command.path,
+      delete_line: deleteLine,
+      type: 'line',
+      duration_ms: Date.now() - startTime,
+      success: true,
+    });
+
+    return `Line ${deleteLine} deleted from ${command.path}`;
+  }
+
   // Track what was deleted for return message
   let deletedType: 'file' | 'directory' = 'file';
 
-  // Execute with write lock (no concurrency check needed for delete)
+  // Execute with write lock (no concurrency check needed for file/directory delete)
   await withWriteLock(fullPath, false, async () => {
     // Check if path exists
     if (!(await exists(fullPath))) {

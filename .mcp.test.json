@@ -1,10 +1,10 @@
 {
   "mcpServers": {
-    "memory-default": {
+    "test-memory-default": {
       "command": "node",
       "args": ["/home/jan/projects/memory-mcp/dist/index.js", "-m", "/tmp/test-memory"]
     },
-    "memory-separate": {
+    "test-memory-separate": {
       "command": "node",
       "args": ["/home/jan/projects/memory-mcp/dist/index.js", "--one-tool-per-command", "-m", "/tmp/test-memory"]
     },

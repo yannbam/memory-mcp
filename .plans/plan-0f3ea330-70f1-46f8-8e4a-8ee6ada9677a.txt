@@ -1,0 +1,9 @@
+🌳 "forgiving-params-session"
+📝 Implement forgiving parameter naming for str_replace command in both unified and one-tool-per-command modes. Accept both old_str/new_str AND old_string/new_string with proper validation.
+📊 ██████████ 100% (5/5 tasks)
+
+├── ✅ |Update Zod Schemas| "Update schemas in mcp-server.ts for both modes:\n1. MemoryCommandSchema str_replace variant (unified mode)\n2. StrReplaceCommandSchema (one-tool-per-command mode)\n\nMake old_str, old_string, new_str, new_string all optional, add refine validation for:\n- At least one old_* variant provided\n- At least one new_* variant provided\n- NOT both old_str and old_string\n- NOT both new_str and new_string" (🚨)
+├── ✅ |Update TypeScript Interface| "Update StrReplaceCommand interface in operations.ts to support both naming conventions with optional fields" (🔴)
+├── ✅ |Update str_replace Function| "Add normalization logic at the start of str_replace function to:\n1. Determine which old_* variant was provided\n2. Determine which new_* variant was provided\n3. Use normalized values throughout the function\n4. Update logging to show which variants were used" (🔴)
+├── ✅ |Write Comprehensive Tests| "Add tests for all forgiving parameter scenarios:\n1. old_str + new_str (original)\n2. old_string + new_string (alternative)\n3. Mixed: old_str + new_string\n4. Mixed: old_string + new_str\n5. Conflict detection: old_str + old_string (should fail)\n6. Conflict detection: new_str + new_string (should fail)\n7. Missing both variants (should fail)" (🔴)
+└── ✅ |Manual Testing with MCP-Debug| "Test with actual MCP-Debug tool:\n1. Test unified tool mode with both naming conventions\n2. Test one-tool-per-command mode with both naming conventions\n3. Verify error messages for conflicts are clear\n4. Request server reconnect from user" (🟡)
