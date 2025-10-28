@@ -4,7 +4,7 @@
 Five specialized agents identified issues across type safety, error handling, test coverage, and documentation.
 
 Detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
-📊 ████░░░░░░ 47% (14/30 tasks)
+📊 ██████░░░░ 67% (20/30 tasks)
 
 ├── ✅ |Phase 1: Critical Fixes| "REQUIRED before merge. Fix type safety, linting, and error handling gaps.\n\nEstimated: 4-6 hours\nGoal: Clean lint (0 errors), no type casts, proper error logging\n\nSee docs/PR-REVIEW-ACTION-PLAN.md for detailed code changes" (🚨) (100%)
 │   ├── ✅ |Fix str_replace schema| "Remove .passthrough() and use basic .object() with all 4 optional fields.\n\n**SOLUTION IMPLEMENTED:**\nAll naming combinations are ALLOWED (including mixed):\n- ✅ {old_str, new_str}\n- ✅ {old_string, new_string}\n- ✅ {old_str, new_string}\n- ✅ {old_string, new_str}\n\nSchema accepts all 4 fields as optional, validation happens in executor.\nPrecedence: underscore variants (old_str, new_str) take priority if multiple provided.\n\nFile: src/memory/schemas.ts (lines 27-37)" (🚨)
@@ -20,12 +20,12 @@ Detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
 │   ├── ✅ |Command executor tests| "New file: tests/unit/command-executor.test.ts\n\n~30 tests covering:\n- insert_line normalization (number/string)\n- str_replace naming (snake/camel)\n- Error messages\n- Edge cases" (🔴)
 │   ├── ✅ |MCP error handling tests| "Extend: tests/integration/test-error-detection.js\n\n~10 tests covering:\n- Schema validation errors return isError: true\n- Error messages are clear\n- Invalid inputs handled gracefully" (🟡)
 │   └── ✅ |Verify test coverage| "Run test suite and verify:\n- npm test shows ~140/140 passing\n- All edge cases from review covered\n- Claude Code compatibility validated" (🔴)
-├── ⏸️ |Phase 3: Documentation| "RECOMMENDED cleanup. Fix misleading/contradictory comments.\n\nEstimated: 1-2 hours\nGoal: Accurate, helpful documentation\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 3 for specific changes" (🟡) (0%)
-│   ├── ⏸️ |Fix critical comment issues| "Fix 3 misleading comments:\n- Schema passthrough explanation\n- Session management contradiction\n- Type safety claim" (🟡)
-│   ├── ⏸️ |Improve workaround docs| "Add context to workarounds:\n- When can they be removed?\n- What version introduced them?\n- How to test if still needed?" (🟡)
-│   ├── ⏸️ |Add protocol references| "Link to MCP spec for protocol requirements.\n\nFile: src/server/mcp-server.ts" (🔵)
-│   ├── ⏸️ |Fix terminology| "Replace 'anyOf' with 'oneOf' for discriminated unions.\n\nFiles: src/server/mcp-server.ts (2 locations)" (🔵)
-│   └── ⏸️ |Remove redundant comments| "Clean up 3 redundant/vague comments that don't add value." (🔵)
+├── ✅ |Phase 3: Documentation| "RECOMMENDED cleanup. Fix misleading/contradictory comments.\n\nEstimated: 1-2 hours\nGoal: Accurate, helpful documentation\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 3 for specific changes" (🟡) (100%)
+│   ├── ✅ |Fix critical comment issues| "Fix 3 misleading comments:\n- Schema passthrough explanation\n- Session management contradiction\n- Type safety claim" (🟡)
+│   ├── ✅ |Improve workaround docs| "Add context to workarounds:\n- When can they be removed?\n- What version introduced them?\n- How to test if still needed?" (🟡)
+│   ├── ✅ |Add protocol references| "Link to MCP spec for protocol requirements.\n\nFile: src/server/mcp-server.ts" (🔵)
+│   ├── ✅ |Fix terminology| "Replace 'anyOf' with 'oneOf' for discriminated unions.\n\nFiles: src/server/mcp-server.ts (2 locations)" (🔵)
+│   └── ✅ |Remove redundant comments| "Clean up 3 redundant/vague comments that don't add value." (🔵)
 ├── ⏸️ |Phase 4: Polish| "OPTIONAL improvements. Can be post-merge follow-up PR.\n\nEstimated: 2-3 hours\nGoal: Production-grade polish\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 4" (🔵) (0%)
 │   ├── ⏸️ |Consider branded types| "Optional: Implement branded MemoryPath type to enforce /memories prefix at type level." (🔵)
 │   ├── ⏸️ |Make CORS configurable| "Optional: Add ALLOWED_ORIGINS env var for production security." (🔵)

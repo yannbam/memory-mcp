@@ -3,48 +3,45 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 3a75b52e-afbf-4a42-aee4-076a217f55da (COMPLETED)
+Session: 8f3424fb-96d1-4612-be8e-c5ad4473b7c8 (IN PROGRESS)
 Branch: feature/discriminated-union-schema
-Context: ~124k tokens at handoff
-Status: ✅ Phase 1 & 2 COMPLETED - 🎯 NEXT: Phase 3 (documentation fixes)
+Context: ~85k tokens
+Status: ✅ Phase 1, 2 & 3 COMPLETED - 🎯 NEXT: Final Verification or skip Phase 4
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
 ### This Session Accomplished
 
-✅ **Phase 2 COMPLETED** - Comprehensive Test Coverage (100%):
+✅ **Phase 3 COMPLETED** - Documentation Improvements (100%):
 
-**Test Files Created:**
-- `test/schema-validation.test.ts` (38 tests) - validates discriminated union schema
-- `test/command-executor.test.ts` (32 tests) - validates executor normalization & dispatch
-- `tests/integration/test-error-detection.js` (+13 tests) - schema validation errors via MCP
+**Changes Made:**
+1. **Critical Comment Fixes (3)**:
+   - `transports.ts:46` - Clarified session header is for future stateful support
+   - `mcp-server.ts:115` - Changed "full type safety" → "type-safe dispatch"
+   - `schemas.ts:27-28` - Already correct (no passthrough reference)
 
-**Test Coverage Summary:**
-- Starting: 85 tests
-- Added: 70 new tests (38 schema + 32 executor)
-- Final: 155 unit tests passing
-- Integration: 27 tests passing (14 original + 13 new)
-- Target was ~55 tests, achieved 70+ (127% of target)
+2. **Enhanced Workaround Documentation (2)**:
+   - `command-executor.ts:59` - Added version context for insert_line serialization
+   - `schemas.ts:42-44` - Clarified Claude Code bug causes numeric serialization (kept WORKAROUND per user request)
 
-**What Was Tested:**
-- ✅ All 6 command variants accept valid input
-- ✅ Both naming conventions (old_str/new_str AND old_string/new_string)
-- ✅ Mixed naming combinations work correctly
-- ✅ Schema rejects invalid commands, missing fields, wrong types
-- ✅ insert_line normalization (number, string, edge cases)
-- ✅ Fail-fast validation when both variants provided
-- ✅ Command dispatch to correct operations
-- ✅ Error messages are clear and helpful
-- ✅ MCP protocol schema errors (throw -32602)
+3. **Protocol References Added (1)**:
+   - `mcp-server.ts:64-66` - Added MCP spec link for tool input schema requirements
+
+4. **Terminology Verified (1)**:
+   - All references already use "oneOf" not "anyOf" (correct for discriminated unions)
+
+5. **Redundant Comments Removed (2)**:
+   - `command-executor.ts:23-24` - Removed obvious exhaustive checking comment
+   - `mcp-server.ts:48` - Improved operations context comment clarity
 
 **Verification:**
-- ✅ npm test: 155/155 passing
-- ✅ npm run lint: 0 errors
-- ✅ npm run build: clean
-- ✅ Integration tests: 27/27 passing
+- ✅ Tests: 155/155 passing
+- ✅ Linting: 0 errors
+- ✅ Build: Clean compilation
 
-No commits yet - all test files ready for commit
+**Commit:**
+- c5e8d86 "docs: Phase 3 PR review fixes - documentation improvements"
 
 ### PR Review Findings Summary
 
@@ -65,59 +62,55 @@ No commits yet - all test files ready for commit
 
 ### What Next Session Should Do
 
-**🎯 CONTINUE WITH PHASE 3: Documentation Fixes**
+**✅ PHASES 1, 2 & 3 ALL COMPLETE!**
 
-**Phases 1 & 2 are COMPLETE** ✅
-- Phase 1: All critical fixes done (type safety, linting, error handling)
-- Phase 2: Test coverage complete (85 → 155 tests, all passing)
-- Commit: ae7c465 "feat: Add comprehensive Phase 2 test coverage"
+Three commits on `feature/discriminated-union-schema`:
+- 2740137 "feat: Complete Phase 1 PR review fixes"
+- ae7c465 "feat: Add comprehensive Phase 2 test coverage (70 new tests)"  
+- c5e8d86 "docs: Phase 3 PR review fixes - documentation improvements"
 
-**Phase 3 Tasks** (RECOMMENDED, 1-2 hours):
+**Next Steps - Choose Your Path:**
 
-Read `docs/PR-REVIEW-ACTION-PLAN.md` section 3 for detailed instructions.
+**Option A: Skip to Final Verification (RECOMMENDED)**
+- Phase 4 is OPTIONAL polish that can be done post-merge
+- Ready for final verification and PR to main
+- See `docs/PR-REVIEW-ACTION-PLAN.md` Final Verification section
 
-1. **Fix 3 Critical Comment Issues** (see section 3.1):
-   - `src/memory/schemas.ts:27-28` - Remove passthrough reference
-   - `src/server/transports.ts:46` - Fix session management comment
-   - `src/server/mcp-server.ts:115` - Update type safety claim
+**Option B: Complete Phase 4 (Optional Polish)**
+Read `docs/PR-REVIEW-ACTION-PLAN.md` section 4 for tasks (2-3 hours):
+1. Consider branded types for paths
+2. Make CORS configurable via env var
+3. Improve error messages with troubleshooting hints
+4. Handle signal handler errors properly
 
-2. **Improve Workaround Documentation** (see section 3.2):
-   - `src/memory/command-executor.ts:59` - Add version context
-   - `src/memory/schemas.ts:43-45` - Improve Claude Code compatibility note
+**Final Verification Checklist** (before PR to main):
+1. ✅ Full test suite: `npm test`, `npm run lint`, `npm run build`
+2. ⏸️ Manual E2E test with Claude Code instance
+3. ⏸️ Update CLAUDE.md handoff
+4. ⏸️ Create PR: feature/discriminated-union-schema → main
 
-3. **Add Protocol References** (see section 3.3):
-   - `src/server/mcp-server.ts:64-69` - Link to MCP spec
-
-4. **Fix Terminology** (see section 3.4):
-   - Replace "anyOf" with "oneOf" in 2 locations
-
-5. **Remove Redundant Comments** (see section 3.5):
-   - Clean up vague comments that don't add value
-
-**After Phase 3:**
-- Run verification: `npm test`, `npm run lint`, `npm run build`
-- Create commit for Phase 3 changes
-- Decide: Phase 4 (optional polish) or skip to Final Verification
-
-**Phase 4 is OPTIONAL** - can be done post-merge as separate PR
+**Current Status:**
+- PR review plan: 67% complete (20/30 tasks)
+- All REQUIRED phases done
+- Optional Phase 4: 0% (can be separate PR)
+- Final Verification: 0%
 
 ### Current Blockers
-None - Phases 1 & 2 complete, clear path for Phase 3 or merge
+None - Phases 1, 2 & 3 complete, ready for Final Verification or direct merge
 
 ## Active Plans
 _Current PlanAndTrack references_
 
-Plan: pr-review-fixes (47% complete - 14/30 tasks) ⚡ ACTIVE - Phases 1 & 2 done
-Plan: phase2-test-coverage (100% complete - 17/17 tasks) ✅ COMPLETED this session
+Plan: pr-review-fixes (67% complete - 20/30 tasks) ⚡ ACTIVE - Phases 1, 2 & 3 done
+Plan: phase3-documentation-fixes (100% complete - 18/18 tasks) ✅ COMPLETED this session
 Plan: memory-system-implementation (75% complete - 12/16 tasks) - paused
 Plan: public-release-beta (3% complete - 1/39 tasks) - resume after PR merge
 
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-✅ Phase 2 test coverage exceeds target: 70 new tests (target was ~55)
-✅ Schema validation tests cover all 6 commands + invalid input edge cases
-✅ Command executor tests verify normalization (insert_line, str_replace naming)
-✅ Integration tests verify MCP protocol error handling (-32602 for schema errors)
-✅ JavaScript parseInt behavior: "2.5" → 2, "2a" → 2 (stops at non-digit)
-✅ Operations layer validates bounds, executor validates types/format
+✅ Phase 3 documentation fixes: 18 tasks completed in ~1 hour
+✅ User requested keeping "WORKAROUND" label (not "COMPATIBILITY") for Claude Code bug
+✅ All "anyOf" references were already "oneOf" (correct terminology for discriminated unions)
+✅ Passthrough reference already removed in Phase 1 (no action needed)
+✅ Added MCP spec link: https://spec.modelcontextprotocol.io/specification/server/tools/
