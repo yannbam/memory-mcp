@@ -29,6 +29,8 @@ _Runtime quirks, version sensitivities, configuration gotchas_
 _Failed approaches, time sinks, what NOT to do (saves future sessions from repeating)_
 
 [💀🔧] When adding new optional parameters to commands, MUST update BOTH locations: the discriminated union schema AND the unified tool inputSchema - missing from inputSchema causes parameters to be silently dropped, leading to incorrect behavior
+[⚠️🧪] MCP-Debug testing is NOT sufficient - Claude Code's MCP client implementation may differ - always test features with actual Claude Code MCP client before considering complete
+[💀🔧] Empty string split gives [''] not [] - when handling empty files with line operations, must check `content === '' ? [] : content.split('\n')` to avoid off-by-one errors in append logic
 
 
 ## Proven Solutions
@@ -39,6 +41,19 @@ _Patterns that work, reliable approaches, validated fixes_
 Individual tool schemas omit command field since tool name implies command
 [✅💡] Parameter combination analysis methodology: Create full combinatorial matrix (every command × every parameter), categorize each as useful/questionable/confusing/nonsensical, identify patterns, design behaviors, create self-contained implementation spec
 Resulted in 4 approved features: create empty file, insert append, delete matching text, document str_replace deletion
+[✅🔒] Unique text requirement for safety: Both str_replace AND delete with old_str should require text appears exactly once - prevents accidental mass deletions/modifications
+Fail fast with clear error message showing occurrence count when text appears multiple times
+[✅🔧] Regex special character escaping: When searching for literal text (not patterns), use escapeRegExp helper: `text.replace(/[.*+?^${}()|[\]\\]/g, '\\## Proven Solutions
+_Patterns that work, reliable approaches, validated fixes_
+
+[✅🔧] Use .shape property to extract raw Zod schema for MCP SDK inputSchema (SDK expects ZodRawShape not ZodObject)
+[✅] Type assertions needed when constructing command objects from parsed params: `{ command: 'view', ...parsed } as operations.ViewCommand`
+Individual tool schemas omit command field since tool name implies command
+[✅💡] Parameter combination analysis methodology: Create full combinatorial matrix (every command × every parameter), categorize each as useful/questionable/confusing/nonsensical, identify patterns, design behaviors, create self-contained implementation spec
+Resulted in 4 approved features: create empty file, insert append, delete matching text, document str_replace deletion')`
+Critical for handling text containing $, ., *, +, ?, etc.
+[✅🎯] Optional parameter defaults in Zod: `.default('')` for create file_text, `.optional()` for insert insert_line
+Handler uses nullish coalescing: `const content = command.file_text ?? ''`
 
 
 ## Testing & Debugging
@@ -46,6 +61,10 @@ _Test strategies that work, debugging approaches, tools that help_
 
 [🔧✨] MCP-Debug tool excellent for live testing MCP servers: connect, initialize, list tools, call tools
 Can test different CLI flags by reconnecting with different args array
+[⚠️🧪] MCP-Debug is useful for quick iteration BUT always verify with actual Claude Code MCP client before marking complete
+Different MCP client implementations may handle schemas/parameters differently
+[✅🧪] Parameter combination testing strategy: Test BOTH tool modes (unified + one-tool-per-command), test with and without optional params, test error cases (multiple occurrences, parameter conflicts)
+Comprehensive test matrix prevents edge case bugs
 
 
 ## Deferred Work
@@ -54,6 +73,17 @@ _Complex tasks or investigations postponed for future sessions_
 
 ## Project-Specific Knowledge
 _Unique aspects of this particular codebase/project_
+
+[📊💡] Parameter combinations feature implementation (Session f7051c6f, Oct 28 2025):
+4 features implemented: create empty file, insert append, delete unique text, str_replace deletion
+All require unique text for safety (delete/str_replace with text search)
+114 tests passing, fully documented in README/CHANGELOG
+Commits: bbd1a83 (docs) + 4950c2e (implementation)
+IMPORTANT: Needs testing with actual Claude Code MCP client (only tested with MCP-Debug so far)
+[🏗️💡] Dual schema locations for parameter changes: When adding optional params, update BOTH MemoryCommandSchema (21-64) AND individual command schemas (76-119) in src/server/mcp-server.ts
+Also update TypeScript interfaces in src/memory/operations.ts
+[🔧💡] Empty file handling pattern: Check `content === ''` before splitting to avoid [''] array
+Append logic: `insertLine = lines.length + 1` works for both empty and non-empty files when using empty array for empty content
 
 
 ---

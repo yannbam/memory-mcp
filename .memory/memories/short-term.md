@@ -35,18 +35,34 @@ _What was done, what's next, blockers_
 ✅ Feature Implementation: 100% complete (4 of 4 features IMPLEMENTED and TESTED)
 
 ### What Next Session Should Do
-**Pre-Release Verification** (4 checks remaining):
-1. Run full test suite (npm test, coverage, lint)
-2. Test clean build from scratch
-3. Security audit (npm audit)
-4. Test memory system integration (reconnect MCP)
+**CRITICAL: Test all 4 new parameter combinations with actual Claude Code MCP client**
+⚠️ This session tested with MCP-Debug, but Claude Code's MCP client implementation may differ!
 
-**After verification:**
+**Thorough Testing Needed**:
+1. **Reconnect memory-mcp** in Claude Code (user must do this)
+2. **Test unified tool mode** (default .mcp.json):
+   - Create empty file: `memory(command: "create", path: "/memories/empty.txt")`
+   - Insert append: `memory(command: "insert", path: "/memories/test.txt", insert_text: "line")`
+   - Delete unique text: `memory(command: "delete", path: "/memories/test.txt", old_str: "text")`
+   - str_replace deletion: `memory(command: "str_replace", path: "/memories/test.txt", old_str: "text")`
+3. **Test one-tool-per-command mode** (switch to test-memory-separate in .mcp.json):
+   - `memory_create(path: "/memories/empty.txt")`
+   - `memory_insert(path: "/memories/test.txt", insert_text: "line")`
+   - `memory_delete(path: "/memories/test.txt", old_str: "text")`
+   - `memory_str_replace(path: "/memories/test.txt", old_str: "text")`
+4. **Test error cases**:
+   - Multiple occurrences (should fail with clear error)
+   - Mixed parameters (delete_line + old_str should fail)
+   - Empty files, special regex characters
+5. **Verify forgiving parameter naming**: Try both old_str and old_string
+
+**After successful testing:**
+- Pre-Release Verification (4 checks: test suite, clean build, security audit, integration)
 - Comprehensive Code Review (4 reviews using pr-review-toolkit agents)
 - Optional: Add CONTRIBUTING.md and GitHub templates
 - Public beta release!
 
-**All features are implemented and tested** - next is verification and review only.
+**If testing reveals issues**: Fix immediately before proceeding to verification.
 
 ### Current Blockers
 None
@@ -70,7 +86,8 @@ _Rapid capture space - add memories here during work without categorization_
 
 [✅🎯🏆] ALL 4 parameter combination features FULLY IMPLEMENTED and TESTED
 [🧪💯] 114 tests passing (was 100, added 14 new tests)
-[🔧✅] Both tool modes tested with MCP-Debug - all features working correctly
-[⚠️💡] CRITICAL design decision: Both str_replace AND delete with old_str require UNIQUE text (fail if multiple occurrences)
+[⚠️🔧] MCP-Debug testing successful BUT next session MUST test with actual Claude Code MCP client (implementation may differ)
+[⚠️💡] CRITICAL design decision from janbam: Both str_replace AND delete with old_str require UNIQUE text (fail if multiple occurrences)
 [📚] Documentation updated: README.md examples + CHANGELOG.md release notes
-[🎯] Ready for Pre-Release Verification (4 checks) and Code Review (4 reviews)
+[💾] Commits: bbd1a83 (docs) + 4950c2e (feature implementation)
+[🎯] Next: Thorough testing with Claude Code MCP client, then Pre-Release Verification and Code Review
