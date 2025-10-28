@@ -150,63 +150,14 @@ docs/
 
 ## Current Development Status
 
-### ✅ Implementation Complete (Branch: feature/discriminated-union-schema)
+**Current development status, session handoffs, and next tasks are tracked in the Memory System.**
 
-All core functionality implemented and tested:
-- ✅ Path validation with security tests (100% coverage)
-- ✅ Zod discriminated union schemas for all 6 commands
-- ✅ Memory operations with comprehensive error handling
-- ✅ MCP server integration with both HTTP and stdio transports
-- ✅ 155 passing unit tests + 27 integration tests
-- ✅ E2E tested with Claude Code
+See:
+- `.memory/memories/short-term.md` - Current session status, handoff, and next steps
+- `.memory/memories/long-term.md` - Persistent project knowledge and lessons learned
+- PlanAndTrack plans in `.plans/` - Detailed task tracking and progress
 
-### ✅ PR Review Fixes (90% Complete - 27/30 tasks) - READY FOR MERGE
-
-Comprehensive 5-agent PR review completed. Action plan: `docs/PR-REVIEW-ACTION-PLAN.md`
-
-**✅ Phase 1: Critical Fixes (COMPLETED)**
-- Type safety restored (0 type casts)
-- Linting clean (0 errors, down from 14)
-- Error logging added
-- Transport cleanup fixed
-- Commit: 2740137
-
-**✅ Phase 2: Test Coverage (COMPLETED)**
-- Added 70 new tests (target was 55)
-- Schema validation tests (38)
-- Command executor tests (32)
-- Total: 155 unit tests passing
-- Commit: ae7c465
-
-**✅ Phase 3: Documentation (COMPLETED)**
-- Fixed 3 critical comment issues
-- Enhanced workaround documentation
-- Added MCP protocol references
-- Removed redundant comments
-- Commit: c5e8d86
-
-**✅ Phase 4: Polish (PARTIALLY COMPLETE)**
-- ✅ Improved error messages with troubleshooting hints
-- ✅ Signal handler error handling (SIGINT/SIGTERM)
-- ⏸️ Skipped: Branded types, configurable CORS (can be post-merge PR)
-- Commit: [pending]
-
-**✅ Final Verification (COMPLETED)**
-1. ✅ Full test suite passing (155/155 tests, 0 lint errors, clean build)
-2. ✅ E2E tested with project_memory tool:
-   - All 6 commands work (view, create, str_replace, insert, rename, delete)
-   - Both naming conventions work (old_str/old_string, new_str/new_string, mixed)
-   - insert_line accepts number|string correctly
-   - Error handling works (path traversal blocked, clear error messages)
-   - Debug logs created in /tmp/memory-mcp/
-3. ✅ This handoff documentation updated
-
-### Next Session Tasks
-
-**Ready to create PR to main:**
-- Commit Phase 4 changes + plan updates
-- Create PR: feature/discriminated-union-schema → main
-- Optional: Add remaining Phase 4 items (branded types, CORS) as follow-up PR
+Use the `project_memory` MCP tool to view and update these files.
 
 ## CI/CD
 
