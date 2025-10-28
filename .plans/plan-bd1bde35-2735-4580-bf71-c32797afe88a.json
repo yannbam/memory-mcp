@@ -1,0 +1,294 @@
+{
+  "uuid": "bd1bde35-2735-4580-bf71-c32797afe88a",
+  "name": "pr-review-fixes",
+  "details": "Implement fixes from comprehensive PR review to prepare feature/discriminated-union-schema for merge to main.\n\nFive specialized agents identified issues across type safety, error handling, test coverage, and documentation.\n\nDetailed action plan: docs/PR-REVIEW-ACTION-PLAN.md",
+  "tasks": [
+    {
+      "name": "Phase 1: Critical Fixes",
+      "details": "REQUIRED before merge. Fix type safety, linting, and error handling gaps.\n\nEstimated: 4-6 hours\nGoal: Clean lint (0 errors), no type casts, proper error logging\n\nSee docs/PR-REVIEW-ACTION-PLAN.md for detailed code changes",
+      "status": "pending",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Fix str_replace schema",
+          "details": "Replace .passthrough() with union of SnakeCase/CamelCase schemas.\n\nMaintains Claude Code compatibility while enforcing required fields.\n\nFile: src/memory/schemas.ts",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "ebfc76b8-22e2-462e-bcdb-545e99ebba99",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Remove type safety escapes",
+          "details": "Eliminate all 'as any' casts in command executor.\n\nWith union schema, normalization becomes type-safe.\n\nFile: src/memory/command-executor.ts\nFixes: 11 linting errors",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "25416a12-105f-4cab-a85b-15193324f26f",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Remove unused import",
+          "details": "Remove MemoryCommandSchema from command-executor imports.\n\nFile: src/memory/command-executor.ts:8\nFixes: 1 linting error",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "4b5db7ab-c714-40aa-aed4-dedfff8ece04",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Fix unnecessary async",
+          "details": "Remove async keyword from ListToolsRequestSchema handler.\n\nFile: src/server/mcp-server.ts:72\nFixes: 1 linting error",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "6c22a3d1-1f4a-49cd-b818-cf2401e3539d",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Add error logging",
+          "details": "Log command execution errors to debug log before returning to client.\n\nEnables server-side monitoring and debugging.\n\nFile: src/server/mcp-server.ts:116-138",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "17751d86-8683-45f0-9b08-fb33691b0e1e",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Fix transport cleanup",
+          "details": "Add .catch() to transport.close() to prevent unhandled promise rejection.\n\nFile: src/server/transports.ts:62",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "62efe22a-3ee1-45c2-8a3c-f3e6830fdd2d",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Improve HTTP errors",
+          "details": "Include error message details in HTTP error responses.\n\nFile: src/server/transports.ts:71-85",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "542168c1-98ff-4894-b82d-78272400ca5a",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Verify clean build",
+          "details": "Run linting, tests, and build to verify all fixes.\n\nCommands:\n- npm run lint (expect 0 errors)\n- npm test (expect 85/85 passing)\n- npm run build",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "16dc3b6c-c843-489b-85c3-8710ef49d73d",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        }
+      ],
+      "uuid": "c4ddb098-c4c2-4831-9dc6-14ab229abb3d",
+      "created_at": "2025-10-28T00:16:24.259Z",
+      "updated_at": "2025-10-28T00:16:24.259Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Phase 2: Test Coverage",
+      "details": "RECOMMENDED before merge. Add ~55 tests for new validation layer.\n\nEstimated: 4-6 hours\nGoal: 85 → 140 tests (comprehensive coverage)\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 2 for test templates",
+      "status": "pending",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Schema validation tests",
+          "details": "New file: tests/unit/schema-validation.test.ts\n\n~25 tests covering:\n- Valid commands (all 6 variants)\n- Both naming conventions\n- Invalid inputs\n- Missing fields\n- Wrong types",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "3f068e55-1018-4b86-87d8-ff15b7062f1f",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Command executor tests",
+          "details": "New file: tests/unit/command-executor.test.ts\n\n~30 tests covering:\n- insert_line normalization (number/string)\n- str_replace naming (snake/camel)\n- Error messages\n- Edge cases",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "014c2ff7-aa9f-4bd4-96b6-015caae83b17",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "MCP error handling tests",
+          "details": "Extend: tests/integration/test-error-detection.js\n\n~10 tests covering:\n- Schema validation errors return isError: true\n- Error messages are clear\n- Invalid inputs handled gracefully",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "e478079b-e131-40d4-bf00-a8adbc2122fe",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Verify test coverage",
+          "details": "Run test suite and verify:\n- npm test shows ~140/140 passing\n- All edge cases from review covered\n- Claude Code compatibility validated",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "2d152b10-9f1a-46e0-acf5-17e3c7e6217b",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        }
+      ],
+      "uuid": "40a56d37-16c9-4310-a781-8fe54d67eb1f",
+      "created_at": "2025-10-28T00:16:24.259Z",
+      "updated_at": "2025-10-28T00:16:24.259Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Phase 3: Documentation",
+      "details": "RECOMMENDED cleanup. Fix misleading/contradictory comments.\n\nEstimated: 1-2 hours\nGoal: Accurate, helpful documentation\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 3 for specific changes",
+      "status": "pending",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Fix critical comment issues",
+          "details": "Fix 3 misleading comments:\n- Schema passthrough explanation\n- Session management contradiction\n- Type safety claim",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "4accb923-dd6e-457a-8537-618f317c27cb",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Improve workaround docs",
+          "details": "Add context to workarounds:\n- When can they be removed?\n- What version introduced them?\n- How to test if still needed?",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "b20706a7-6076-4d90-b7cf-ec9c39ca7d88",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Add protocol references",
+          "details": "Link to MCP spec for protocol requirements.\n\nFile: src/server/mcp-server.ts",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "65ecf7de-08eb-48c3-a442-04a959c35c8e",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Fix terminology",
+          "details": "Replace 'anyOf' with 'oneOf' for discriminated unions.\n\nFiles: src/server/mcp-server.ts (2 locations)",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "441bce68-e806-44dc-a207-995b02893b8b",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Remove redundant comments",
+          "details": "Clean up 3 redundant/vague comments that don't add value.",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "9eaf0bda-d5e4-4002-9354-bf6bd7062e3c",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        }
+      ],
+      "uuid": "220572da-949a-4663-a49c-26b4d9ca0843",
+      "created_at": "2025-10-28T00:16:24.259Z",
+      "updated_at": "2025-10-28T00:16:24.259Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Phase 4: Polish",
+      "details": "OPTIONAL improvements. Can be post-merge follow-up PR.\n\nEstimated: 2-3 hours\nGoal: Production-grade polish\n\nSee docs/PR-REVIEW-ACTION-PLAN.md section 4",
+      "status": "pending",
+      "priority": "low",
+      "sub_tasks": [
+        {
+          "name": "Consider branded types",
+          "details": "Optional: Implement branded MemoryPath type to enforce /memories prefix at type level.",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "1f214eec-64a6-4ea3-9e51-a57e62d0ef4c",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Make CORS configurable",
+          "details": "Optional: Add ALLOWED_ORIGINS env var for production security.",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "c4a68cc9-9567-48ad-bb93-7edbe8f8e8e7",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Improve error messages",
+          "details": "Optional: Add troubleshooting hints to startup errors.",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "fb6bd79d-3ebd-44c2-8837-48db94760f6c",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        },
+        {
+          "name": "Handle signal errors",
+          "details": "Optional: Properly handle cleanup errors in SIGINT/SIGTERM handlers.",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "65108eeb-0d8b-499f-bc33-aaafb2c4443a",
+          "created_at": "2025-10-28T00:16:24.259Z",
+          "updated_at": "2025-10-28T00:16:24.259Z"
+        }
+      ],
+      "uuid": "14bbd790-8d7d-4bfc-b458-b37e091c0a51",
+      "created_at": "2025-10-28T00:16:24.259Z",
+      "updated_at": "2025-10-28T00:16:24.259Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Final Verification",
+      "details": "Pre-merge checklist before creating PR to main",
+      "status": "pending",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run full test suite",
+          "details": "Verify all tests pass:\n- npm test\n- npm run lint\n- npm run build",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "819d7525-df9f-4c69-a279-742ac70670bd",
+          "created_at": "2025-10-28T00:16:24.260Z",
+          "updated_at": "2025-10-28T00:16:24.260Z"
+        },
+        {
+          "name": "Manual E2E test",
+          "details": "Test with actual Claude Code instance:\n- All 6 commands work\n- Both naming conventions work\n- Error handling works\n- Debug logs created",
+          "status": "pending",
+          "priority": "urgent",
+          "uuid": "af93575d-af11-4023-8789-c1acdc2d161c",
+          "created_at": "2025-10-28T00:16:24.260Z",
+          "updated_at": "2025-10-28T00:16:24.260Z"
+        },
+        {
+          "name": "Update CLAUDE.md",
+          "details": "Update handoff section with:\n- What was fixed\n- Test coverage status\n- Ready for merge to main",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "ed30bee0-b722-4f8f-b748-45d37931da63",
+          "created_at": "2025-10-28T00:16:24.260Z",
+          "updated_at": "2025-10-28T00:16:24.260Z"
+        },
+        {
+          "name": "Create PR to main",
+          "details": "Merge feature/discriminated-union-schema → main\n\nInclude:\n- Reference to PR-REVIEW-ACTION-PLAN.md\n- Summary of 5-agent review findings\n- Test coverage improvements\n- Breaking changes (none expected)",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "dd962fa3-2966-49a4-b72b-565d7cd1928f",
+          "created_at": "2025-10-28T00:16:24.260Z",
+          "updated_at": "2025-10-28T00:16:24.260Z"
+        }
+      ],
+      "uuid": "8ec10a2f-ff7a-4131-8011-327cf9eb5689",
+      "created_at": "2025-10-28T00:16:24.259Z",
+      "updated_at": "2025-10-28T00:16:24.259Z",
+      "completion_percentage": 0
+    }
+  ],
+  "created_at": "2025-10-28T00:16:24.260Z",
+  "updated_at": "2025-10-28T00:16:24.260Z"
+}

@@ -3,60 +3,77 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 16d4313a-89b5-4fe3-959d-cac81084062e
+Session: 0bb07c86-7a4f-4d4b-a75e-a3b73da3aeca
 Branch: feature/discriminated-union-schema
-Context: ~114k tokens (approaching handoff)
-Status: ✅ Discriminated union implementation COMPLETE and TESTED
+Context: ~88k tokens (wrapping up for handoff)
+Status: ✅ Comprehensive PR review COMPLETE - Action plan ready
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
 ### This Session Accomplished
-✅ Implemented discriminated union schema using low-level Server API
-✅ Created src/memory/schemas.ts with 6 command variants
-✅ Created src/memory/command-executor.ts with type-safe dispatch
-✅ Refactored src/server/mcp-server.ts to use Server instead of McpServer
-✅ Fixed MCP protocol validation by using $refStrategy: "none" and adding type: "object"
-✅ Added UX improvements: accept both number/string for insert_line
-✅ Added UX improvements: accept both snake_case and camelCase for str_replace parameters
-✅ All 6 commands tested and working perfectly
-✅ Updated docs/DISCRIMINATED-UNION-IMPLEMENTATION.md with complete results
-✅ GPT-5 consultation provided critical solution for MCP protocol compliance
+✅ Conducted comprehensive 5-agent PR review for merge to main
+✅ Agents used: code-reviewer, type-design-analyzer, silent-failure-hunter, comment-analyzer, pr-test-analyzer
+✅ Created detailed action plan: docs/PR-REVIEW-ACTION-PLAN.md
+✅ Created PlanAndTrack plan "pr-review-fixes" (30 tasks across 4 phases)
+✅ Identified critical issues: type safety escapes, test coverage gaps, error handling
+✅ Designed union schema solution to maintain Claude Code compatibility
+
+### PR Review Findings Summary
+
+**Critical Issues** (6 found):
+- Type safety: 3x `as any` casts bypass TypeScript (11 linting errors)
+- Schema: .passthrough() allows any fields (security issue)
+- Error handling: Command errors not logged server-side
+- Architecture: Type duplication between schemas and operations
+
+**Test Coverage Gap**:
+- New validation layer has ZERO tests (schema validation, command executor)
+- Need ~55 new tests for production confidence
+- Existing 85 tests cover operations layer perfectly
+
+**Linting**: 14 errors (11 type safety, 3 misc)
+
+**Verdict**: NOT ready for merge - needs Phase 1 fixes minimum
 
 ### What Next Session Should Do
 
-**Priority 1: Code Review and PR Preparation**
-Branch: feature/discriminated-union-schema (4 commits ready)
-Status: Implementation complete, all tests passing
+**IMMEDIATE: Implement Phase 1 Fixes** (4-6 hours, REQUIRED)
+Use plan: `pr-review-fixes` 
+Reference: `docs/PR-REVIEW-ACTION-PLAN.md`
 
-Tasks:
-1. Run code review to check for any issues
-2. Verify all tests still pass (npm test)
-3. Check linting (npm run lint)
-4. Review commit messages and squash if needed
-5. Merge feature/discriminated-union-schema → dev
-6. Update CLAUDE.md handoff section with latest status
-7. Consider if this warrants a new minor version (0.2.0)
+Key fixes:
+1. Replace .passthrough() with union of SnakeCase/CamelCase schemas
+2. Remove all `as any` casts (becomes type-safe with union schema)
+3. Add error logging to command execution
+4. Fix transport cleanup error handling
+5. Remove unused imports, fix unnecessary async
 
-**Priority 2: Continue Public Beta Preparation**
-After merge to dev, continue with Phase 2-3:
-- Create .mcp.example.json template for users
-- Update README with discriminated union benefits
-- Consider creating GitHub release for v0.2.0
+**Result**: Clean lint (0 errors), full type safety, proper error handling
+
+**STRONGLY RECOMMENDED: Phase 2 Tests** (4-6 hours)
+Add ~55 tests for schema validation and command executor
+Coverage: 85 → 140 tests
+
+**RECOMMENDED: Phase 3 Docs** (1-2 hours)
+Fix misleading comments, add protocol references
+
+**After all fixes**: Create PR to main with review summary
 
 ### Current Blockers
-None - implementation complete and tested
+None - clear path forward documented
 
 ## Active Plans
 _Current PlanAndTrack references_
 
-Plan: memory-system-implementation (75% complete - 12/16 tasks)
-Plan: public-release-beta (3% complete - 1/39 tasks)
+Plan: pr-review-fixes (0% complete - 0/30 tasks) ⚡ ACTIVE - implement Phase 1 next session
+Plan: memory-system-implementation (75% complete - 12/16 tasks) - paused
+Plan: public-release-beta (3% complete - 1/39 tasks) - resume after PR merge
 
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-Branch feature/discriminated-union-schema has 4 commits ready for review
-Commits: 1b085e2 (main impl), 92880a2 (insert_line fix), 4020b27 (docs), 1fa7ce9 (flexible naming)
-All 6 memory commands tested and working with actual Claude Code instance
-Test files in .memory/memories/ can be deleted after merge (discriminated-union-test.md, insert-test.txt)
+PR review revealed union schema pattern better than .passthrough() for flexible naming
+Union approach: StrReplaceCommandSnakeCase | StrReplaceCommandCamelCase
+Maintains Claude Code compatibility while enforcing required fields at schema level
+With union schema, type casts become unnecessary - full type safety restored

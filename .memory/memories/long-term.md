@@ -24,6 +24,8 @@ _Failed approaches, time sinks, what NOT to do (saves future sessions from repea
 Don't use McpServer.registerTool for discriminated unions - it always wraps inputSchema in z.object() making top-level unions impossible
 Don't use zodToJsonSchema with default settings - produces $ref at top level which some validators reject when mixed with type: "object"
 Don't use z.refine() on discriminated union schemas - breaks the discriminated union structure for Zod's discriminatedUnion type
+Don't use .passthrough() for flexible parameter naming - security risk (accepts ANY fields) and requires type casts - use union of schemas instead
+Never skip PR review for "working" code - Session 0bb07c86 found 6 critical issues in fully functional E2E-tested implementation
 
 
 ## Proven Solutions
@@ -32,8 +34,9 @@ _Patterns that work, reliable approaches, validated fixes_
 Discriminated union pattern: Use Server class with manual setRequestHandler for ListToolsRequestSchema and CallToolRequestSchema
 Schema conversion: zodToJsonSchema(schema, { $refStrategy: "none", strictUnions: true }) then add type: "object"
 UX flexibility: Accept union of types (number | string) in schema then normalize in command executor
-Parameter naming: Accept both snake_case and camelCase variants using .passthrough() and normalize in executor
+Parameter naming flexibility: Use union of schemas (SnakeCase | CamelCase) NOT .passthrough() - maintains type safety while accepting both conventions
 GPT-5 consultation effective for complex architectural decisions - session 1761595236443-75uvjxnu provided critical $refStrategy insight
+Multi-agent PR review highly effective: code-reviewer, type-design-analyzer, silent-failure-hunter, comment-analyzer, pr-test-analyzer each found unique issues
 
 
 ## Testing & Debugging
