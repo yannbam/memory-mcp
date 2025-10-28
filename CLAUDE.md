@@ -217,11 +217,11 @@ Instead of accumulating redundant entries, refine knowledge in place using str_r
 - **Three emojis:** Rich dimensions - `[⚠️🔧🤯] str_replace silently fails if old_str appears multiple times`
 
 **Suggested dimensions (use any emojis you want!):**
-1. **Kind** - Type of information (⚠️ warning, 💡 insight, 🔄 deferred, ✅ validated, 💀 fatal)
-2. **Object** - Domain/area (🔧 tool, 📦 dependency, 🏗️ architecture, 🧪 testing, 📝 docs)
-3. **Emotion** - Experience quality (🤯 surprising, 😅 relief, 🎯 clarity, 🔥 critical, 💪 hard-won)
+1. **Kind** - Type of information (⚠️ warning, 💡 insight, 🔄 deferred, ✅ validated, 💀 fatal, etc.)
+2. **Object** - Domain/area (🔧 tool, 📦 dependency, 🏗️ architecture, 🧪 testing, 📝 docs, etc.)
+3. **Emotion** - Experience quality (🤯 surprising, 😅 relief, 🎯 clarity, 🔥 critical, 🤔 open question)
 
-**The entire emoji space is available** - these are just examples. Create combinations that work for your project and context.
+CRITICAL: **The entire emoji space is available** - these are just examples. Use ANY emoji and ANY combination that adds meaningful dimensions to the memory.
 
 ### What Makes Memory Valuable?
 
