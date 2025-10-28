@@ -8,6 +8,11 @@ Conditional registration in createMemoryServer() controlled by oneToolPerCommand
 Both modes use identical underlying operations - only tool registration differs
 [🧪💡] Unified tool description is intentionally minimal/commented out - experiment to test HOW Claude uses commands/parameters intuitively without detailed manual
 This is NOT incomplete - it's deliberate UX testing for future session analysis
+[🎯💡] Parameter combination design principle: Never mix paradigms (position-based + content-based = confusing)
+Position-based: insert_line, delete_line, view_range (specific line numbers)
+Content-based: old_str, new_str, file_text (text search/replacement)
+Read vs Write: view operations never modify files
+Mixing these creates ambiguity and should be rejected at schema validation level
 
 
 ## Performance & Optimization
@@ -32,6 +37,8 @@ _Patterns that work, reliable approaches, validated fixes_
 [✅🔧] Use .shape property to extract raw Zod schema for MCP SDK inputSchema (SDK expects ZodRawShape not ZodObject)
 [✅] Type assertions needed when constructing command objects from parsed params: `{ command: 'view', ...parsed } as operations.ViewCommand`
 Individual tool schemas omit command field since tool name implies command
+[✅💡] Parameter combination analysis methodology: Create full combinatorial matrix (every command × every parameter), categorize each as useful/questionable/confusing/nonsensical, identify patterns, design behaviors, create self-contained implementation spec
+Resulted in 4 approved features: create empty file, insert append, delete matching text, document str_replace deletion
 
 
 ## Testing & Debugging
@@ -43,11 +50,6 @@ Can test different CLI flags by reconnecting with different args array
 
 ## Deferred Work
 _Complex tasks or investigations postponed for future sessions_
-
-[🔄🎯] Create combinatorial matrix of ALL command+parameter combinations and implement sensible ones
-- Example: delete with path+old_str => replace old_str with "" (delete matching text)
-- Example: str_replace with path+old_str => replace old_str with "" (delete matching text)
-- Analyze which combinations provide useful functionality vs which are nonsensical
 
 
 ## Project-Specific Knowledge

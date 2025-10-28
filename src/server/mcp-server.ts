@@ -30,20 +30,20 @@ const MemoryCommandSchema = z.discriminatedUnion('command', [
   z.object({
     command: z.literal('create'),
     path: z.string().describe('Memory path starting with /memories'),
-    file_text: z.string().describe('File content to write'),
+    file_text: z.string().default('').describe('File content to write. Defaults to empty string if omitted (creates empty file).'),
   }),
   z.object({
     command: z.literal('str_replace'),
     path: z.string().describe('Memory path starting with /memories'),
     old_str: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
     old_string: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
-    new_str: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
-    new_string: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
+    new_str: z.string().optional().describe('Replacement text. Use new_str OR new_string. Empty string deletes the matched text.'),
+    new_string: z.string().optional().describe('Replacement text. Use new_str OR new_string. Empty string deletes the matched text.'),
   }),
   z.object({
     command: z.literal('insert'),
     path: z.string().describe('Memory path starting with /memories'),
-    insert_line: z.number().describe('Line number where text should be inserted (1-based, inserts AT this line pushing existing line down)'),
+    insert_line: z.number().optional().describe('Line number where text should be inserted (1-based, inserts AT this line pushing existing line down). If omitted, appends to end of file.'),
     insert_text: z.string().describe('Text to insert'),
   }),
   z.object({
@@ -55,6 +55,10 @@ const MemoryCommandSchema = z.discriminatedUnion('command', [
       .positive()
       .optional()
       .describe('Optional: Delete specific line number (1-based indexing). If provided, only that line is deleted from the file.'),
+    old_str: z.string().optional()
+      .describe('Optional: Delete unique text from the file (must appear exactly once). Empty lines resulting from deletion are removed. Use old_str OR old_string.'),
+    old_string: z.string().optional()
+      .describe('Optional: Delete unique text from the file (must appear exactly once). Empty lines resulting from deletion are removed. Use old_str OR old_string.'),
   }),
   z.object({
     command: z.literal('rename'),
@@ -83,20 +87,20 @@ const ViewCommandSchema = z.object({
 
 const CreateCommandSchema = z.object({
   path: z.string().describe('Memory path starting with /memories'),
-  file_text: z.string().describe('File content to write'),
+  file_text: z.string().default('').describe('File content to write. Defaults to empty string if omitted (creates empty file).'),
 });
 
 const StrReplaceCommandSchema = z.object({
   path: z.string().describe('Memory path starting with /memories'),
   old_str: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
   old_string: z.string().optional().describe('Text to find (must be unique in file). Use old_str OR old_string.'),
-  new_str: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
-  new_string: z.string().optional().describe('Replacement text. Use new_str OR new_string.'),
+  new_str: z.string().optional().describe('Replacement text. Use new_str OR new_string. Empty string deletes the matched text.'),
+  new_string: z.string().optional().describe('Replacement text. Use new_str OR new_string. Empty string deletes the matched text.'),
 });
 
 const InsertCommandSchema = z.object({
   path: z.string().describe('Memory path starting with /memories'),
-  insert_line: z.number().describe('Line number where text should be inserted (0-based)'),
+  insert_line: z.number().optional().describe('Line number where text should be inserted (1-based, inserts AT this line pushing existing line down). If omitted, appends to end of file.'),
   insert_text: z.string().describe('Text to insert'),
 });
 
@@ -108,6 +112,10 @@ const DeleteCommandSchema = z.object({
     .positive()
     .optional()
     .describe('Optional: Delete specific line number (1-based indexing). If provided, only that line is deleted from the file.'),
+  old_str: z.string().optional()
+    .describe('Optional: Delete unique text from the file (must appear exactly once). Empty lines resulting from deletion are removed. Use old_str OR old_string.'),
+  old_string: z.string().optional()
+    .describe('Optional: Delete unique text from the file (must appear exactly once). Empty lines resulting from deletion are removed. Use old_str OR old_string.'),
 });
 
 const RenameCommandSchema = z.object({

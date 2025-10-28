@@ -27,6 +27,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Parameter combinations** - Optional parameters for more intuitive usage:
+  - `create` without `file_text` creates empty file (touch equivalent)
+  - `insert` without `insert_line` appends to end of file
+  - `delete` with `old_str`/`old_string` deletes unique text occurrence
+  - `str_replace` without `new_str` deletes unique text (defaults to empty string)
+- **Forgiving parameter naming** - Accept both `old_str`/`new_str` and `old_string`/`new_string` interchangeably
+
+### Changed
+- All text-based operations (`str_replace`, `delete` with `old_str`) now require unique occurrences
+- Both operations fail with clear error if text appears multiple times
+
 ### Planned
 - npm package publication as @yannbam/memory-mcp
 - Additional configuration options

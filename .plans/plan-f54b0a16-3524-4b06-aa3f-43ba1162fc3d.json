@@ -255,7 +255,7 @@
     {
       "name": "Feature Implementation",
       "details": "Implement 4 deferred features from long-term memory and session handoff before public release. These enhance usability, parameter flexibility, and fix UX issues.",
-      "status": "in_progress",
+      "status": "completed",
       "priority": "urgent",
       "sub_tasks": [
         {
@@ -265,7 +265,7 @@
           "priority": "high",
           "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
           "created_at": "2025-10-28T14:48:34.344Z",
-          "updated_at": "2025-10-28T15:32:37.169Z"
+          "updated_at": "2025-10-28T18:41:01.756Z"
         },
         {
           "name": "Implement forgiving parameter naming",
@@ -274,7 +274,7 @@
           "priority": "high",
           "uuid": "e679cd32-ce4a-4f85-9447-d105a366fe70",
           "created_at": "2025-10-28T14:48:34.344Z",
-          "updated_at": "2025-10-28T15:55:08.030Z"
+          "updated_at": "2025-10-28T18:41:01.756Z"
         },
         {
           "name": "Add delete_line parameter to delete command",
@@ -283,22 +283,22 @@
           "priority": "medium",
           "uuid": "37bda57a-6263-4bb6-b7a9-4216af798b65",
           "created_at": "2025-10-28T14:48:34.344Z",
-          "updated_at": "2025-10-28T16:26:41.729Z"
+          "updated_at": "2025-10-28T18:41:01.756Z"
         },
         {
           "name": "Implement useful parameter combinations",
           "details": "Create combinatorial matrix and implement sensible combinations:\n- Analyze ALL command+parameter combinations\n- Identify useful patterns:\n  * delete with path+old_str → delete matching text (like str_replace with empty new_str)\n  * str_replace with empty new_str → delete matching text\n  * view with create_if_missing flag\n- Document which combinations are supported\n- Add tests for new combination behaviors\n- Update schema descriptions for combined usage",
-          "status": "pending",
+          "status": "completed",
           "priority": "low",
           "uuid": "924b61da-8b33-4185-8e5b-e9216aeb0822",
           "created_at": "2025-10-28T14:48:34.344Z",
-          "updated_at": "2025-10-28T14:48:34.344Z"
+          "updated_at": "2025-10-28T18:41:01.756Z"
         }
       ],
       "uuid": "35e5d954-b53d-42b4-a869-66d2c4d4ef8f",
       "created_at": "2025-10-28T14:48:34.344Z",
       "updated_at": "2025-10-28T14:58:58.525Z",
-      "completion_percentage": 75
+      "completion_percentage": 100
     },
     {
       "name": "Optional Professional Touches",
@@ -428,5 +428,5 @@
     }
   ],
   "created_at": "2025-10-28T14:48:34.344Z",
-  "updated_at": "2025-10-28T16:26:48.239Z"
+  "updated_at": "2025-10-28T18:41:37.435Z"
 }

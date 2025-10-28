@@ -30,7 +30,7 @@ export interface ViewCommand {
 
 export interface CreateCommand {
   path: string;
-  file_text: string;
+  file_text?: string;
 }
 
 export interface StrReplaceCommand {
@@ -43,13 +43,15 @@ export interface StrReplaceCommand {
 
 export interface InsertCommand {
   path: string;
-  insert_line: number;
+  insert_line?: number;
   insert_text: string;
 }
 
 export interface DeleteCommand {
   path: string;
   delete_line?: number;
+  old_str?: string;
+  old_string?: string;
 }
 
 export interface RenameCommand {
@@ -257,14 +259,15 @@ export async function create(command: CreateCommand, context: OperationsContext)
       await fs.mkdir(dir, { recursive: true });
     }
 
-    // Write file content
-    await fs.writeFile(fullPath, command.file_text, 'utf-8');
+    // Write file content (default to empty string if not provided)
+    const content = command.file_text ?? '';
+    await fs.writeFile(fullPath, content, 'utf-8');
   });
 
   // Log operation
   await context.logger.debug('create', {
     path: command.path,
-    file_size: command.file_text.length,
+    file_size: (command.file_text ?? '').length,
     duration_ms: Date.now() - startTime,
     success: true,
   });
@@ -295,14 +298,11 @@ export async function str_replace(
   }
 
   const oldStr = command.old_str ?? command.old_string;
-  const newStr = command.new_str ?? command.new_string;
+  const newStr = command.new_str ?? command.new_string ?? '';
 
   // Validate that at least one variant of each parameter is provided
   if (!oldStr) {
     throw new Error('Must provide either old_str or old_string');
-  }
-  if (!newStr) {
-    throw new Error('Must provide either new_str or new_string');
   }
 
   // Validate and convert path
@@ -380,16 +380,25 @@ export async function insert(command: InsertCommand, context: OperationsContext)
 
     // Read file content
     const content = await fs.readFile(fullPath, 'utf-8');
-    const lines = content.split('\n');
+    // Handle empty file: split('') gives [''], but we want []
+    const lines = content === '' ? [] : content.split('\n');
 
-    // Validate insert_line (1-based indexing)
-    if (command.insert_line < 1 || command.insert_line > lines.length + 1) {
-      throw new Error(`Invalid insert_line ${command.insert_line}. Must be 1-${lines.length + 1}`);
+    // Determine insert position
+    let insertLine: number;
+    if (command.insert_line === undefined) {
+      // Append to end - insert after last line
+      insertLine = lines.length + 1;
+    } else {
+      insertLine = command.insert_line;
+      // Validate insert_line (1-based indexing)
+      if (insertLine < 1 || insertLine > lines.length + 1) {
+        throw new Error(`Invalid insert_line ${insertLine}. Must be 1-${lines.length + 1}`);
+      }
     }
 
     // Insert text at specified line (convert from 1-based to 0-based array index)
     // Remove trailing newline from insert_text to avoid double newlines
-    lines.splice(command.insert_line - 1, 0, command.insert_text.replace(/\n$/, ''));
+    lines.splice(insertLine - 1, 0, command.insert_text.replace(/\n$/, ''));
 
     // Write updated content
     await fs.writeFile(fullPath, lines.join('\n'), 'utf-8');
@@ -404,7 +413,11 @@ export async function insert(command: InsertCommand, context: OperationsContext)
     success: true,
   });
 
-  return `Text inserted at line ${command.insert_line} in ${command.path}`;
+  if (command.insert_line === undefined) {
+    return `Text appended to end of ${command.path}`;
+  } else {
+    return `Text inserted at line ${command.insert_line} in ${command.path}`;
+  }
 }
 
 /**
@@ -425,8 +438,23 @@ export async function deleteOp(
     throw new Error('Cannot delete the /memories directory itself');
   }
 
+  // Normalize parameter names for old_str (forgiving naming)
+  const old_str = command.old_str || command.old_string;
+
+  // Validation: Cannot mix position-based and content-based deletion
+  if (command.delete_line !== undefined && old_str !== undefined) {
+    throw new Error(
+      'Cannot use both delete_line and old_str - choose position-based OR content-based deletion'
+    );
+  }
+
   // Validate and convert path
   const fullPath = validatePath(command.path, context.memoryRoot);
+
+  // Handle text-based deletion
+  if (old_str !== undefined) {
+    return await deleteMatchingText(command.path, fullPath, old_str, context, startTime);
+  }
 
   // Handle line-specific deletion
   if (command.delete_line !== undefined) {
@@ -510,6 +538,76 @@ export async function deleteOp(
   return deletedType === 'file'
     ? `File deleted: ${command.path}`
     : `Directory deleted: ${command.path}`;
+}
+
+/**
+ * Helper: Delete all occurrences of matching text from a file
+ * Empty lines resulting from deletion are also removed
+ */
+async function deleteMatchingText(
+  memoryPath: string,
+  fullPath: string,
+  searchText: string,
+  context: OperationsContext,
+  startTime: number,
+): Promise<string> {
+  // Count occurrences for return message
+  let occurrences = 0;
+
+  // Execute with write lock and concurrency check
+  await withWriteLock(fullPath, true, async () => {
+    // Check if file exists
+    if (!(await exists(fullPath))) {
+      throw new Error(`File not found: ${memoryPath}`);
+    }
+
+    // Verify it's a file, not a directory
+    const stat = await fs.stat(fullPath);
+    if (!stat.isFile()) {
+      throw new Error(`Cannot delete text from directory: ${memoryPath}`);
+    }
+
+    // Read file content
+    const content = await fs.readFile(fullPath, 'utf-8');
+
+    // Count occurrences before deletion
+    occurrences = (content.match(new RegExp(escapeRegExp(searchText), 'g')) || []).length;
+
+    if (occurrences === 0) {
+      throw new Error(`Text not found in file: "${searchText}"`);
+    } else if (occurrences > 1) {
+      throw new Error(`Text appears ${occurrences} times in ${memoryPath}. Must be unique.`);
+    }
+
+    // Delete the unique occurrence of the text
+    const afterDeletion = content.replace(searchText, '');
+
+    // Remove empty lines
+    const lines = afterDeletion.split('\n');
+    const nonEmptyLines = lines.filter((line) => line.trim() !== '');
+
+    // Write cleaned content
+    const finalContent = nonEmptyLines.join('\n');
+    await fs.writeFile(fullPath, finalContent, 'utf-8');
+  });
+
+  // Log operation
+  await context.logger.debug('delete_text', {
+    path: memoryPath,
+    searchText,
+    occurrences,
+    duration_ms: Date.now() - startTime,
+    success: true,
+  });
+
+  return `Deleted ${occurrences} occurrence(s) of "${searchText}" from ${memoryPath}`;
+}
+
+/**
+ * Helper: Escape special regex characters for literal string matching
+ */
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**

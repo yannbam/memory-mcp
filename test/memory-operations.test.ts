@@ -340,20 +340,22 @@ describe('Memory Operations', () => {
       ).rejects.toThrow('Must provide either old_str or old_string');
     });
 
-    it('should throw error when neither new_str nor new_string is provided', async () => {
+    it('should delete text when new_str is omitted (defaults to empty)', async () => {
       // Create test file
-      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Some text');
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Keep this old text here');
 
-      // Attempt without new parameter
-      await expect(
-        operations.str_replace(
-          {
-            path: '/memories/test.txt',
-            old_str: 'Some text',
-          },
-          context,
-        ),
-      ).rejects.toThrow('Must provide either new_str or new_string');
+      // Omit new_str - should default to empty string (deletion)
+      const result = await operations.str_replace(
+        {
+          path: '/memories/test.txt',
+          old_str: 'old text ',
+        },
+        context,
+      );
+
+      expect(result).toContain('has been edited');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('Keep this here');
     });
   });
 
@@ -652,6 +654,221 @@ describe('Memory Operations', () => {
           context,
         ),
       ).rejects.toThrow('Destination already exists');
+    });
+  });
+
+  // Parameter combinations tests
+  describe('create with optional file_text', () => {
+    it('should create empty file when file_text omitted', async () => {
+      const result = await operations.create({ path: '/memories/empty.txt' }, context);
+
+      expect(result).toContain('created successfully');
+      const content = await fs.readFile(path.join(memoryRoot, 'empty.txt'), 'utf-8');
+      expect(content).toBe('');
+    });
+
+    it('should create file with content when file_text provided', async () => {
+      const result = await operations.create(
+        { path: '/memories/data.txt', file_text: 'content' },
+        context,
+      );
+
+      expect(result).toContain('created successfully');
+      const content = await fs.readFile(path.join(memoryRoot, 'data.txt'), 'utf-8');
+      expect(content).toBe('content');
+    });
+
+    it('should create empty file when file_text is empty string', async () => {
+      const result = await operations.create(
+        { path: '/memories/empty2.txt', file_text: '' },
+        context,
+      );
+
+      expect(result).toContain('created successfully');
+      const content = await fs.readFile(path.join(memoryRoot, 'empty2.txt'), 'utf-8');
+      expect(content).toBe('');
+    });
+  });
+
+  describe('insert with optional insert_line', () => {
+    it('should append to end when insert_line omitted', async () => {
+      // Create file with content
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'line 1\nline 2\nline 3',
+      );
+
+      const result = await operations.insert(
+        {
+          path: '/memories/test.txt',
+          insert_text: 'appended line',
+        },
+        context,
+      );
+
+      expect(result).toContain('appended to end');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('line 1\nline 2\nline 3\nappended line');
+    });
+
+    it('should insert at specific line when insert_line provided', async () => {
+      // Create file with content
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'line 1\nline 2\nline 3',
+      );
+
+      const result = await operations.insert(
+        {
+          path: '/memories/test.txt',
+          insert_line: 2,
+          insert_text: 'inserted line',
+        },
+        context,
+      );
+
+      expect(result).toContain('inserted at line 2');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('line 1\ninserted line\nline 2\nline 3');
+    });
+
+    it('should append to empty file when insert_line omitted', async () => {
+      // Create empty file
+      await fs.writeFile(path.join(memoryRoot, 'empty.txt'), '');
+
+      const result = await operations.insert(
+        {
+          path: '/memories/empty.txt',
+          insert_text: 'first line',
+        },
+        context,
+      );
+
+      expect(result).toContain('appended to end');
+      const content = await fs.readFile(path.join(memoryRoot, 'empty.txt'), 'utf-8');
+      expect(content).toBe('first line');
+    });
+  });
+
+  describe('delete with old_str (content-based deletion)', () => {
+    it('should delete unique text and remove empty line if created', async () => {
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'debug code\nThis is line 2\nLine 3',
+      );
+
+      const result = await operations.deleteOp(
+        { path: '/memories/test.txt', old_str: 'debug code' },
+        context,
+      );
+
+      expect(result).toContain('1 occurrence(s)');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('This is line 2\nLine 3');
+    });
+
+    it('should delete text from middle of line', async () => {
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'Start debug code end\nNormal line\nLine 3',
+      );
+
+      const result = await operations.deleteOp(
+        { path: '/memories/test.txt', old_str: 'debug code ' },
+        context,
+      );
+
+      expect(result).toContain('1 occurrence(s)');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('Start end\nNormal line\nLine 3');
+    });
+
+    it('should error when text appears multiple times', async () => {
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'debug code\nSome line\ndebug code again',
+      );
+
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', old_str: 'debug code' }, context),
+      ).rejects.toThrow('Text appears 2 times');
+    });
+
+    it('should error when text not found', async () => {
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Some content');
+
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', old_str: 'nonexistent' }, context),
+      ).rejects.toThrow('Text not found');
+    });
+
+    it('should error when using both delete_line and old_str', async () => {
+      await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'Some content');
+
+      await expect(
+        operations.deleteOp(
+          {
+            path: '/memories/test.txt',
+            delete_line: 1,
+            old_str: 'content',
+          },
+          context,
+        ),
+      ).rejects.toThrow('Cannot use both delete_line and old_str');
+    });
+
+    it('should accept old_string as alternative parameter name', async () => {
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'Text to delete\nKeep this',
+      );
+
+      const result = await operations.deleteOp(
+        { path: '/memories/test.txt', old_string: 'Text to delete' },
+        context,
+      );
+
+      expect(result).toContain('1 occurrence(s)');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('Keep this');
+    });
+
+    it('should handle special regex characters in search text', async () => {
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'Price: $100.00 total',
+      );
+
+      const result = await operations.deleteOp(
+        { path: '/memories/test.txt', old_str: '$100.00' },
+        context,
+      );
+
+      expect(result).toContain('1 occurrence(s)');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('Price:  total');
+    });
+  });
+
+  describe('str_replace with empty string deletion', () => {
+    it('should delete text when new_str is empty', async () => {
+      await fs.writeFile(
+        path.join(memoryRoot, 'test.txt'),
+        'Keep this debug code and this',
+      );
+
+      const result = await operations.str_replace(
+        {
+          path: '/memories/test.txt',
+          old_str: 'debug code ',
+          new_str: '',
+        },
+        context,
+      );
+
+      expect(result).toContain('has been edited');
+      const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
+      expect(content).toBe('Keep this and this');
     });
   });
 });

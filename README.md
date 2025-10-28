@@ -184,18 +184,27 @@ await memory({
 Create or overwrite files (creates parent directories as needed).
 
 ```typescript
+// Create file with content
 await memory({
   command: "create",
   path: "/memories/todo.txt",
   file_text: "- Task 1\n- Task 2"
 })
 // → "File created successfully at /memories/todo.txt"
+
+// Create empty file (omit file_text)
+await memory({
+  command: "create",
+  path: "/memories/empty.txt"
+})
+// → "File created successfully at /memories/empty.txt"
 ```
 
 ### str_replace
 Replace unique text in a file (text must appear exactly once).
 
 ```typescript
+// Replace text
 await memory({
   command: "str_replace",
   path: "/memories/notes.txt",
@@ -203,12 +212,24 @@ await memory({
   new_str: "new value"
 })
 // → "File /memories/notes.txt has been edited"
+
+// Delete text by omitting new_str (defaults to empty string)
+await memory({
+  command: "str_replace",
+  path: "/memories/notes.txt",
+  old_str: "debug code"
+  // new_str omitted - deletes the text
+})
+// → "File /memories/notes.txt has been edited"
 ```
 
+**Note**: Both `old_str`/`new_str` and `old_string`/`new_string` parameter names are accepted for flexibility.
+
 ### insert
-Insert text at a specific line number.
+Insert text at a specific line number, or append to end of file.
 
 ```typescript
+// Insert at specific line
 await memory({
   command: "insert",
   path: "/memories/todo.txt",
@@ -216,24 +237,52 @@ await memory({
   insert_text: "- Urgent task"
 })
 // → "Text inserted at line 2 in /memories/todo.txt"
+
+// Append to end (omit insert_line)
+await memory({
+  command: "insert",
+  path: "/memories/todo.txt",
+  insert_text: "- Last task"
+})
+// → "Text appended to end of /memories/todo.txt"
 ```
 
 ### delete
-Delete files or directories (recursive for directories).
+Delete files, directories, specific lines, or unique text occurrences.
 
 ```typescript
+// Delete file
 await memory({
   command: "delete",
   path: "/memories/old-notes.txt"
 })
 // → "File deleted: /memories/old-notes.txt"
 
+// Delete directory
 await memory({
   command: "delete",
   path: "/memories/archive"
 })
 // → "Directory deleted: /memories/archive"
+
+// Delete specific line (1-based)
+await memory({
+  command: "delete",
+  path: "/memories/notes.txt",
+  delete_line: 5
+})
+// → "Line 5 deleted from /memories/notes.txt"
+
+// Delete unique text occurrence
+await memory({
+  command: "delete",
+  path: "/memories/notes.txt",
+  old_str: "debug code"
+})
+// → "Deleted 1 occurrence(s) of "debug code" from /memories/notes.txt"
 ```
+
+**Note**: `old_str` and `old_string` are interchangeable. Text must appear exactly once (unique occurrence).
 
 ### rename
 Rename or move files/directories (creates parent directories as needed).
