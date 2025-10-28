@@ -152,13 +152,6 @@ docs/
 
 **Current development status, session handoffs, and next tasks are tracked in the Memory System.**
 
-See:
-- `.memory/memories/short-term.md` - Current session status, handoff, and next steps
-- `.memory/memories/long-term.md` - Persistent project knowledge and lessons learned
-- PlanAndTrack plans in `.plans/` - Detailed task tracking and progress
-
-Use the `project_memory` MCP tool to view and update these files.
-
 ## CI/CD
 
 GitHub Actions workflow runs on `push` and `pull_request` to `main` and `dev` branches:
