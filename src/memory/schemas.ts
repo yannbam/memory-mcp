@@ -40,7 +40,7 @@ const InsertCommand = z.object({
   command: z.literal('insert'),
   path: z.string().describe('Path to file to modify'),
   // WORKAROUND: Accept both number and string for insert_line
-  // Claude Code's MCP parameter serialization may send numeric params as strings
+  // Claude Code's MCP client incorrectly serializes numeric parameters as strings
   // The command executor normalizes strings to numbers before calling operations
   insert_line: z
     .union([z.number().int(), z.string()])

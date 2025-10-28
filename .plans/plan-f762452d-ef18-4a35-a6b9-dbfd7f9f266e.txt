@@ -1,0 +1,22 @@
+🌳 "phase3-documentation-fixes"
+📝 Phase 3: Documentation quality improvements based on PR review findings. Focus on comment accuracy, terminology precision, and helpful context additions.
+📊 █████████░ 94% (17/18 tasks)
+
+├── ✅ |Fix Critical Comment Issues| "Address 3 comments with factual errors or outdated references" (🚨) (100%)
+│   ├── ✅ |schemas.ts:27-28 - Remove passthrough reference| "Remove obsolete comment about .passthrough() which was removed in Phase 1" (🔴)
+│   ├── ✅ |transports.ts:46 - Fix session management comment| "Correct technical inaccuracy about session ID handling" (🔴)
+│   └── ✅ |mcp-server.ts:115 - Update type safety claim| "Fix misleading comment about type safety after Phase 1 improvements" (🔴)
+├── ✅ |Improve Workaround Documentation| "Add context to workarounds explaining why they exist and when they might be revisited" (🟡) (100%)
+│   ├── ✅ |command-executor.ts:59 - Add version context| "Explain why manual type cast exists (MCP SDK limitation)" (🟡)
+│   └── ✅ |schemas.ts:43-45 - Improve Claude Code compatibility note| "Better explain the UX trade-off for accepting both naming conventions" (🟡)
+├── ✅ |Add Protocol References| "Link to official MCP specification for protocol-level behavior" (🟡) (100%)
+│   └── ✅ |mcp-server.ts:64-69 - Add MCP spec link| "Reference official spec for error handling behavior" (🟡)
+├── ✅ |Fix Terminology| "Replace incorrect 'anyOf' with correct 'oneOf' terminology" (🔵) (100%)
+│   └── ✅ |Find and fix anyOf references| "Search codebase for 'anyOf' and replace with 'oneOf' where appropriate" (🔵)
+├── ✅ |Remove Redundant Comments| "Clean up comments that don't add value or are obvious from code" (🔵) (100%)
+│   └── ✅ |Identify and remove low-value comments| "Review comments marked in action plan and remove if not adding value" (🔵)
+├── ✅ |Verification| "Run all checks to ensure changes are correct" (🚨) (100%)
+│   ├── ✅ |Run tests| "npm test - verify all 155 tests still pass" (🔴)
+│   ├── ✅ |Run linter| "npm run lint - verify 0 errors" (🔴)
+│   └── ✅ |Build check| "npm run build - verify clean compilation" (🔴)
+└── 🔄 |Commit Phase 3 Changes| "Create commit with all documentation fixes" (🔴)

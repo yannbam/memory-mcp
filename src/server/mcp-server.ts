@@ -45,7 +45,7 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
     },
   );
 
-  // Create operations context
+  // Bundle configuration for memory operations (passed to all command handlers)
   const context: OperationsContext = {
     memoryRoot,
     logger,
@@ -61,8 +61,9 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
     $refStrategy: 'none', // Inline the schema to avoid $ref at top level
   });
 
-  // MCP protocol requires type: "object" at top level
-  // Add it to satisfy protocol validation while keeping anyOf structure
+  // MCP protocol requires type: "object" at top level for tool input schemas
+  // See: https://spec.modelcontextprotocol.io/specification/server/tools/
+  // Add it to satisfy protocol validation while keeping oneOf discriminated union
   const memoryToolInputSchema = {
     type: 'object',
     ...baseSchema,
@@ -113,7 +114,7 @@ export function createMemoryServer(memoryRoot: string, logger: Logger, treeView:
       );
     }
 
-    // Execute command with full type safety
+    // Execute command with type-safe dispatch
     try {
       const result = await executeMemoryCommand(args, context);
 

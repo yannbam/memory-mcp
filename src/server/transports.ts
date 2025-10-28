@@ -43,7 +43,7 @@ export async function initHttpTransport(server: Server, port: number): Promise<v
   app.use(
     cors({
       origin: '*', // Allow all origins
-      exposedHeaders: ['Mcp-Session-Id'], // Required for session management
+      exposedHeaders: ['Mcp-Session-Id'], // Exposed for future stateful mode support (currently stateless)
       allowedHeaders: ['Content-Type', 'mcp-session-id'],
     }),
   );

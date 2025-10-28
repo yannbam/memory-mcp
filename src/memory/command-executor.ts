@@ -20,8 +20,6 @@ export async function executeMemoryCommand(
   args: MemoryCommand,
   context: OperationsContext,
 ): Promise<string> {
-  // TypeScript provides exhaustive checking here
-  // Each case has automatic type narrowing
   switch (args.command) {
     case 'view':
       // TypeScript knows: args has { command: 'view', path: string, view_range?: [number, number] }
@@ -64,7 +62,9 @@ export async function executeMemoryCommand(
 
     case 'insert': {
       // TypeScript knows: args has { command: 'insert', path: string, insert_line: number | string, insert_text: string }
-      // Normalize insert_line to number (handles Claude Code serialization issue)
+      // Normalize insert_line to number
+      // Claude Code's MCP client may serialize numeric parameters as strings (as of 2025-01)
+      // Accept both types for compatibility
       const insertLine = typeof args.insert_line === 'string' ? parseInt(args.insert_line, 10) : args.insert_line;
 
       // Validate the conversion

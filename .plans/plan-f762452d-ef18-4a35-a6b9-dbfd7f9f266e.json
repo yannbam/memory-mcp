@@ -1,0 +1,189 @@
+{
+  "uuid": "f762452d-ef18-4a35-a6b9-dbfd7f9f266e",
+  "name": "phase3-documentation-fixes",
+  "details": "Phase 3: Documentation quality improvements based on PR review findings. Focus on comment accuracy, terminology precision, and helpful context additions.",
+  "tasks": [
+    {
+      "name": "Fix Critical Comment Issues",
+      "details": "Address 3 comments with factual errors or outdated references",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "schemas.ts:27-28 - Remove passthrough reference",
+          "details": "Remove obsolete comment about .passthrough() which was removed in Phase 1",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "bbceee70-701b-4dfb-90d3-73e59e6b0834",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:05:31.606Z"
+        },
+        {
+          "name": "transports.ts:46 - Fix session management comment",
+          "details": "Correct technical inaccuracy about session ID handling",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "6624b40f-f337-4d05-8cf0-2efdc94e3a40",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:05:44.305Z"
+        },
+        {
+          "name": "mcp-server.ts:115 - Update type safety claim",
+          "details": "Fix misleading comment about type safety after Phase 1 improvements",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "41603809-76d8-4a0a-bacb-afecf24f68ac",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:05:55.258Z"
+        }
+      ],
+      "uuid": "8bec02bb-8ba8-4a7b-adca-15043839acd5",
+      "created_at": "2025-10-28T02:04:33.964Z",
+      "updated_at": "2025-10-28T02:04:33.964Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Improve Workaround Documentation",
+      "details": "Add context to workarounds explaining why they exist and when they might be revisited",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "command-executor.ts:59 - Add version context",
+          "details": "Explain why manual type cast exists (MCP SDK limitation)",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "75459aaf-005f-43e7-b438-ee952f54f73e",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:06:18.805Z"
+        },
+        {
+          "name": "schemas.ts:43-45 - Improve Claude Code compatibility note",
+          "details": "Better explain the UX trade-off for accepting both naming conventions",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "f1669e94-de20-421c-b1e5-e6702a7ef26a",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:06:34.506Z"
+        }
+      ],
+      "uuid": "d2502592-f3b8-4e97-9668-b10cc2a0550d",
+      "created_at": "2025-10-28T02:04:33.964Z",
+      "updated_at": "2025-10-28T02:04:33.964Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Add Protocol References",
+      "details": "Link to official MCP specification for protocol-level behavior",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "mcp-server.ts:64-69 - Add MCP spec link",
+          "details": "Reference official spec for error handling behavior",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "a94c6568-0476-4f6f-8415-4adcf37d7225",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:06:53.348Z"
+        }
+      ],
+      "uuid": "3cadf4e3-00e9-4569-897a-cd294b7f6272",
+      "created_at": "2025-10-28T02:04:33.964Z",
+      "updated_at": "2025-10-28T02:04:33.964Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Fix Terminology",
+      "details": "Replace incorrect 'anyOf' with correct 'oneOf' terminology",
+      "status": "completed",
+      "priority": "low",
+      "sub_tasks": [
+        {
+          "name": "Find and fix anyOf references",
+          "details": "Search codebase for 'anyOf' and replace with 'oneOf' where appropriate",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "6c6703e6-f8ec-4ce1-980d-b98eca71da49",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:07:12.148Z"
+        }
+      ],
+      "uuid": "f1af2afc-0f02-4257-a8ec-c07e472c2d4b",
+      "created_at": "2025-10-28T02:04:33.964Z",
+      "updated_at": "2025-10-28T02:04:33.964Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Remove Redundant Comments",
+      "details": "Clean up comments that don't add value or are obvious from code",
+      "status": "completed",
+      "priority": "low",
+      "sub_tasks": [
+        {
+          "name": "Identify and remove low-value comments",
+          "details": "Review comments marked in action plan and remove if not adding value",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "51294848-f310-43e2-a260-ea88b9b94209",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:07:48.131Z"
+        }
+      ],
+      "uuid": "f9283d0b-58ac-4c5f-b9a3-1eb7bc7c80d8",
+      "created_at": "2025-10-28T02:04:33.964Z",
+      "updated_at": "2025-10-28T02:04:33.964Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Verification",
+      "details": "Run all checks to ensure changes are correct",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run tests",
+          "details": "npm test - verify all 155 tests still pass",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "226e3446-342f-4557-ad21-f23e8b22462d",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:08:06.375Z"
+        },
+        {
+          "name": "Run linter",
+          "details": "npm run lint - verify 0 errors",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "cc372c28-18e5-427e-8198-4323ce871c90",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:08:17.927Z"
+        },
+        {
+          "name": "Build check",
+          "details": "npm run build - verify clean compilation",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "6ba3a769-450a-44b9-b652-5f5b09e518b9",
+          "created_at": "2025-10-28T02:04:33.964Z",
+          "updated_at": "2025-10-28T02:08:27.666Z"
+        }
+      ],
+      "uuid": "177c7c26-d643-413c-a1c6-657ec8b05644",
+      "created_at": "2025-10-28T02:04:33.964Z",
+      "updated_at": "2025-10-28T02:04:33.964Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Commit Phase 3 Changes",
+      "details": "Create commit with all documentation fixes",
+      "status": "in_progress",
+      "priority": "high",
+      "uuid": "5a01b5a3-2bdb-467f-b11b-e2e7b6afce99",
+      "created_at": "2025-10-28T02:04:33.964Z",
+      "updated_at": "2025-10-28T02:08:27.938Z"
+    }
+  ],
+  "created_at": "2025-10-28T02:04:33.964Z",
+  "updated_at": "2025-10-28T02:08:27.938Z"
+}
