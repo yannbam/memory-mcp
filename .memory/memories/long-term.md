@@ -2,6 +2,26 @@
 
 ## Architecture & Design
 _How the system actually works vs how it was intended to work_
+## Concurrency & Multi-Instance Behavior
+_How the system handles multiple Claude instances accessing same memory files_
+
+[🏗️🔒💡] Hybrid concurrency strategy combining true reader-writer locks (@esfx/async-readerwriterlock) with optimistic concurrency control (mtime-based)
+Implementation: src/memory/locking.ts (LockManager class L43-216, withReadLock L291-308, withWriteLock L322-361)
+Architecture documented in docs/ARCHITECTURE.md L60-81 and docs/LOCKING-REDESIGN.md (complete redesign spec)
+[⚡🎯] Read-read concurrency: Multiple readers on same file execute simultaneously with ZERO blocking (shared read locks) - ~38x speedup tested with 50 concurrent clients
+Read-write conflict: Reader completes first, writer waits for exclusive lock
+Write-write race: First writer succeeds, second fails with mtime mismatch error prompting re-read and retry
+[🔒💡] Lock granularity: One RW lock per unique file path (reference counted, auto-cleanup at zero refs)
+Non-existent files: Lock parent directory instead (prevents creation races)
+Multi-path operations (rename): Deadlock-free via sorted path order acquisition
+[⚠️🤯] Optimistic concurrency control pattern: (1) Capture mtime BEFORE lock, (2) Acquire lock, (3) Check mtime AFTER lock, (4) Throw if changed
+Error message: "File has been modified by another process. Please read the file again and retry your operation."
+Ensures Claude detects concurrent modifications and retries with fresh data - no silent corruption
+[⚠️💀] Current limitation: Locks are in-memory only (not cross-process filesystem locks)
+Works perfectly for multiple Claude instances connecting to SAME memory-mcp server process
+Does NOT coordinate between multiple independent memory-mcp server processes (different lock pools)
+This is intentional - MCP servers designed for single-process multi-client usage
+
 
 [⚠️🔒💡] **INTENTIONAL SPEC DEVIATION**: create command fails if file exists (Session d53d3ec2, Oct 30 2025)
 Anthropic spec says "Create or overwrite" but this implementation enforces create-only semantics for safety
@@ -74,6 +94,8 @@ Different MCP client implementations may handle schemas/parameters differently
 Empty file view returns "Memory file is empty.", empty directory returns "Directory is empty." (both tree and simple modes), empty file creation returns "Created empty memory file."
 Implementation: operations.ts (viewFile L194-197, viewDirectory L183-186, create L286-288) + tree-view.ts (renderDirectoryTree L273-276)
 Tested: 117 unit tests + MCP-Debug integration (all pass)
+[⚠️💀🧪] NO CONCURRENT OPERATION TESTS - Critical gap: Zero test coverage for multi-instance scenarios (concurrent reads, read/write conflicts, write/write races, rename deadlock prevention) - all tests are single-threaded
+Integration testing scenarios documented in LOCKING-REDESIGN.md but not implemented yet
 
 
 ## Deferred Work
