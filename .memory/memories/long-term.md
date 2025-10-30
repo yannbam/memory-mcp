@@ -21,6 +21,18 @@ Ensures Claude detects concurrent modifications and retries with fresh data - no
 Works perfectly for multiple Claude instances connecting to SAME memory-mcp server process
 Does NOT coordinate between multiple independent memory-mcp server processes (different lock pools)
 This is intentional - MCP servers designed for single-process multi-client usage
+[💀🔧⚠️] CRITICAL LIMITATION OF MTIME (Session 76621b6d, Oct 30 2025): Mtime only detects CONCURRENT modifications (during lock wait window), NOT SEQUENTIAL modifications (between separate operations)
+Scenario: Claude reads file at T0, another process modifies at T1, Claude writes at T2 → NO ERROR (mtime captured at T2, compares with T2)
+Result: Confusing "text not found" errors instead of clear "file modified" notification
+Solution: Checksum-based detection (Session 76621b6d) - cache content checksums, compare before writes
+[🚀💡] Checksum-based concurrency detection (Session 76621b6d, Oct 30 2025): DESIGNED, implementation pending
+Replace mtime with SHA-256 content checksums cached in-memory per process
+Detection window: From LAST operation (any time in past) to CURRENT operation (not just lock-wait window)
+Works across stdio server processes: each caches what IT saw, compares with current disk state
+Two-layer: (1) Cache vs disk (sequential detection), (2) Pre-lock vs post-lock (concurrent detection)
+Performance: ~0.4ms overhead for 10KB files (negligible for human-readable memory files)
+Design: docs/CHECKSUM-CONCURRENCY-DESIGN.md | Plan: checksum-concurrency-implementation
+Branch: feature/checksum-concurrency-detection
 
 
 [⚠️🔒💡] **INTENTIONAL SPEC DEVIATION**: create command fails if file exists (Session d53d3ec2, Oct 30 2025)

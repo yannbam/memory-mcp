@@ -3,85 +3,104 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: e0d8aaf1-7893-4efc-a7aa-582a7daa9234
-Branch: dev
-Context: ~95k tokens (clean handoff point)
-Working on: COMPLETED - Empty content UX messaging improvements (all tests pass!)
+Session: 76621b6d-1a88-426b-972b-1a9363d47d53
+Branch: feature/checksum-concurrency-detection
+Context: ~99k tokens (clean handoff point for implementation)
+Working on: Checksum-based concurrency detection - Design & Planning Phase COMPLETE
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
 ### This Session Accomplished
-✅ **EMPTY CONTENT UX MESSAGING - COMPLETE!**
-  - Implemented friendly messages for 3 empty content scenarios
-  - Empty file view: "Memory file is empty." (instead of "1: ")
-  - Empty directory view: "Directory is empty." (both simple and tree modes)
-  - Empty file creation: "Created empty memory file." (when file_text omitted)
+✅ **CHECKSUM-BASED CONCURRENCY DETECTION - DESIGN & PLANNING COMPLETE!**
+  - Analyzed current mtime-based concurrency detection system
+  - Identified critical limitation: only detects concurrent modifications (during lock wait), NOT sequential modifications (between separate operations)
+  - Designed checksum-based solution that works across separate stdio MCP server processes
+  - Created comprehensive design document: docs/CHECKSUM-CONCURRENCY-DESIGN.md
+  - Created detailed implementation plan: checksum-concurrency-implementation (32 tasks across 5 phases)
 
-✅ **Implementation**:
-  - Modified 2 source files: operations.ts, tree-view.ts
-  - Added 4 new unit tests + updated 2 existing tests
-  - All 117 tests passing (was 114 before)
-  - Updated README examples and test count
-  - Documented in CHANGELOG
+✅ **Branch Created**: feature/checksum-concurrency-detection
+  - Branched from dev (clean state, all 117 tests passing)
+  - Ready for implementation work
 
-✅ **Code locations**:
-  - src/memory/operations.ts: viewFile (L190-236), viewDirectory (L153-185), create (L245-289)
-  - src/memory/tree-view.ts: renderDirectoryTree (L269-289)
-  - test/memory-operations.test.ts: 5 tests updated/added
-  - test/tree-view.test.ts: 1 test added
+✅ **Key Design Decisions**:
+  - Use SHA-256 content checksums instead of mtime
+  - In-memory cache per MCP server process (Map<path, checksum>)
+  - Two-layer detection: (1) cache vs current file (sequential), (2) pre-lock vs post-lock (concurrent)
+  - Cache checksums after all read/write operations
+  - Clear cache on delete/rename
+  - Show current file contents in error messages (with truncation at 5000 chars)
+  - Performance: ~0.4ms overhead for 10KB files (negligible)
 
-✅ **Commit**: fce4cbf - "feat: add friendly UX messages for empty content"
+✅ **What This Solves**:
+  Real-world scenario: Claude session A reads file, session B modifies it minutes later, session A tries to write based on stale data
+  Current: Confusing "text not found" error
+  After: Clear "File has been modified by another process" error with current contents shown
 
 ### What Next Session Should Do
 
-**✅ COMPLETED - Empty Content UX Messaging!**
-All 3 empty content scenarios now have friendly messages.
-117 tests passing. Fully documented and committed (fce4cbf).
+**IMMEDIATE: Begin Implementation Phase**
+Follow the checksum-concurrency-implementation plan:
 
-**Next Steps - Pre-Release Verification**:
-From public-release-beta-v2 plan (70% complete):
-1. **Pre-Release Verification** (0/4 tasks - all pending):
-   - Run full test suite (verify 117/117 pass)
-   - Test clean build (rm -rf, npm install, npm run build)
-   - Security audit (npm audit, review dependencies)
-   - Test memory system integration (reconnect MCP, test all commands)
+1. **Implementation** (9 tasks - all pending):
+   - Create src/memory/checksums.ts with all utility functions
+   - Modify src/memory/locking.ts to use checksums (replace mtime code)
+   - Update all 6 operations in src/memory/operations.ts to cache checksums
+   - Start with: Checksum Utilities Module (highest priority)
 
-2. **Comprehensive Code Review** (0/4 tasks - all pending):
-   - Run code-reviewer agent
-   - Run type-design-analyzer agent
-   - Run comment-analyzer agent
-   - Manual review checklist
+2. **Unit Testing** (5 tasks):
+   - Create test/checksum-utilities.test.ts
+   - Update test/locking.test.ts (remove mtime, add checksum tests)
+   - Update test/memory-operations.test.ts (verify caching)
+   - Edge case tests
+   - Verify all 117+ tests pass
 
-3. **Optional Professional Touches** (0/2 tasks - optional):
-   - Create CONTRIBUTING.md
-   - Add GitHub templates (.github/)
+3. **Integration Testing** (4 tasks):
+   - Multi-process concurrent access test
+   - Manual testing with two Claude Code sessions
+   - Performance verification
+   - Error message UX review
 
-After all checks: Public beta release! 🚀
+4. **Documentation** (4 tasks):
+   - Update ARCHITECTURE.md (technical details)
+   - Update README.md (user-facing implications only)
+   - Update CHANGELOG.md
+   - Add code comments (e/code protocol)
+
+5. **Review & Validation** (5 tasks):
+   - Code review checklist
+   - Test coverage verification (≥80%)
+   - Security review
+   - Update memory & handoff
+   - Final commit & PR preparation
+
+**View Plan**: `mcp__PlanAndTrack__ViewPlan checksum-concurrency-implementation`
+
+**Design Doc**: Read docs/CHECKSUM-CONCURRENCY-DESIGN.md for complete technical specification
 
 ### Current Blockers
-None
+None - Design complete, ready for implementation
 
 ## Active Plans
 _Current PlanAndTrack references_
 
-Plan: public-release-beta-v2 (80% complete - 35/44 tasks)
-Next steps: Pre-Release Verification and Code Review
-- Feature Implementation: 100% complete ✅ (4 of 4 features DONE)
-  ✅ insert_line fix
-  ✅ forgiving parameter naming
-  ✅ delete_line parameter
-  ✅ parameter combinations
-- Pre-Release Verification: 0% (4 checks remaining)
-- Comprehensive Code Review: 0% (4 reviews remaining)
-- Optional Professional Touches: 0% (2 docs - optional)
+**ACTIVE**: checksum-concurrency-implementation (0% - 0/32 tasks)
+Branch: feature/checksum-concurrency-detection
+Design: docs/CHECKSUM-CONCURRENCY-DESIGN.md
+Next: Start Implementation phase → Create src/memory/checksums.ts
+
+**ON HOLD**: public-release-beta-v2 (80% complete - 35/44 tasks)
+Paused for checksum feature development
+Will resume after checksum implementation merged to dev
 
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-[✅🎨💯] Empty content UX messaging COMPLETE - 3 features, 117 tests pass (commits fce4cbf, 61dae27)
-[📝] Updated README examples and test count (85→117), documented in CHANGELOG
-[💾] Plan archived: empty-content-ux-messages (8/8 tasks completed)
-[🧪] MCP-Debug testing: All 7 tests pass (empty dir, empty file view/create, subdirectory)
-[📖] Added parameter combinations quick reference to README + operations.ts (commit f3119a9)
-[🚀] Ready for: Pre-Release Verification (4 checks) → Code Review (4 agents) → Beta Release
+[🚀💡🎯] Checksum concurrency feature designed - replaces mtime with SHA-256 content hashing for cross-operation detection
+[📋✅] Implementation plan created: 32 tasks across 5 phases (Implementation, Unit Testing, Integration, Docs, Review)
+[🌿] New branch: feature/checksum-concurrency-detection (from dev, clean state)
+[📖] Design doc: docs/CHECKSUM-CONCURRENCY-DESIGN.md (comprehensive technical spec)
+[⚡💯] Performance impact: ~0.4ms overhead for 10KB files (SHA-256 ~500MB/s throughput)
+[🔍💡] Key insight: Each stdio server has own cache but all check same disk state → detects cross-process modifications
+[🎯] Solves real problem: Sequential modifications (read → external modify → write) now detected with clear error + current contents
+[📝] Memory updated with complete handoff: what's done, what's next, how to proceed
