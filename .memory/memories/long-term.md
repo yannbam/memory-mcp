@@ -29,7 +29,7 @@ Solution: SHA-256 content checksum caching - detects ALL modifications since las
 Implementation: src/memory/checksums.ts (6 functions), modified locking.ts (two-layer detection), operations.ts (cache after ops)
 Two-layer: (1) Cache vs disk (sequential), (2) Pre-lock vs post-lock (concurrent), both use SHA-256 checksum comparison
 Cross-process detection: Each stdio server has own in-memory cache, all compare against shared disk state
-Error messages: Show current file contents (5000-char truncation), clear explanation, actionable guidance
+Error messages: Show current file contents (full, no truncation as of Session 84de9e4e), clear explanation, actionable guidance
 Performance: ~0.4ms overhead for 10KB files (tested: 162 tests pass in 3.5s, 93.4% coverage)
 Testing: +45 new tests (18 checksum utils, 15 locking, 9 operations, 3 integration), all passing
 Commit: 1322798 on feature/checksum-concurrency-detection branch, ready to merge to dev
@@ -93,6 +93,14 @@ Resulted in 4 approved features: create empty file, insert append, delete matchi
 Critical for handling text containing $, ., *, +, ?, etc.
 [✅🎯] Optional parameter defaults in Zod: `.default('')` for create file_text, `.optional()` for insert insert_line
 Handler uses nullish coalescing: `const content = command.file_text ?? ''`
+
+[🎨✅💡] Shared formatting module pattern (Session 84de9e4e, Oct 30 2025)
+Problem: Both operations.ts (view command) and locking.ts (error messages) needed same line-numbering logic
+Solution: Created src/memory/formatting.ts with formatFileContent() function
+Avoids circular dependency: operations.ts imports locking.ts, so locking.ts can't import operations.ts
+Both modules import from neutral third module (formatting.ts)
+Benefits: DRY principle, consistent UX, single source of truth for formatting changes
+Implementation: formatFileContent(content, viewRange?) handles line numbering with 4-space padding
 
 
 ## Testing & Debugging

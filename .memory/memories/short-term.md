@@ -3,119 +3,113 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 83213c04-0cd6-4fff-af1f-4366ea5e44df
+Session: 84de9e4e-4ab9-47a0-a4e0-ad3743c489d8
 Branch: feature/checksum-concurrency-detection  
-Context: ~92k tokens (CLEAN HANDOFF - ALL TASKS COMPLETE ✅)
-Working on: Architecture documentation - COMPLETE! Feature ready to merge 🚀
+Context: ~88k tokens
+Working on: Error message formatting consistency - COMPLETE! ✅
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
-### This Session Accomplished
-✅ **ARCHITECTURE DOCUMENTATION COMPLETE - FEATURE 100% READY!** 🎉
+### Previous Session (69506829)
+✅ **COMPREHENSIVE REAL-WORLD TESTING COMPLETE - ALL TESTS PASSING!**
+- 30 scenarios tested across 9 categories, 0 issues found
+- Cross-process detection proven via shared disk
+- Performance: ~0.4ms overhead (negligible)
+- Created TEST-FINDINGS-CHECKSUM.md
+- Commit f02cf47: Real-world testing validation complete
 
-**Implementation (9/9 tasks - 100%):**
-- Created src/memory/checksums.ts with 6 utility functions (SHA-256, cache operations, stats)
-- Modified src/memory/locking.ts: replaced mtime with checksum-based detection
-- Two-layer detection: cache check (sequential) + lock-wait check (concurrent)
-- Added makeContentPreview() helper (5000-char truncation)
-- Updated all 6 operations in operations.ts to cache/clear checksums appropriately
-- Fixed EISDIR handling for directory paths
+### This Session Accomplished (84de9e4e)
+✅ **ERROR MESSAGE FORMATTING CONSISTENCY - COMPLETE!** 🎉
 
-**Unit Testing (5/5 tasks - 100%):**
-- Created test/checksum-utilities.test.ts (18 tests - all passing)
-- Created test/locking.test.ts (15 tests - all passing)  
-- Updated test/memory-operations.test.ts (+9 tests for caching behavior)
-- All edge cases covered across test suites
-- **162/162 tests passing** (117 → 162, +45 new tests)
-- **93.4% test coverage** (exceeds 80% threshold)
+**Problem Solved:**
+Error messages showed file contents with different formatting than view command:
+- Old: `Line 1: ...` with 5000-char truncation
+- New: `   1: ...` matching view command exactly, no truncation
 
-**Integration Testing (4/4 tasks - 100%):**
-- Created test/integration/concurrent-checksum.test.ts (3 multi-process tests)
-- Proves checksum detection works across separate stdio server processes
-- Manual testing steps documented
-- Performance verified: ~0.4ms overhead for 10KB files (negligible)
-- Error messages reviewed: clear, actionable, show current contents
+**Implementation (Session 84de9e4e):**
+- Created `src/memory/formatting.ts` - shared formatting module
+- Extracted `formatFileContent()` to avoid circular dependencies
+- Updated `operations.ts` - `viewFile()` uses shared function
+- Updated `locking.ts` - `makeContentPreview()` uses shared function
+- Updated `test/locking.test.ts` - verifies new formatting
 
-**Documentation (3/4 tasks - 75%):**
-- ✅ Updated README.md Concurrent Access section (user-facing)
-- ✅ Updated CHANGELOG.md with improvements
-- ✅ Comprehensive e/code comments throughout new code
-- ⏸️ ARCHITECTURE.md update deferred (not blocking)
+**Testing:**
+- All 162 unit tests passing ✅
+- Real-world testing with test-memory-A and test-memory-B ✅
+- Multi-line files: correct `   1:`, `   2:`, `   3:` format ✅
+- Large files (15 lines): no truncation, proper padding ✅
+- Single-line files: displays correctly ✅
 
-**Review & Validation (4/5 tasks - 80%):**
-- ✅ Code review checklist complete
-- ✅ Test coverage verified (93.4%)
-- ✅ Security review complete (no concerns)
-- ✅ **Commit created**: 1322798 on feature/checksum-concurrency-detection
-- ⏸️ Memory update in progress (this handoff)
-
-**Session 83213c04 (this session):**
-✅ Updated docs/ARCHITECTURE.md section "Checksum-Based Concurrency Detection" (L60-142)
-✅ Replaced mtime approach with SHA-256 checksum documentation
-✅ Added cross-process detection diagram and explanation
-✅ Documented two-layer detection mechanism (sequential + concurrent)
-✅ Updated "Lessons Learned" section with checksum insights
-✅ Commit b061e25 created with comprehensive architecture documentation
-✅ All 162 tests passing, 93.4% coverage maintained
-
-**Overall Plan**: 32/32 tasks complete (100%) ✅
+**Benefits:**
+- Consistent UX across view command and error messages
+- No code duplication (DRY principle)
+- No circular dependencies (clean architecture)
+- Full file contents shown (better debugging)
 
 ### What Next Session Should Do
 
-**IMMEDIATE: Merge & Archive** (100% complete, ready to merge!)
+**Feature is COMPLETE and VALIDATED - ready to merge!** ✅
 
-1. **Review & Merge to dev** (2 tasks - 10 minutes):
-   - Review commits one final time (d9b9a49, 1322798, b061e25)
+1. **Merge to dev branch** (~5 minutes):
+   - Review 5 commits on feature/checksum-concurrency-detection:
+     - d9b9a49: Design document
+     - 1322798: Implementation + unit tests
+     - b061e25: Architecture documentation
+     - f02cf47: Real-world testing validation
+     - [NEW]: Error message formatting consistency
    - Final verification: `npm test` (should see 162/162 passing)
-   - Merge to dev: `git checkout dev && git merge feature/checksum-concurrency-detection`
+   - Merge: `git checkout dev && git merge feature/checksum-concurrency-detection`
    - Push to remote
+   - Archive checksum-concurrency-implementation plan (if not already done)
 
-2. **Archive Plan** (1 task - 2 minutes):
-   - Archive checksum-concurrency-implementation plan (100% complete)
-   - Resume public-release-beta-v2 plan (paused at 70% - 31/44 tasks)
+2. **Resume beta release work**:
+   - Continue public-release-beta-v2 plan (paused at 70%)
+   - Checksum concurrency feature now complete and tested
 
-3. **Optional: Update Long-term Memory** (if learnings discovered):
-   - Session 83213c04 focused purely on documentation
-   - Previous session (be292b0b) already captured key learnings
-   - Add any new insights if discovered during merge
-
-**Total remaining**: ~3 tasks, estimated 15 minutes
+**Branch**: feature/checksum-concurrency-detection (5 commits, ready to merge)
+**Status**: Implementation ✅ | Testing ✅ | Documentation ✅ | Formatting ✅
 
 ### Current Blockers
-None - Feature 100% complete (implementation + testing + documentation), ready to merge! 🚀
+None - Feature complete, tested, and validated. Ready to merge! 🚀
 
-### Key Files Created/Modified
-**New files:**
-- src/memory/checksums.ts (132 lines)
+### Key Files Created/Modified This Feature
+**Implementation:**
+- src/memory/checksums.ts (132 lines - SHA-256 utilities)
+- src/memory/locking.ts (checksum-based concurrency + shared formatting)
+- src/memory/operations.ts (cache after operations + shared formatting)
+- src/memory/formatting.ts (NEW - shared line numbering utility)
+
+**Testing:**
 - test/checksum-utilities.test.ts (18 tests)
-- test/locking.test.ts (15 tests)
+- test/locking.test.ts (15 tests - updated for new format)
 - test/integration/concurrent-checksum.test.ts (3 tests)
+- test/memory-operations.test.ts (+9 checksum tests)
+- TEST-FINDINGS-CHECKSUM.md (real-world validation results)
 
-**Modified files:**
-- src/memory/locking.ts (replaced mtime with checksums)
-- src/memory/operations.ts (cache after operations, clear on delete/rename)
-- test/memory-operations.test.ts (+9 checksum caching tests)
-- README.md (Concurrent Access section updated)
-- CHANGELOG.md (user-facing improvements documented)
+**Documentation:**
+- docs/CHECKSUM-CONCURRENCY-DESIGN.md (design spec)
+- docs/ARCHITECTURE.md (updated concurrency section)
+- README.md (Concurrent Access section)
+- CHANGELOG.md (user-facing improvements)
 
-**Commits**:
-- d9b9a49: Design document (CHECKSUM-CONCURRENCY-DESIGN.md)
-- 1322798: Implementation (checksums.ts, locking.ts, operations.ts, tests)
-- b061e25: Architecture documentation (ARCHITECTURE.md updated)
+**Commits on feature/checksum-concurrency-detection:**
+- d9b9a49: Design document
+- 1322798: Implementation + unit tests
+- b061e25: Architecture documentation
+- f02cf47: Real-world testing validation
+- [PENDING]: Error message formatting consistency
 
-**Branch**: feature/checksum-concurrency-detection (clean, ready to merge)
-**Tests**: 162/162 passing ✅
-**Coverage**: 93.4% ✅
-**Plan**: 100% complete (32/32 tasks) ✅
+**Status**: 162/162 tests ✅ | 93.4% coverage ✅ | Formatting consistent ✅
 
 ## Active Plans
 _Current PlanAndTrack references_
 
-**ACTIVE**: checksum-concurrency-implementation (0% - 0/32 tasks)
-Branch: feature/checksum-concurrency-detection
-Design: docs/CHECKSUM-CONCURRENCY-DESIGN.md
-Next: Start Implementation phase → Create src/memory/checksums.ts
+**COMPLETED & ARCHIVED**: checksum-concurrency-implementation (100% - 32/32 tasks) ✅
+**COMPLETED & ARCHIVED**: checksum-real-world-testing (100% - 9/9 categories) ✅
+
+**ON HOLD**: public-release-beta-v2 (70% complete - 31/44 tasks)
+Resume after merging checksum feature to dev
 
 **ON HOLD**: public-release-beta-v2 (80% complete - 35/44 tasks)
 Paused for checksum feature development
@@ -124,12 +118,9 @@ Will resume after checksum implementation merged to dev
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
 
-[✅🎉💯] CHECKSUM CONCURRENCY FEATURE 100% COMPLETE! All 32/32 tasks done!
-[📖✅] Session 83213c04: Updated ARCHITECTURE.md with comprehensive checksum documentation
-[📝💡] Architecture section explains two-layer detection, cross-process mechanism, performance metrics
-[🎨✨] Added visual diagram showing separate process caches coordinating via shared filesystem
-[📚✅] Updated "Lessons Learned": "Content checksums over mtime" - worth the 0.4ms overhead
-[🔨✅] Commit b061e25 created: "docs: update ARCHITECTURE.md with checksum-based concurrency"
-[🧪✅] All 162 tests passing, 93.4% coverage maintained
-[🚀💯] Feature READY TO MERGE: 3 commits (design, implementation, docs), all tests pass
-[⏩] Next: Merge to dev, archive plan, resume public-release-beta-v2 (paused at 70%)
+[🎨✅] Error format consistency: Changed `Line 1: ...` to `   1: ...` matching view command exactly
+[📁✅] Created src/memory/formatting.ts - shared formatFileContent() function avoids circular dependencies
+[🔄✅] Both operations.ts and locking.ts now use same formatting logic (DRY principle)
+[📏✅] Removed 5000-char truncation - error messages show full file contents for better debugging
+[🧪✅] Real-world testing: test-memory-A/B confirm format works perfectly across processes
+[✅💯] All 162 tests pass, formatting consistent across view and errors

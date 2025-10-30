@@ -128,17 +128,17 @@ describe('Locking and Concurrency Detection', () => {
       }
     });
 
-    it('should truncate large file contents in error message', async () => {
-      // Create file with large content
-      const filePath = path.join(testRoot, 'large.txt');
-      const largeContent = 'x'.repeat(10000); // 10KB
+    it('should show full file contents with line numbers in error message', async () => {
+      // Create file with multiple lines
+      const filePath = path.join(testRoot, 'multiline.txt');
+      const originalContent = 'line 1\nline 2\nline 3';
 
-      await fs.writeFile(filePath, largeContent, 'utf-8');
-      setCachedChecksum(filePath, computeChecksum(largeContent));
+      await fs.writeFile(filePath, originalContent, 'utf-8');
+      setCachedChecksum(filePath, computeChecksum(originalContent));
 
-      // Modify to different large content
-      const newLargeContent = 'y'.repeat(10000);
-      await fs.writeFile(filePath, newLargeContent, 'utf-8');
+      // Modify content
+      const newContent = 'modified 1\nmodified 2\nmodified 3';
+      await fs.writeFile(filePath, newContent, 'utf-8');
 
       // Try to write
       try {
@@ -148,11 +148,12 @@ describe('Locking and Concurrency Detection', () => {
         fail('Should have thrown concurrency error');
       } catch (err) {
         const error = err as Error;
-        // Should contain truncation indicator
-        expect(error.message).toContain('truncated');
-        expect(error.message).toContain('10000 bytes total');
-        // Should not contain the full 10KB
-        expect(error.message.length).toBeLessThan(7000); // ~5000 chars + overhead
+        // Should use view command format (line numbers with padding)
+        expect(error.message).toContain('   1: modified 1');
+        expect(error.message).toContain('   2: modified 2');
+        expect(error.message).toContain('   3: modified 3');
+        // Should show current contents
+        expect(error.message).toContain('Current contents of');
       }
     });
 

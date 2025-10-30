@@ -20,6 +20,7 @@ import {
   computeChecksum,
   getCachedChecksum,
 } from './checksums.js';
+import { formatFileContent } from './formatting.js';
 
 /**
  * Lock release function
@@ -229,26 +230,19 @@ async function determinePathToLock(filePath: string): Promise<string> {
 
 /**
  * Helper: Create content preview for error messages
- * Truncates large files with indicator to avoid overwhelming terminal
+ * Uses same formatting as view command for consistency
  *
  * @param content - File content as string
  * @param filePath - File path for display
- * @returns Formatted preview with truncation if needed
+ * @returns Formatted preview with line numbers
  */
 function makeContentPreview(content: string, filePath: string): string {
-  const maxLength = 5000;
-
   // Build preview header
   let preview = `Current contents of ${filePath}:\n`;
   preview += '━'.repeat(60) + '\n';
 
-  // Add content (truncate if needed)
-  if (content.length <= maxLength) {
-    preview += content;
-  } else {
-    preview += content.slice(0, maxLength);
-    preview += '\n\n[... truncated, file is ' + content.length + ' bytes total]';
-  }
+  // Use shared formatting function (same as view command)
+  preview += formatFileContent(content);
 
   // Add footer
   preview += '\n' + '━'.repeat(60);
