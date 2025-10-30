@@ -327,27 +327,34 @@ await memory({
 
 ## Concurrent Access
 
-The server supports **multiple Claude instances** accessing the same memory files simultaneously through a high-performance reader-writer lock system:
+The server supports **multiple Claude instances** accessing the same memory files simultaneously with robust concurrency detection:
 
 - **True RW Locks**: Powered by `@esfx/async-readerwriterlock`
 - **Concurrent Reads**: Multiple readers can access the same file simultaneously (no blocking)
 - **Exclusive Writes**: Writers get exclusive access, blocking both readers and other writers
 - **Atomic Multi-Path Locking**: Deadlock-safe locking for operations like rename (source + destination)
-- **Optimistic Concurrency**: Additional mtime-based change detection for extra safety
+- **Content-Based Modification Detection**: SHA-256 checksums detect file changes across sequential operations
 
 **Performance**: ~38x speedup for read-heavy workloads (tested with 50 concurrent clients)
 
+**Modification Detection**:
+- **Sequential Detection**: Detects when file modified between separate operations (read → external change → write)
+- **Concurrent Detection**: Detects when file modified during lock acquisition
+- **Clear Error Messages**: Shows current file contents when modification detected
+- **Works Across Sessions**: Each stdio server has its own cache, all verify against disk state
+
 **Example Scenario**:
-1. Claude A reads `/memories/notes.txt` (acquires shared read lock)
+1. Claude A reads `/memories/notes.txt` (acquires shared read lock, caches content checksum)
 2. Claude B reads the same file (also acquires shared read lock - no blocking!)
 3. Claude C tries to edit the file (waits for exclusive write lock)
 4. Claudes A & B finish reading (release read locks)
 5. Claude C acquires write lock and modifies the file
-6. If file was modified during lock wait: Error with prompt to re-read
+6. Claude A tries to write based on stale understanding → Error with current file contents shown
 
 **Key Benefits**:
 - Read operations never block each other (true parallelism)
 - Write operations serialize correctly (data integrity)
+- Detects modifications that happened minutes ago, not just during lock wait
 - Deadlock prevention through sorted lock acquisition
 - Per-path lock granularity (different files don't interfere)
 

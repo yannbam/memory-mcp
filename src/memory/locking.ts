@@ -3,31 +3,28 @@
  *
  * Provides file locking for concurrent access from multiple Claude instances.
  * Uses @esfx/async-readerwriterlock for true shared read locks and exclusive write locks.
- * Implements optimistic concurrency control using mtime (modification timestamp).
+ * Implements optimistic concurrency control using content checksums (SHA-256).
  *
  * Key Features:
  * - Shared read locks: Multiple readers can access concurrently
  * - Exclusive write locks: Only one writer at a time
  * - Multi-path atomic locking: Lock multiple paths for rename operations
- * - Optimistic concurrency: Detect modifications while waiting for locks
+ * - Optimistic concurrency: Detect modifications using cached content checksums
+ * - Sequential modification detection: Detects changes across separate operations
  */
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { AsyncReaderWriterLock } from '@esfx/async-readerwriterlock';
+import {
+  computeChecksum,
+  getCachedChecksum,
+} from './checksums.js';
 
 /**
  * Lock release function
  */
 export type LockRelease = () => Promise<void>;
-
-/**
- * Lock acquisition result with mtime tracking
- */
-export interface LockResult {
-  release: LockRelease;
-  mtimeBefore: number | null;
-}
 
 /**
  * LockManager manages a pool of reader-writer locks, one per path.
@@ -124,43 +121,25 @@ export class LockManager {
   /**
    * Acquire write lock for a path
    * Exclusive - only one writer at a time
-   * Optionally captures mtime before locking for optimistic concurrency control
    *
    * @param filePath - Absolute filesystem path to lock
-   * @param captureMtime - Whether to capture mtime before acquiring lock
-   * @returns Lock release function and mtime (if captured)
+   * @returns Lock release function
    */
-  async acquireWriteLock(
-    filePath: string,
-    captureMtime: boolean = false,
-  ): Promise<LockResult> {
-    // Capture mtime BEFORE acquiring lock (for optimistic concurrency)
-    let mtimeBefore: number | null = null;
-    if (captureMtime) {
-      try {
-        const stats = await fs.stat(filePath);
-        mtimeBefore = stats.mtimeMs;
-      } catch (err) {
-        const fsError = err as { code?: string };
-        if (fsError.code !== 'ENOENT') throw err;
-        // File doesn't exist yet - that's ok for create operations
-      }
-    }
-
+  async acquireWriteLock(filePath: string): Promise<LockRelease> {
     // Get lock instance for this path
     const lock = this.getLock(filePath);
 
     // Acquire exclusive write lock
     const lockHandle = await lock.write();
 
-    // Return release function with captured mtime
+    // Return release function
     const release = (): Promise<void> => {
       lockHandle.unlock();
       this.releaseLock(filePath);
       return Promise.resolve();
     };
 
-    return { release, mtimeBefore };
+    return release;
   }
 
   /**
@@ -249,35 +228,32 @@ async function determinePathToLock(filePath: string): Promise<string> {
 }
 
 /**
- * Check if file was modified since captured mtime.
+ * Helper: Create content preview for error messages
+ * Truncates large files with indicator to avoid overwhelming terminal
  *
- * Used for optimistic concurrency control - detects if file changed
- * while waiting for lock acquisition.
- *
- * @param filePath - Absolute filesystem path
- * @param mtimeBefore - Mtime captured before lock acquisition
- * @returns true if file was modified, false otherwise
+ * @param content - File content as string
+ * @param filePath - File path for display
+ * @returns Formatted preview with truncation if needed
  */
-export async function wasFileModified(
-  filePath: string,
-  mtimeBefore: number | null,
-): Promise<boolean> {
-  // If mtime wasn't captured, can't check for modifications
-  if (mtimeBefore === null) {
-    return false;
+function makeContentPreview(content: string, filePath: string): string {
+  const maxLength = 5000;
+
+  // Build preview header
+  let preview = `Current contents of ${filePath}:\n`;
+  preview += '━'.repeat(60) + '\n';
+
+  // Add content (truncate if needed)
+  if (content.length <= maxLength) {
+    preview += content;
+  } else {
+    preview += content.slice(0, maxLength);
+    preview += '\n\n[... truncated, file is ' + content.length + ' bytes total]';
   }
 
-  // Get current mtime
-  try {
-    const stats = await fs.stat(filePath);
-    const mtimeAfter = stats.mtimeMs;
+  // Add footer
+  preview += '\n' + '━'.repeat(60);
 
-    // Compare timestamps
-    return mtimeAfter !== mtimeBefore;
-  } catch {
-    // File doesn't exist anymore - consider it modified
-    return true;
-  }
+  return preview;
 }
 
 /**
@@ -310,52 +286,95 @@ export async function withReadLock<T>(
 /**
  * Execute an operation with write lock and optimistic concurrency control
  *
- * Acquires write lock, checks for concurrent modifications, executes operation.
- * Throws error if file was modified while waiting for lock.
+ * Uses content checksum comparison to detect modifications:
+ * 1. Read file and compute checksum (before lock)
+ * 2. Compare with cached checksum (detects sequential modifications)
+ * 3. Acquire write lock
+ * 4. Re-read and verify checksum (detects concurrent modifications during lock wait)
  *
  * @param filePath - Absolute filesystem path to lock
  * @param checkConcurrency - Whether to check for concurrent modifications
  * @param operation - Async operation to execute while holding lock
  * @returns Result from operation
- * @throws Error if file was modified concurrently
+ * @throws Error if file was modified sequentially or concurrently
  */
 export async function withWriteLock<T>(
   filePath: string,
   checkConcurrency: boolean,
   operation: () => Promise<T>,
 ): Promise<T> {
-  // Capture mtime BEFORE determining path to lock (for original filePath)
-  let mtimeBefore: number | null = null;
-  if (checkConcurrency) {
+  // For operations that don't need concurrency checking (e.g., create, delete)
+  if (!checkConcurrency) {
+    const pathToLock = await determinePathToLock(filePath);
+    const release = await lockManager.acquireWriteLock(pathToLock);
     try {
-      const stats = await fs.stat(filePath);
-      mtimeBefore = stats.mtimeMs;
-    } catch (err) {
-      const fsError = err as { code?: string };
-      if (fsError.code !== 'ENOENT') throw err;
-      // File doesn't exist yet - that's ok for create operations
+      return await operation();
+    } finally {
+      await release();
     }
   }
 
-  // Determine what to lock (parent directory if file doesn't exist)
-  const pathToLock = await determinePathToLock(filePath);
-
-  // Acquire lock (no mtime capture needed - already done above)
-  const { release } = await lockManager.acquireWriteLock(pathToLock, false);
+  // Read file and compute checksum BEFORE lock acquisition
+  let contentBefore: string;
+  let checksumBefore: string;
 
   try {
-    // Check if file was modified while waiting for lock
-    if (checkConcurrency && (await wasFileModified(filePath, mtimeBefore))) {
+    contentBefore = await fs.readFile(filePath, 'utf-8');
+    checksumBefore = computeChecksum(contentBefore);
+  } catch (err) {
+    const fsError = err as { code?: string };
+    if (fsError.code === 'ENOENT' || fsError.code === 'EISDIR') {
+      // File doesn't exist or is a directory - can't check concurrency
+      // Let the operation handle validation and error messaging
+      const pathToLock = await determinePathToLock(filePath);
+      const release = await lockManager.acquireWriteLock(pathToLock);
+      try {
+        return await operation();
+      } finally {
+        await release();
+      }
+    }
+    throw err; // Other errors (permission, etc.)
+  }
+
+  // Check against cached checksum (detects sequential modifications)
+  const cachedChecksum = getCachedChecksum(filePath);
+  if (cachedChecksum && cachedChecksum !== checksumBefore) {
+    // File changed since last access by THIS server instance
+    const preview = makeContentPreview(contentBefore, filePath);
+
+    throw new Error(
+      'File has been modified by another process.\n\n' +
+        preview +
+        '\n\n' +
+        'Please review the current contents and retry if appropriate.',
+    );
+  }
+
+  // Acquire exclusive write lock
+  const pathToLock = await determinePathToLock(filePath);
+  const release = await lockManager.acquireWriteLock(pathToLock);
+
+  try {
+    // Re-read and verify checksum (detects concurrent modifications during lock wait)
+    const contentNow = await fs.readFile(filePath, 'utf-8');
+    const checksumNow = computeChecksum(contentNow);
+
+    if (checksumNow !== checksumBefore) {
+      // File modified while waiting for lock
+      const preview = makeContentPreview(contentNow, filePath);
+
       throw new Error(
-        'File has been modified by another process. ' +
-          'Please read the file again and retry your operation.',
+        'File was modified while waiting for lock.\n\n' +
+          preview +
+          '\n\n' +
+          'Please review the current contents and retry.',
       );
     }
 
-    // Execute operation while holding lock
+    // Execute operation - file hasn't changed
     return await operation();
   } finally {
-    // Always release lock
     await release();
   }
 }
