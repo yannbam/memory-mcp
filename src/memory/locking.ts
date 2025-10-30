@@ -218,8 +218,21 @@ async function determinePathToLock(filePath: string): Promise<string> {
       // Ensure parent directory exists
       try {
         await fs.mkdir(parentDir, { recursive: true });
-      } catch {
-        // Directory already exists or creation failed, continue anyway
+      } catch (err) {
+        const mkdirError = err as { code?: string; message?: string };
+
+        // EEXIST is expected - directory was created by another process
+        if (mkdirError.code === 'EEXIST') {
+          return parentDir;
+        }
+
+        // All other errors indicate a real problem
+        throw new Error(
+          `Failed to create parent directory: ${parentDir}\n` +
+            `Error code: ${mkdirError.code ?? 'UNKNOWN'}\n` +
+            `Message: ${mkdirError.message ?? 'Unknown error'}\n` +
+            `This prevents the memory operation from proceeding.`,
+        );
       }
 
       return parentDir;
@@ -351,7 +364,33 @@ export async function withWriteLock<T>(
 
   try {
     // Re-read and verify checksum (detects concurrent modifications during lock wait)
-    const contentNow = await fs.readFile(filePath, 'utf-8');
+    let contentNow: string;
+    try {
+      contentNow = await fs.readFile(filePath, 'utf-8');
+    } catch (err) {
+      const fsError = err as { code?: string };
+
+      // File was deleted while waiting for lock
+      if (fsError.code === 'ENOENT') {
+        throw new Error(
+          `File was deleted while waiting for lock: ${filePath}\n` +
+            `Another process removed this file during the operation.\n` +
+            `Please verify the file still exists and retry if appropriate.`,
+        );
+      }
+
+      // File was replaced with directory
+      if (fsError.code === 'EISDIR') {
+        throw new Error(
+          `File was replaced with a directory while waiting for lock: ${filePath}\n` +
+            `This indicates unexpected concurrent filesystem changes.`,
+        );
+      }
+
+      // Any other error - rethrow as-is
+      throw err;
+    }
+
     const checksumNow = computeChecksum(contentNow);
 
     if (checksumNow !== checksumBefore) {
@@ -376,7 +415,7 @@ export async function withWriteLock<T>(
 /**
  * Execute an operation with write locks on multiple paths atomically
  *
- * NEW FUNCTION for rename operations that need to lock both source and destination.
+ * Used for rename operations that need to lock both source and destination.
  * Acquires all locks atomically (in sorted order to prevent deadlock).
  *
  * @param filePaths - Array of absolute filesystem paths to lock

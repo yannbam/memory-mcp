@@ -52,6 +52,7 @@ import {
   computeChecksum,
   setCachedChecksum,
   clearCachedChecksum,
+  getAllCachedEntries,
 } from './checksums.js';
 import { formatFileContent } from './formatting.js';
 import type { Logger } from '../utils/logger.js';
@@ -171,7 +172,9 @@ export async function view(command: ViewCommand, context: OperationsContext): Pr
 
       // Cache checksum after reading entire file (not partial reads with view_range)
       if (!command.view_range) {
-        // Read file content for checksum
+        // TODO: Optimize - viewFile() already read content, avoid double-read
+        // Current: Read separately because viewFile() may format/transform content
+        // Better: Refactor viewFile() to return both raw content and formatted output
         const content = await fs.readFile(fullPath, 'utf-8');
         setCachedChecksum(fullPath, computeChecksum(content));
       }
@@ -448,6 +451,23 @@ export async function insert(command: InsertCommand, context: OperationsContext)
 }
 
 /**
+ * Clear cached checksums for a directory and all children
+ * Prevents memory leaks when deleting directories
+ *
+ * @param dirPath - Absolute directory path
+ */
+function clearCachedChecksumsRecursive(dirPath: string): void {
+  const normalizedDir = path.resolve(dirPath);
+
+  // Iterate through cache and remove entries under this directory
+  for (const [cachedPath] of getAllCachedEntries()) {
+    if (cachedPath.startsWith(normalizedDir + path.sep) || cachedPath === normalizedDir) {
+      clearCachedChecksum(cachedPath);
+    }
+  }
+}
+
+/**
  * Delete command: Delete a file or directory
  *
  * @param command - Delete command parameters
@@ -466,7 +486,7 @@ export async function deleteOp(
   }
 
   // Normalize parameter names for old_str (forgiving naming)
-  const old_str = command.old_str || command.old_string;
+  const old_str = command.old_str ?? command.old_string;
 
   // Validation: Cannot mix position-based and content-based deletion
   if (command.delete_line !== undefined && old_str !== undefined) {
@@ -557,8 +577,8 @@ export async function deleteOp(
       await fs.rm(fullPath, { recursive: true });
       deletedType = 'directory';
 
-      // Clear cache for deleted directory
-      clearCachedChecksum(fullPath);
+      // Clear cache for deleted directory and all children
+      clearCachedChecksumsRecursive(fullPath);
     } else {
       throw new Error(`Path not found: ${command.path}`);
     }

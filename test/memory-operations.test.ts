@@ -13,6 +13,7 @@ import {
   getCachedChecksum,
   computeChecksum,
   setCachedChecksum,
+  getChecksumCacheStats,
 } from '../src/memory/checksums.js';
 import type { Logger } from '../src/utils/logger.js';
 
@@ -593,6 +594,32 @@ describe('Memory Operations', () => {
         operations.deleteOp({ path: '/memories/nonexistent.txt', delete_line: 1 }, context),
       ).rejects.toThrow('File not found');
     });
+
+    it('should clear cache entries for directory children when deleting directory', async () => {
+      // Create directory with files
+      await fs.mkdir(path.join(memoryRoot, 'testdir'));
+      const child1 = path.join(memoryRoot, 'testdir/child1.txt');
+      const child2 = path.join(memoryRoot, 'testdir/child2.txt');
+      await fs.writeFile(child1, 'content1', 'utf-8');
+      await fs.writeFile(child2, 'content2', 'utf-8');
+
+      // Cache children (simulating previous reads)
+      setCachedChecksum(child1, computeChecksum('content1'));
+      setCachedChecksum(child2, computeChecksum('content2'));
+
+      const statsBefore = getChecksumCacheStats();
+      expect(statsBefore.size).toBeGreaterThanOrEqual(2);
+
+      // Delete parent directory
+      await operations.deleteOp({ path: '/memories/testdir' }, context);
+
+      // Child cache entries should be cleared
+      expect(getCachedChecksum(child1)).toBeUndefined();
+      expect(getCachedChecksum(child2)).toBeUndefined();
+
+      const statsAfter = getChecksumCacheStats();
+      expect(statsAfter.size).toBeLessThan(statsBefore.size);
+    });
   });
 
   describe('rename command', () => {
@@ -1057,6 +1084,96 @@ describe('Memory Operations', () => {
         expect(error.message).toContain('Modified by another process');
         expect(error.message).toContain('Current contents of');
       }
+    });
+
+    it('should not mask concurrent modifications when str_replace fails for other reasons', async () => {
+      // Verify concurrent modification detection happens BEFORE text validation
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const originalContent = 'TODO: Buy milk';
+      await fs.writeFile(testFile, originalContent, 'utf-8');
+
+      // Establish cached checksum
+      const originalChecksum = computeChecksum(originalContent);
+      setCachedChecksum(testFile, originalChecksum);
+
+      // External process modifies file
+      const modifiedContent = 'TODO: Buy eggs';
+      await fs.writeFile(testFile, modifiedContent, 'utf-8');
+
+      // Try operation - concurrent modification detected BEFORE text matching
+      await expect(
+        operations.str_replace(
+          { path: '/memories/test.txt', old_str: 'bread', new_str: 'cookies' },
+          context,
+        ),
+      ).rejects.toThrow('File has been modified by another process');
+
+      // Verify cache wasn't corrupted by failed operation
+      const currentChecksum = getCachedChecksum(testFile);
+      expect(currentChecksum).toBe(originalChecksum); // Should still be original
+
+      // After re-reading file, operation should succeed with correct text
+      await operations.view({ path: '/memories/test.txt' }, context); // Updates cache
+      await expect(
+        operations.str_replace(
+          { path: '/memories/test.txt', old_str: 'eggs', new_str: 'bread' },
+          context,
+        ),
+      ).resolves.toBeDefined();
+    });
+
+    it('should not mask concurrent modifications when insert fails for other reasons', async () => {
+      // Verify concurrent modification detection happens BEFORE line validation
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const originalContent = 'Line 1\nLine 2';
+      await fs.writeFile(testFile, originalContent, 'utf-8');
+
+      setCachedChecksum(testFile, computeChecksum(originalContent));
+
+      // External process modifies file
+      const modifiedContent = 'Line 1\nLine 2\nLine 3';
+      await fs.writeFile(testFile, modifiedContent, 'utf-8');
+
+      // Try insert - concurrent modification detected BEFORE line range validation
+      await expect(
+        operations.insert(
+          { path: '/memories/test.txt', insert_line: 100, insert_text: 'New' },
+          context,
+        ),
+      ).rejects.toThrow('File has been modified by another process');
+
+      // After re-reading, operation succeeds with valid line
+      await operations.view({ path: '/memories/test.txt' }, context);
+      await expect(
+        operations.insert(
+          { path: '/memories/test.txt', insert_line: 2, insert_text: 'New' },
+          context,
+        ),
+      ).resolves.toBeDefined();
+    });
+
+    it('should not mask concurrent modifications when delete fails for other reasons', async () => {
+      // Verify concurrent modification detection happens BEFORE text matching
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const originalContent = 'TODO: Buy milk';
+      await fs.writeFile(testFile, originalContent, 'utf-8');
+
+      setCachedChecksum(testFile, computeChecksum(originalContent));
+
+      // External process modifies file
+      const modifiedContent = 'TODO: Buy eggs';
+      await fs.writeFile(testFile, modifiedContent, 'utf-8');
+
+      // Try delete - concurrent modification detected BEFORE text matching
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', old_str: 'bread' }, context),
+      ).rejects.toThrow('File has been modified by another process');
+
+      // After re-reading, operation succeeds with correct text
+      await operations.view({ path: '/memories/test.txt' }, context);
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', old_str: 'eggs' }, context),
+      ).resolves.toBeDefined();
     });
   });
 });

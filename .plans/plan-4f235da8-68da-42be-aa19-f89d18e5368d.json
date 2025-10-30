@@ -1,0 +1,219 @@
+{
+  "uuid": "4f235da8-68da-42be-aa19-f89d18e5368d",
+  "name": "pr-review-fixes-checksum",
+  "details": "Fix critical issues identified in comprehensive PR review before merging feature/checksum-concurrency-detection to dev. Review session 781d7a06 identified 7 CRITICAL issues that must be fixed before merge, plus 5 important improvements. This plan covers Phase 1 (critical - required) and Phase 2 (important - recommended).",
+  "tasks": [
+    {
+      "name": "Phase 1: Critical Fixes",
+      "details": "7 critical issues that MUST be fixed before merge. Estimated 2.5-3 hours total.",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Issue 1: Fix silent mkdir failure",
+          "details": "Location: src/memory/locking.ts:219-223\nProblem: Empty catch block swallows ALL mkdir errors (EACCES, EROFS, ENOSPC, etc.)\nSolution: Catch only EEXIST specifically, throw all other errors with context\nTime: 10 minutes\nVerification: Manual test with permission denied scenario",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "f02b7a0d-4543-444a-90b2-0f3fc1bcf516",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:12:09.080Z"
+        },
+        {
+          "name": "Issue 2: Add concurrent lock contention test",
+          "details": "Location: test/integration/concurrent-checksum.test.ts\nProblem: Core feature (Layer 2 - concurrent modification during lock wait) not tested. Lines 359-361 in locking.ts UNCOVERED\nSolution: Add test with actual lock contention using setTimeout() to create race\nTime: 45 minutes\nVerification: Coverage report shows lines 359-361 covered, test passes",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "8b87d494-60a8-4e5c-adb1-11b60d3f71ee",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:12:59.143Z"
+        },
+        {
+          "name": "Issue 3: Add cache-after-failure tests",
+          "details": "Location: test/memory-operations.test.ts\nProblem: No tests verify checksum cache isn't corrupted when operations fail\nSolution: Add 3 tests - str_replace fails, insert fails, delete fails\nTime: 30 minutes\nVerification: All 3 tests pass without code changes (validates current implementation)",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "2880108f-b921-4c3b-84f2-bbe285865198",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:13:48.202Z"
+        },
+        {
+          "name": "Issue 4: Fix directory deletion memory leak",
+          "details": "Location: src/memory/operations.ts:554-561 + src/memory/checksums.ts\nProblem: Deleting directory only clears cache for directory, not children - memory leak\nSolution: Add getAllCachedEntries() export, implement clearCachedChecksumsRecursive() helper, use in delete operation\nTime: 30 minutes\nVerification: New test passes showing child cache entries cleared",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "37c45335-56f6-4645-9b9c-c918cfaf2aed",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:15:53.404Z"
+        },
+        {
+          "name": "Issue 5: Correct memory calculation",
+          "details": "Location: src/memory/checksums.ts:125-130\nProblem: Memory estimate 3-4x too low (64 chars = 128 bytes not 32, total ~270 bytes not 102)\nSolution: Fix calculation and add clear disclaimer about approximation\nTime: 15 minutes\nVerification: Visual inspection of corrected comment",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "6b56a66d-6fc2-490a-9865-f06214c91a68",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:16:22.906Z"
+        },
+        {
+          "name": "Issue 6: Fix path validation comment",
+          "details": "Location: src/memory/formatting.ts:30\nProblem: Comment says start line can be -1 but code rejects it (only end line accepts -1)\nSolution: Change comment to 'must be >= 1'\nTime: 2 minutes\nVerification: Visual inspection",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "2a26392d-1c77-4f8b-b7fe-4bee4eccd890",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:16:22.906Z"
+        },
+        {
+          "name": "Issue 7: Fix case sensitivity comment",
+          "details": "Location: src/memory/checksums.ts:60-61\nProblem: Comment claims path.resolve() handles case sensitivity - factually wrong\nSolution: Correct comment to explain case handling depends on filesystem\nTime: 2 minutes\nVerification: Visual inspection",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "711c4a33-f889-49bd-9d16-ef3608248f09",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:16:22.906Z"
+        }
+      ],
+      "uuid": "27e5e49f-0fdf-4672-a458-b1e981583a1c",
+      "created_at": "2025-10-30T17:11:29.391Z",
+      "updated_at": "2025-10-30T17:11:29.391Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Phase 2: Important Improvements",
+      "details": "5 quality improvements that should be fixed but aren't merge blockers. Estimated 1-2 hours total.",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Issue 8: Improve file deletion error message",
+          "details": "Location: src/memory/locking.ts:354\nProblem: Raw ENOENT error when file deleted during lock wait - confusing\nSolution: Wrap post-lock readFile in try-catch with context-specific error messages\nTime: 15 minutes",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "62fc0f50-0048-4f19-984d-02f8965d93e2",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:20:42.473Z"
+        },
+        {
+          "name": "Issue 9: Fix || vs ?? bug",
+          "details": "Location: src/memory/operations.ts:469\nProblem: Uses || instead of ?? for parameter fallback (empty string bug)\nSolution: Change to ?? for consistency with lines 320-321\nTime: 2 minutes",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "89130678-003a-4b99-9899-40c6b0406c43",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:20:19.918Z"
+        },
+        {
+          "name": "Issue 10: Remove stale temporal marker",
+          "details": "Location: src/memory/locking.ts:379\nProblem: 'NEW FUNCTION' comment will age poorly\nSolution: Replace with descriptive comment about purpose\nTime: 2 minutes",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "e6d5a4f4-0baa-4299-8530-0d8b120afe58",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:20:19.918Z"
+        },
+        {
+          "name": "Issue 11: Fix performance claims",
+          "details": "Location: src/memory/checksums.ts:38-41\nProblem: Unvalidated specific performance numbers that will become stale\nSolution: Soften claims to 'sub-millisecond' and 'typical' ranges\nTime: 5 minutes",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "8a27f5d2-7a3d-4e70-b39b-7cdf515c31fa",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:20:19.918Z"
+        },
+        {
+          "name": "Issue 12: Add double-read TODO",
+          "details": "Location: src/memory/operations.ts:170-176\nProblem: File read twice (view + checksum) without explanation\nSolution: Add TODO comment explaining why and potential optimization\nTime: 3 minutes",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "e415f849-96ad-4e18-85fb-ca206bae999e",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:20:19.918Z"
+        }
+      ],
+      "uuid": "f6db3790-0223-4712-89ad-8c9323431029",
+      "created_at": "2025-10-30T17:11:29.391Z",
+      "updated_at": "2025-10-30T17:11:29.391Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Testing & Verification",
+      "details": "Run full test suite and verify all fixes are working correctly",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run full test suite",
+          "details": "Command: npm test\nExpected: 165+ tests passing (162 existing + 3 new from Issue #3 + 1 from Issue #4 + 1 from Issue #2)",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "a403c81a-6c12-44d0-b487-9a78b44fd012",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:18:01.738Z"
+        },
+        {
+          "name": "Verify coverage maintained",
+          "details": "Command: npm run test:coverage\nExpected: ≥93% coverage (should increase to ~94%)\nCritical: Lines 359-361 in locking.ts must be covered",
+          "status": "completed",
+          "priority": "urgent",
+          "uuid": "fa8716de-d7ad-4951-a65a-7eab3440c717",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:18:27.919Z"
+        },
+        {
+          "name": "Run linting",
+          "details": "Command: npm run lint\nExpected: No errors",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "1201089e-b209-43c9-920d-4e2eaec9aa91",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:19:16.488Z"
+        },
+        {
+          "name": "Type check",
+          "details": "Command: npm run build\nExpected: Successful compilation",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "34e67a3e-da1f-4042-964a-44e5b6cba0d0",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:19:16.488Z"
+        }
+      ],
+      "uuid": "0a60c2bc-dcb4-4992-8286-764b861bf37b",
+      "created_at": "2025-10-30T17:11:29.391Z",
+      "updated_at": "2025-10-30T17:11:29.391Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Documentation & Commit",
+      "details": "Final documentation updates and commit",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Update short-term memory",
+          "details": "Update session handoff with completion status and what was fixed",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "4993bb67-1e41-4e52-87dd-7f1381365f79",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:22:00.954Z"
+        },
+        {
+          "name": "Create commit",
+          "details": "Commit message format:\n'fix: address critical PR review findings\n\n- Fix empty catch block in mkdir (silent failure)\n- Add concurrent lock contention test\n- Add cache-after-failure tests\n- Fix directory deletion cache leak\n- Correct memory calculation (was 3-4x too low)\n- Fix misleading comments (path validation, case sensitivity)\n- Improve error messages and code consistency'",
+          "status": "in_progress",
+          "priority": "high",
+          "uuid": "fe37af8f-55ef-458f-ae8e-b4964d27ff2a",
+          "created_at": "2025-10-30T17:11:29.391Z",
+          "updated_at": "2025-10-30T17:22:01.203Z"
+        }
+      ],
+      "uuid": "ced5fe29-35b9-477a-8b2d-cb7f4e3cb9f3",
+      "created_at": "2025-10-30T17:11:29.391Z",
+      "updated_at": "2025-10-30T17:11:29.391Z",
+      "completion_percentage": 50
+    }
+  ],
+  "created_at": "2025-10-30T17:11:29.392Z",
+  "updated_at": "2025-10-30T17:22:01.203Z"
+}

@@ -191,38 +191,60 @@ describe('Locking and Concurrency Detection', () => {
   });
 
   describe('Write Locks - Concurrent Modification Detection', () => {
-    it('should detect modifications during lock acquisition', async () => {
-      // This test simulates concurrent modification during the lock-wait window
-      // In practice this is tested via integration tests with actual concurrency
+    it('should detect modification during lock acquisition wait', async () => {
+      // Test the core feature: Layer 2 detection (concurrent modification during lock wait)
+      // This validates lines 359-361 in locking.ts which were previously UNCOVERED
 
-      // Create and cache file
-      const filePath = path.join(testRoot, 'concurrent.txt');
-      const originalContent = 'Original';
-      await fs.writeFile(filePath, originalContent, 'utf-8');
+      const testFile = path.join(testRoot, 'concurrent-race.txt');
+      await fs.writeFile(testFile, 'Original Content', 'utf-8');
 
-      // Cache original checksum
-      setCachedChecksum(filePath, computeChecksum(originalContent));
+      // Cache original checksum (simulating previous read)
+      setCachedChecksum(testFile, computeChecksum('Original Content'));
 
-      // Simulate: during lock acquisition, file gets modified
-      // We'll modify it synchronously before the operation executes
-      let operationStarted = false;
+      let write1Started = false;
+      let write1InProgress = false;
 
-      try {
-        await withWriteLock(filePath, true, async () => {
-          operationStarted = true;
-          // This should not execute if concurrent modification detected
-          throw new Error('Should not reach here');
-        });
+      // First write operation - holds lock for 100ms
+      const write1Promise = withWriteLock(testFile, true, async () => {
+        write1Started = true;
+        write1InProgress = true;
 
-        fail('Should have detected modification');
-      } catch (err) {
-        const error = err as Error;
+        // Introduce delay to ensure second operation waits
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-        // If modification was detected, operation should not start
-        // But in this unit test, we can't easily simulate true concurrency
-        // Integration tests will cover this properly
-        expect(error.message).toBeDefined();
-      }
+        // Modify file while holding lock
+        await fs.writeFile(testFile, 'Modified by Write 1', 'utf-8');
+        write1InProgress = false;
+      });
+
+      // Wait for first write to start and acquire lock
+      await new Promise(resolve => {
+        const checkInterval = setInterval(() => {
+          if (write1Started) {
+            clearInterval(checkInterval);
+            resolve(undefined);
+          }
+        }, 10);
+      });
+
+      // Ensure first write is holding the lock
+      expect(write1InProgress).toBe(true);
+
+      // Second write starts while first holds lock - will wait for lock
+      const write2Promise = withWriteLock(testFile, true, async () => {
+        // This should throw because file changed during wait
+        await fs.writeFile(testFile, 'Modified by Write 2', 'utf-8');
+      });
+
+      // First should succeed
+      await expect(write1Promise).resolves.toBeUndefined();
+
+      // Second should throw - file was modified while waiting for lock
+      await expect(write2Promise).rejects.toThrow('File was modified while waiting for lock');
+
+      // Verify final state is from first write
+      const finalContent = await fs.readFile(testFile, 'utf-8');
+      expect(finalContent).toBe('Modified by Write 1');
     });
   });
 

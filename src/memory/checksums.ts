@@ -35,10 +35,11 @@ const checksumCache = new Map<string, string>();
  * @param content - File content as string (UTF-8)
  * @returns Hex digest (64 characters, lowercase)
  *
- * Performance: ~500 MB/s throughput
- * - 1 KB file: ~0.002ms
- * - 10 KB file: ~0.02ms
- * - 50 KB file: ~0.1ms
+ * Performance: Fast SHA-256 hashing using Node crypto library
+ * - Small files (1-10 KB): Sub-millisecond
+ * - Medium files (50 KB): ~0.1ms typical
+ * - Performance scales linearly with content size
+ * - Actual speed depends on CPU and Node.js version
  */
 export function computeChecksum(content: string): string {
   // Create SHA-256 hash of content
@@ -58,7 +59,9 @@ export function computeChecksum(content: string): string {
  */
 export function getCachedChecksum(filePath: string): string | undefined {
   // Normalize path to canonical form to ensure cache hits
-  // Handles: symlinks, . and .., case sensitivity
+  // Resolves: symlinks, relative segments (. and ..)
+  // Note: Case handling depends on filesystem (case-sensitive on Linux,
+  //       case-insensitive on macOS/Windows)
   return checksumCache.get(path.resolve(filePath));
 }
 
@@ -110,6 +113,16 @@ export function clearAllCachedChecksums(): void {
 }
 
 /**
+ * Get all cached entries (for iteration)
+ * Used internally for recursive cache clearing
+ *
+ * @returns Iterator over [path, checksum] pairs
+ */
+export function getAllCachedEntries(): IterableIterator<[string, string]> {
+  return checksumCache.entries();
+}
+
+/**
  * Get cache statistics
  *
  * @returns Cache size and memory estimate
@@ -119,14 +132,20 @@ export function clearAllCachedChecksums(): void {
  * - Monitoring memory usage
  * - Performance analysis
  */
-export function getChecksumCacheStats() {
+export function getChecksumCacheStats(): {
+  size: number;
+  memoryEstimate: number;
+} {
   return {
     size: checksumCache.size,
-    // Approximate memory per entry:
-    // - Path key: ~50 bytes average
-    // - Checksum value: 64 chars = ~32 bytes
-    // - Map overhead: ~20 bytes
-    // Total: ~102 bytes per entry
-    memoryEstimate: checksumCache.size * 102,
+    // APPROXIMATE memory per entry (actual varies by V8 version and path lengths):
+    // - Path key: ~100 bytes average (varies widely: 20-500+ bytes)
+    // - Checksum value: 64 chars × 2 bytes (UTF-16) = ~128 bytes
+    // - Map overhead: ~40-80 bytes (V8 implementation detail)
+    // Total estimate: ~270 bytes per entry (rough approximation)
+    //
+    // NOTE: This is an ORDER-OF-MAGNITUDE estimate for monitoring purposes.
+    // Do not rely on this for precise memory accounting.
+    memoryEstimate: checksumCache.size * 270,
   };
 }

@@ -27,7 +27,7 @@ export function formatFileContent(content: string, viewRange?: [number, number])
     const requestedStart = viewRange[0];
     const requestedEnd = viewRange[1];
 
-    // Check if start line is valid (1-based, or -1 for special meaning)
+    // Check if start line is valid (1-based indexing, must be >= 1)
     if (requestedStart < 1) {
       throw new Error(`Invalid line range: start line must be >= 1, got ${requestedStart}`);
     }
