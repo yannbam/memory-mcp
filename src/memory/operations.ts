@@ -290,15 +290,18 @@ export async function create(command: CreateCommand, context: OperationsContext)
   // Validate and convert path
   const fullPath = validatePath(command.path, context.memoryRoot);
 
-  // Execute with write lock and concurrency check
-  // Always enable concurrency checking - locking module handles non-existent files correctly
-  // (mtimeBefore will be null, wasFileModified returns false)
-  await withWriteLock(fullPath, true, async () => {
+  // Execute with write lock (no concurrency check needed - create is for new files only)
+  await withWriteLock(fullPath, false, async () => {
     // Ensure parent directory exists
     const dir = path.dirname(fullPath);
     if (!(await exists(dir))) {
       // Create parent directory
       await fs.mkdir(dir, { recursive: true });
+    }
+
+    // Check if file already exists - fail fast if it does
+    if (await exists(fullPath)) {
+      throw new Error(`File already exists at ${command.path}`);
     }
 
     // Write file content (default to empty string if not provided)

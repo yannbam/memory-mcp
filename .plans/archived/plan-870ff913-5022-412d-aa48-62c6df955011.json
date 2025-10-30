@@ -1,0 +1,59 @@
+{
+  "uuid": "870ff913-5022-412d-aa48-62c6df955011",
+  "name": "create-command-fail-on-exists",
+  "details": "Change create command behavior to fail if file already exists (deviation from Anthropic spec)",
+  "tasks": [
+    {
+      "name": "Modify create function",
+      "details": "Add existence check in operations.ts create() function - fail with clear error if file exists",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "c6bd6bec-b09e-4efa-88e5-033fcbddb4b5",
+      "created_at": "2025-10-30T09:45:38.075Z",
+      "updated_at": "2025-10-30T09:45:57.947Z"
+    },
+    {
+      "name": "Update tests",
+      "details": "Change 'should overwrite existing file' test to expect error, verify other create tests still pass",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "fb44d8da-2a77-49df-a3bf-ca4f316a4253",
+      "created_at": "2025-10-30T09:45:38.076Z",
+      "updated_at": "2025-10-30T09:46:14.587Z"
+    },
+    {
+      "name": "Run test suite",
+      "details": "Verify all 117 tests still pass with new behavior",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "1d441298-abc2-4129-b320-515fac400c95",
+      "created_at": "2025-10-30T09:45:38.076Z",
+      "updated_at": "2025-10-30T09:46:33.824Z"
+    },
+    {
+      "name": "Update documentation",
+      "details": "Update README and CHANGELOG to document this intentional spec deviation",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "6eaca2bb-2128-469c-81b4-3a1133d7b026",
+      "created_at": "2025-10-30T09:45:38.076Z",
+      "updated_at": "2025-10-30T09:47:07.615Z"
+    },
+    {
+      "name": "Update memory",
+      "details": "Record this spec deviation in long-term memory",
+      "status": "completed",
+      "priority": "low",
+      "sub_tasks": [],
+      "uuid": "efe57f44-3b6c-46ae-b92f-7d0ee258a423",
+      "created_at": "2025-10-30T09:45:38.076Z",
+      "updated_at": "2025-10-30T09:47:26.966Z"
+    }
+  ],
+  "created_at": "2025-10-30T09:45:38.076Z",
+  "updated_at": "2025-10-30T09:47:27.147Z"
+}

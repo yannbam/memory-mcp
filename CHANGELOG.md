@@ -40,6 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `create` without `file_text`: "Created empty memory file."
 
 ### Changed
+- **BREAKING**: `create` command now fails if file already exists (deviation from Anthropic spec)
+  - Previously: silently overwrote existing files
+  - Now: throws error "File already exists at {path}"
+  - Enforces create-only semantics for safety
 - All text-based operations (`str_replace`, `delete` with `old_str`) now require unique occurrences
 - Both operations fail with clear error if text appears multiple times
 

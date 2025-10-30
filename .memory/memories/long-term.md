@@ -3,6 +3,13 @@
 ## Architecture & Design
 _How the system actually works vs how it was intended to work_
 
+[⚠️🔒💡] **INTENTIONAL SPEC DEVIATION**: create command fails if file exists (Session d53d3ec2, Oct 30 2025)
+Anthropic spec says "Create or overwrite" but this implementation enforces create-only semantics for safety
+Implementation: operations.ts L303-305 checks exists() before writeFile(), throws "File already exists at {path}"
+Test coverage: test/memory-operations.test.ts L149-161 verifies error on existing file
+Documented in README (deviation note) and CHANGELOG (BREAKING change)
+Reason: User requested fail-fast behavior instead of silent overwrite for safety
+
 [🏗️💡] MCP server supports dual tool exposure modes: unified tool with command parameter (default) vs separate tools per command
 Conditional registration in createMemoryServer() controlled by oneToolPerCommand boolean flag
 Both modes use identical underlying operations - only tool registration differs

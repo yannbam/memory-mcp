@@ -146,16 +146,18 @@ describe('Memory Operations', () => {
       expect(fileContent).toBe(content);
     });
 
-    it('should overwrite existing file', async () => {
+    it('should fail when file already exists', async () => {
       // Create initial file
       await fs.writeFile(path.join(memoryRoot, 'test.txt'), 'original');
 
-      // Overwrite with new content
-      await operations.create({ path: '/memories/test.txt', file_text: 'updated' }, context);
+      // Attempt to create file that already exists should fail
+      await expect(
+        operations.create({ path: '/memories/test.txt', file_text: 'updated' }, context)
+      ).rejects.toThrow('File already exists at /memories/test.txt');
 
-      // Verify content was updated
+      // Verify original content was not modified
       const fileContent = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
-      expect(fileContent).toBe('updated');
+      expect(fileContent).toBe('original');
     });
 
     it('should create empty file with file_text=""', async () => {

@@ -208,7 +208,9 @@ await memory({
 ```
 
 ### create
-Create or overwrite files (creates parent directories as needed).
+Create new files (fails if file already exists, creates parent directories as needed).
+
+**Note**: This implementation differs from Anthropic's spec which allows overwriting. This MCP server enforces create-only semantics for safety.
 
 ```typescript
 // Create file with content
