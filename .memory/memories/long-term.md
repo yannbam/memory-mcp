@@ -2,6 +2,7 @@
 
 ## Architecture & Design
 _How the system actually works vs how it was intended to work_
+
 ## Concurrency & Multi-Instance Behavior
 _How the system handles multiple Claude instances accessing same memory files_
 
@@ -147,8 +148,9 @@ Empty file handling pattern: Check `content === ''` before splitting to avoid ['
 Append logic: `insertLine = lines.length + 1` works for both empty and non-empty files when using empty array for empty content
 
 
----
-Note: These are starter sections - add new sections as your understanding evolves!
+## Add new sections here at will
+
+## Miscellaneous
 
 Test cache contamination prevention: ALWAYS call clearAllCachedChecksums() in beforeEach hook [🧪💡]
 Checksum cache is a global singleton - persists across tests in same process
