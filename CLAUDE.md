@@ -173,7 +173,8 @@ The test: **"Is this worth preserving across sessions?"**
 1. Read memories to absorb context
 2. Create session plan from memories + new instructions
 3. Move plan-captured items out of short-term Quick Notes
-4. Space cleared for new discoveries
+4. **PURGE leftover Quick Notes** - if any remain from previous session, delete them (they should have been processed during previous session end)
+5. Space cleared for new discoveries
 
 #### ⚡ **DURING SESSION**
 - Add to Quick Notes immediately when you discover/decide/defer something
@@ -181,12 +182,18 @@ The test: **"Is this worth preserving across sessions?"**
 - One line = one atomic memory (1-3 sentences for completeness)
 - Search existing memories before adding - maybe there's knowledge to refine?
 
+**Quick Note Shortcut:**
+```
+memory(command: "insert", path: "/memories/short-term.md", insert_text: "Your memory here [emoji]")
+```
+Omitting `insert_line` appends to the end of the file - perfect for quickly adding Quick Notes without needing to know line numbers.
+
 #### 🌙 **SESSION END**
 1. Review Quick Notes - what patterns emerged?
 2. Promote enduring insights to appropriate long-term sections
 3. Update/delete obsolete long-term entries (knowledge evolution!)
-4. Clean Quick Notes of session-only information
-5. Write clear handoff in short-term for next session
+4. Write clear handoff in short-term for next session
+5. **PURGE ALL Quick Notes** - delete the entire ## Quick Notes section content (keep the section header with description, but remove all entries)
 
 ### Memory Format & Operations
 
@@ -208,13 +215,13 @@ Instead of accumulating redundant entries, refine knowledge in place using str_r
 
 **Emoji markers per memory** - use them when they add meaningful dimensions to a memory.
 
-**Format (when used):** `[[emoji1][emoji2][emoji3]]` at the beginning of the line
+**Format (when used):** `[[emoji1][emoji2][emoji3]]` at the end of the line
 
 **Use 0 to 3 emojis as needed:**
 - **No emojis:** Simple facts - "Tests run with `npm test` and require NODE_ENV=test"
-- **One emoji:** Basic context - `[⚠️] Path validation must check resolved path stays within root`
-- **Two emojis:** More context - `[💀🔧] npm audit fix breaks @modelcontextprotocol/sdk peer dependencies`
-- **Three emojis:** Rich dimensions - `[⚠️🔧🤯] str_replace silently fails if old_str appears multiple times`
+- **One emoji:** Basic context - `Path validation must check resolved path stays within root [⚠️]`
+- **Two emojis:** More context - `npm audit fix breaks @modelcontextprotocol/sdk peer dependencies [💀🔧]`
+- **Three emojis:** Rich dimensions - `str_replace silently fails if old_str appears multiple times [⚠️🔧🤯]`
 
 **Suggested dimensions (use any emojis you want!):**
 1. **Kind** - Type of information (⚠️ warning, 💡 insight, 🔄 deferred, ✅ validated, 💀 fatal, etc.)
@@ -223,14 +230,32 @@ Instead of accumulating redundant entries, refine knowledge in place using str_r
 
 CRITICAL: **The entire emoji space is available** - these are just examples. Use ANY emoji and ANY combination that adds meaningful dimensions to the memory.
 
+**IMPORTANT - Memory Markers vs Decorative Emojis:**
+
+**Memory markers are visual highlighters** - they make specific memory lines stand out when scanning, like highlighting important passages in a book:
+- ✅ **GOOD**: `WARNING: Path validation must fail on traversal attempts [⚠️]` - the [⚠️] marker makes this line jump out visually
+- ✅ **GOOD**: `Checksum detection fully validated and working [✅🧪]` - markers help you spot validated facts quickly
+- ✅ **GOOD**: `CRITICAL BUG: str_replace fails silently on duplicates [💀🔧]` - the [💀] makes you notice this immediately
+
+**Decorative emojis are visual clutter** - they don't mark specific memories, they just decorate prose:
+- ❌ **BAD**: "Feature complete, tested, and validated. Ready to merge! 🚀" - this is prose, not a memory entry
+- ❌ **BAD**: "All 162 unit tests passing ✅" - this is a status bullet, not a memory entry
+- ❌ **BAD**: "COMPLETED & ARCHIVED ✅" - this is a section heading, not a memory entry
+
+**The distinction:**
+- **Memory entries** (one-line atomic facts in long-term.md or short-term.md Quick Notes) → USE markers to highlight
+- **Everything else** (handoffs, status updates, descriptions, headings, bullets) → NO emojis
+
+Think of emoji markers as **visual bookmarks** in your memory - they help you quickly find "all warnings", "all critical issues", "all validated facts" when scanning hundreds of memory lines.
+
 ### What Makes Memory Valuable?
 
 **KEEP memories that:**
 - Save future sessions from wasting time
-- Capture non-obvious behavior: `[⚠️🔧🤯] str_replace silently fails if old_str appears multiple times in file`
-- Record costly mistakes: `[💀📦] Never run npm audit fix - breaks @modelcontextprotocol/sdk peer deps`
+- Capture non-obvious behavior: `str_replace silently fails if old_str appears multiple times in file [⚠️🔧🤯]`
+- Record costly mistakes: `Never run npm audit fix - breaks @modelcontextprotocol/sdk peer deps [💀📦]`
 - Document workarounds: `Use path.resolve() + startsWith() check to prevent directory traversal`
-- Track deferred work: `[🔄] TODO later: investigate HTTP transport timeout after 5min idle`
+- Track deferred work: `TODO later: investigate HTTP transport timeout after 5min idle [🔄]`
 - Note simple facts: `Line 185-231 in operations.ts handles view range validation`
 
 **SKIP memories that are:**

@@ -5,11 +5,15 @@
       "args": ["./dist/index.js", "--tree-view"],
       "env": {}
     },
-    "test-memory-default": {
+    "test-memory-A": {
       "command": "node",
       "args": ["/home/jan/projects/memory-mcp/dist/index.js", "-m", "/tmp/test-memory"]
     },
-    "test-memory-separate": {
+    "test-memory-B": {
+      "command": "node",
+      "args": ["/home/jan/projects/memory-mcp/dist/index.js", "-m", "/tmp/test-memory"]
+    },
+    "test-memory-multitool": {
       "command": "node",
       "args": ["/home/jan/projects/memory-mcp/dist/index.js", "--one-tool-per-command", "-m", "/tmp/test-memory"]
     },

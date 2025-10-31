@@ -27,6 +27,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Concurrency Detection**: Replaced mtime-based detection with content checksum verification (SHA-256)
+  - Now detects modifications across sequential operations (not just during lock wait)
+  - Works across separate stdio MCP server processes via shared disk state
+  - Each server caches checksums, compares against current file state before writes
+  - Performance overhead: ~0.4ms for typical 10KB files (negligible for human-readable notes)
+
+### Improved
+- **Error Messages**: File modification errors now show complete current file contents
+  - Clear explanation: "File has been modified by another process"
+  - Content preview with 5000-char truncation for large files
+  - Actionable guidance: "Please review the current contents and retry if appropriate"
+
 ### Added
 - **Parameter combinations** - Optional parameters for more intuitive usage:
   - `create` without `file_text` creates empty file (touch equivalent)

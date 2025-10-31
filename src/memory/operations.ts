@@ -48,6 +48,13 @@ import * as path from 'path';
 import { withReadLock, withWriteLock, withMultipleWriteLocks } from './locking.js';
 import { validatePath } from './path-security.js';
 import { renderDirectoryTree } from './tree-view.js';
+import {
+  computeChecksum,
+  setCachedChecksum,
+  clearCachedChecksum,
+  getAllCachedEntries,
+} from './checksums.js';
+import { formatFileContent } from './formatting.js';
 import type { Logger } from '../utils/logger.js';
 
 /**
@@ -157,11 +164,22 @@ export async function view(command: ViewCommand, context: OperationsContext): Pr
     const stat = await fs.stat(fullPath);
 
     if (stat.isDirectory()) {
-      // View directory contents
+      // View directory contents (don't cache - directories change frequently)
       return await viewDirectory(fullPath, command.path, context);
     } else if (stat.isFile()) {
       // View file contents
-      return await viewFile(fullPath, command.view_range);
+      const fileContent = await viewFile(fullPath, command.view_range);
+
+      // Cache checksum after reading entire file (not partial reads with view_range)
+      if (!command.view_range) {
+        // TODO: Optimize - viewFile() already read content, avoid double-read
+        // Current: Read separately because viewFile() may format/transform content
+        // Better: Refactor viewFile() to return both raw content and formatted output
+        const content = await fs.readFile(fullPath, 'utf-8');
+        setCachedChecksum(fullPath, computeChecksum(content));
+      }
+
+      return fileContent;
     } else {
       throw new Error(`Path not found: ${command.path}`);
     }
@@ -227,54 +245,8 @@ async function viewFile(fullPath: string, viewRange?: [number, number]): Promise
   // Read file content
   const content = await fs.readFile(fullPath, 'utf-8');
 
-  // Check if file is empty
-  if (content === '') {
-    return 'Memory file is empty.';
-  }
-
-  const lines = content.split('\n');
-
-  // Determine which lines to display
-  let displayLines = lines;
-  let startNum = 1;
-
-  if (viewRange && viewRange.length === 2) {
-    // Validate line range
-    const requestedStart = viewRange[0];
-    const requestedEnd = viewRange[1];
-
-    // Check if start line is valid (1-based, or -1 for special meaning)
-    if (requestedStart < 1) {
-      throw new Error(`Invalid line range: start line must be >= 1, got ${requestedStart}`);
-    }
-
-    // Check if range is within file bounds
-    if (requestedStart > lines.length) {
-      throw new Error(
-        `Line range out of bounds: requested start line ${requestedStart}, but file only has ${lines.length} lines`
-      );
-    }
-
-    // Check if end line is valid (must be >= start, or -1 for EOF)
-    if (requestedEnd !== -1 && requestedEnd < requestedStart) {
-      throw new Error(
-        `Invalid line range: end line ${requestedEnd} is before start line ${requestedStart}`
-      );
-    }
-
-    // Extract line range
-    const startLine = Math.max(1, requestedStart) - 1;
-    const endLine = requestedEnd === -1 ? lines.length : Math.min(requestedEnd, lines.length);
-    displayLines = lines.slice(startLine, endLine);
-    startNum = startLine + 1;
-  }
-
-  // Format with line numbers
-  const numberedLines = displayLines.map(
-    (line, i) => `${String(i + startNum).padStart(4, ' ')}: ${line}`,
-  );
-
-  return numberedLines.join('\n');
+  // Use shared formatting function
+  return formatFileContent(content, viewRange);
 }
 
 /**
@@ -291,6 +263,7 @@ export async function create(command: CreateCommand, context: OperationsContext)
   const fullPath = validatePath(command.path, context.memoryRoot);
 
   // Execute with write lock (no concurrency check needed - create is for new files only)
+  let writtenContent: string = '';
   await withWriteLock(fullPath, false, async () => {
     // Ensure parent directory exists
     const dir = path.dirname(fullPath);
@@ -305,8 +278,11 @@ export async function create(command: CreateCommand, context: OperationsContext)
     }
 
     // Write file content (default to empty string if not provided)
-    const content = command.file_text ?? '';
-    await fs.writeFile(fullPath, content, 'utf-8');
+    writtenContent = command.file_text ?? '';
+    await fs.writeFile(fullPath, writtenContent, 'utf-8');
+
+    // Cache checksum of newly created file
+    setCachedChecksum(fullPath, computeChecksum(writtenContent));
   });
 
   // Log operation
@@ -385,6 +361,9 @@ export async function str_replace(
 
     // Write updated content
     await fs.writeFile(fullPath, newContent, 'utf-8');
+
+    // Cache checksum of modified file
+    setCachedChecksum(fullPath, computeChecksum(newContent));
   });
 
   // Log operation
@@ -448,7 +427,11 @@ export async function insert(command: InsertCommand, context: OperationsContext)
     lines.splice(insertLine - 1, 0, command.insert_text.replace(/\n$/, ''));
 
     // Write updated content
-    await fs.writeFile(fullPath, lines.join('\n'), 'utf-8');
+    const newContent = lines.join('\n');
+    await fs.writeFile(fullPath, newContent, 'utf-8');
+
+    // Cache checksum of modified file
+    setCachedChecksum(fullPath, computeChecksum(newContent));
   });
 
   // Log operation
@@ -464,6 +447,23 @@ export async function insert(command: InsertCommand, context: OperationsContext)
     return `Text appended to end of ${command.path}`;
   } else {
     return `Text inserted at line ${command.insert_line} in ${command.path}`;
+  }
+}
+
+/**
+ * Clear cached checksums for a directory and all children
+ * Prevents memory leaks when deleting directories
+ *
+ * @param dirPath - Absolute directory path
+ */
+function clearCachedChecksumsRecursive(dirPath: string): void {
+  const normalizedDir = path.resolve(dirPath);
+
+  // Iterate through cache and remove entries under this directory
+  for (const [cachedPath] of getAllCachedEntries()) {
+    if (cachedPath.startsWith(normalizedDir + path.sep) || cachedPath === normalizedDir) {
+      clearCachedChecksum(cachedPath);
+    }
   }
 }
 
@@ -486,7 +486,7 @@ export async function deleteOp(
   }
 
   // Normalize parameter names for old_str (forgiving naming)
-  const old_str = command.old_str || command.old_string;
+  const old_str = command.old_str ?? command.old_string;
 
   // Validation: Cannot mix position-based and content-based deletion
   if (command.delete_line !== undefined && old_str !== undefined) {
@@ -533,7 +533,11 @@ export async function deleteOp(
       lines.splice(deleteLine - 1, 1);
 
       // Write updated content
-      await fs.writeFile(fullPath, lines.join('\n'), 'utf-8');
+      const newContent = lines.join('\n');
+      await fs.writeFile(fullPath, newContent, 'utf-8');
+
+      // Cache checksum of modified file
+      setCachedChecksum(fullPath, computeChecksum(newContent));
     });
 
     // Log operation
@@ -565,10 +569,16 @@ export async function deleteOp(
       // Delete file
       await fs.unlink(fullPath);
       deletedType = 'file';
+
+      // Clear cache for deleted file
+      clearCachedChecksum(fullPath);
     } else if (stat.isDirectory()) {
       // Delete directory recursively
       await fs.rm(fullPath, { recursive: true });
       deletedType = 'directory';
+
+      // Clear cache for deleted directory and all children
+      clearCachedChecksumsRecursive(fullPath);
     } else {
       throw new Error(`Path not found: ${command.path}`);
     }
@@ -636,6 +646,9 @@ async function deleteMatchingText(
     // Write cleaned content
     const finalContent = nonEmptyLines.join('\n');
     await fs.writeFile(fullPath, finalContent, 'utf-8');
+
+    // Cache checksum of modified file
+    setCachedChecksum(fullPath, computeChecksum(finalContent));
   });
 
   // Log operation
@@ -708,6 +721,9 @@ export async function rename(command: RenameCommand, context: OperationsContext)
         // Other errors (EXDEV for cross-filesystem, etc.)
         throw error;
       }
+
+      // Clear cache for old path (new path will be cached on next access)
+      clearCachedChecksum(oldFullPath);
     } else if (sourceStat.isDirectory()) {
       // For directories: Use fs.rename (link doesn't work for directories)
       // Check if destination exists first (has TOCTOU race, but unavoidable for directories)
@@ -715,6 +731,9 @@ export async function rename(command: RenameCommand, context: OperationsContext)
         throw new Error(`Destination already exists: ${command.new_path}`);
       }
       await fs.rename(oldFullPath, newFullPath);
+
+      // Clear cache for old path
+      clearCachedChecksum(oldFullPath);
     } else {
       throw new Error(`Source path not found: ${command.old_path}`);
     }

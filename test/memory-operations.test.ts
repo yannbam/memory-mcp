@@ -8,6 +8,13 @@ import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as operations from '../src/memory/operations.js';
+import {
+  clearAllCachedChecksums,
+  getCachedChecksum,
+  computeChecksum,
+  setCachedChecksum,
+  getChecksumCacheStats,
+} from '../src/memory/checksums.js';
 import type { Logger } from '../src/utils/logger.js';
 
 // Mock logger for tests
@@ -29,6 +36,9 @@ describe('Memory Operations', () => {
 
   // Setup and teardown
   beforeEach(async () => {
+    // Clear checksum cache to prevent cross-test contamination
+    clearAllCachedChecksums();
+
     // Create test directory
     await fs.mkdir(memoryRoot, { recursive: true });
   });
@@ -584,6 +594,32 @@ describe('Memory Operations', () => {
         operations.deleteOp({ path: '/memories/nonexistent.txt', delete_line: 1 }, context),
       ).rejects.toThrow('File not found');
     });
+
+    it('should clear cache entries for directory children when deleting directory', async () => {
+      // Create directory with files
+      await fs.mkdir(path.join(memoryRoot, 'testdir'));
+      const child1 = path.join(memoryRoot, 'testdir/child1.txt');
+      const child2 = path.join(memoryRoot, 'testdir/child2.txt');
+      await fs.writeFile(child1, 'content1', 'utf-8');
+      await fs.writeFile(child2, 'content2', 'utf-8');
+
+      // Cache children (simulating previous reads)
+      setCachedChecksum(child1, computeChecksum('content1'));
+      setCachedChecksum(child2, computeChecksum('content2'));
+
+      const statsBefore = getChecksumCacheStats();
+      expect(statsBefore.size).toBeGreaterThanOrEqual(2);
+
+      // Delete parent directory
+      await operations.deleteOp({ path: '/memories/testdir' }, context);
+
+      // Child cache entries should be cleared
+      expect(getCachedChecksum(child1)).toBeUndefined();
+      expect(getCachedChecksum(child2)).toBeUndefined();
+
+      const statsAfter = getChecksumCacheStats();
+      expect(statsAfter.size).toBeLessThan(statsBefore.size);
+    });
   });
 
   describe('rename command', () => {
@@ -891,6 +927,253 @@ describe('Memory Operations', () => {
       expect(result).toContain('has been edited');
       const content = await fs.readFile(path.join(memoryRoot, 'test.txt'), 'utf-8');
       expect(content).toBe('Keep this and this');
+    });
+  });
+
+  describe('Checksum Caching Behavior', () => {
+    it('should cache checksum after view (full file read)', async () => {
+      // Create file
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const content = 'Hello, World!';
+      await fs.writeFile(testFile, content);
+
+      // View file (full read)
+      await operations.view({ path: '/memories/test.txt' }, context);
+
+      // Checksum should be cached
+      const cached = getCachedChecksum(testFile);
+      expect(cached).toBe(computeChecksum(content));
+    });
+
+    it('should NOT cache checksum after partial view (with view_range)', async () => {
+      // Create file
+      const testFile = path.join(memoryRoot, 'test.txt');
+      await fs.writeFile(testFile, 'line1\nline2\nline3');
+
+      // View with range (partial read)
+      await operations.view({ path: '/memories/test.txt', view_range: [1, 2] }, context);
+
+      // Checksum should NOT be cached
+      const cached = getCachedChecksum(testFile);
+      expect(cached).toBeUndefined();
+    });
+
+    it('should cache checksum after create', async () => {
+      // Create file
+      const content = 'New file content';
+      await operations.create(
+        { path: '/memories/new.txt', file_text: content },
+        context,
+      );
+
+      // Checksum should be cached
+      const testFile = path.join(memoryRoot, 'new.txt');
+      const cached = getCachedChecksum(testFile);
+      expect(cached).toBe(computeChecksum(content));
+    });
+
+    it('should cache checksum after str_replace', async () => {
+      // Create file
+      const testFile = path.join(memoryRoot, 'test.txt');
+      await fs.writeFile(testFile, 'Hello, World!');
+
+      // str_replace
+      await operations.str_replace(
+        { path: '/memories/test.txt', old_str: 'World', new_str: 'Universe' },
+        context,
+      );
+
+      // Checksum should be cached (new content)
+      const newContent = 'Hello, Universe!';
+      const cached = getCachedChecksum(testFile);
+      expect(cached).toBe(computeChecksum(newContent));
+    });
+
+    it('should cache checksum after insert', async () => {
+      // Create file
+      const testFile = path.join(memoryRoot, 'test.txt');
+      await fs.writeFile(testFile, 'line1\nline3');
+
+      // Insert
+      await operations.insert(
+        { path: '/memories/test.txt', insert_line: 2, insert_text: 'line2' },
+        context,
+      );
+
+      // Checksum should be cached (new content)
+      const newContent = 'line1\nline2\nline3';
+      const cached = getCachedChecksum(testFile);
+      expect(cached).toBe(computeChecksum(newContent));
+    });
+
+    it('should clear checksum after file deletion', async () => {
+      // Create and cache file
+      const testFile = path.join(memoryRoot, 'delete-me.txt');
+      await fs.writeFile(testFile, 'content');
+      setCachedChecksum(testFile, computeChecksum('content'));
+
+      // Delete file
+      await operations.deleteOp({ path: '/memories/delete-me.txt' }, context);
+
+      // Checksum should be cleared
+      const cached = getCachedChecksum(testFile);
+      expect(cached).toBeUndefined();
+    });
+
+    it('should clear checksum after rename (old path)', async () => {
+      // Create and cache file
+      const oldFile = path.join(memoryRoot, 'old.txt');
+      const newFile = path.join(memoryRoot, 'new.txt');
+      await fs.writeFile(oldFile, 'content');
+      setCachedChecksum(oldFile, computeChecksum('content'));
+
+      // Rename
+      await operations.rename(
+        { old_path: '/memories/old.txt', new_path: '/memories/new.txt' },
+        context,
+      );
+
+      // Old path checksum should be cleared
+      const cachedOld = getCachedChecksum(oldFile);
+      expect(cachedOld).toBeUndefined();
+
+      // New path won't have checksum yet (will be cached on next read)
+      const cachedNew = getCachedChecksum(newFile);
+      expect(cachedNew).toBeUndefined();
+    });
+
+    it('should detect sequential modifications and throw error', async () => {
+      // Create file and cache it
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const originalContent = 'TODO: Buy milk';
+      await fs.writeFile(testFile, originalContent);
+
+      // Simulate previous read caching the checksum
+      setCachedChecksum(testFile, computeChecksum(originalContent));
+
+      // External process modifies file
+      await fs.writeFile(testFile, 'TODO: Buy eggs');
+
+      // Try to str_replace - should detect modification
+      await expect(
+        operations.str_replace(
+          { path: '/memories/test.txt', old_str: 'milk', new_str: 'bread' },
+          context,
+        ),
+      ).rejects.toThrow('File has been modified by another process');
+    });
+
+    it('should show current contents in sequential modification error', async () => {
+      // Create file and cache it
+      const testFile = path.join(memoryRoot, 'notes.txt');
+      await fs.writeFile(testFile, 'Original notes');
+      setCachedChecksum(testFile, computeChecksum('Original notes'));
+
+      // External modification
+      await fs.writeFile(testFile, 'Modified by another process');
+
+      // Try to modify
+      try {
+        await operations.str_replace(
+          { path: '/memories/notes.txt', old_str: 'Original', new_str: 'Updated' },
+          context,
+        );
+        fail('Should have thrown error');
+      } catch (err) {
+        const error = err as Error;
+        expect(error.message).toContain('Modified by another process');
+        expect(error.message).toContain('Current contents of');
+      }
+    });
+
+    it('should not mask concurrent modifications when str_replace fails for other reasons', async () => {
+      // Verify concurrent modification detection happens BEFORE text validation
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const originalContent = 'TODO: Buy milk';
+      await fs.writeFile(testFile, originalContent, 'utf-8');
+
+      // Establish cached checksum
+      const originalChecksum = computeChecksum(originalContent);
+      setCachedChecksum(testFile, originalChecksum);
+
+      // External process modifies file
+      const modifiedContent = 'TODO: Buy eggs';
+      await fs.writeFile(testFile, modifiedContent, 'utf-8');
+
+      // Try operation - concurrent modification detected BEFORE text matching
+      await expect(
+        operations.str_replace(
+          { path: '/memories/test.txt', old_str: 'bread', new_str: 'cookies' },
+          context,
+        ),
+      ).rejects.toThrow('File has been modified by another process');
+
+      // Verify cache wasn't corrupted by failed operation
+      const currentChecksum = getCachedChecksum(testFile);
+      expect(currentChecksum).toBe(originalChecksum); // Should still be original
+
+      // After re-reading file, operation should succeed with correct text
+      await operations.view({ path: '/memories/test.txt' }, context); // Updates cache
+      await expect(
+        operations.str_replace(
+          { path: '/memories/test.txt', old_str: 'eggs', new_str: 'bread' },
+          context,
+        ),
+      ).resolves.toBeDefined();
+    });
+
+    it('should not mask concurrent modifications when insert fails for other reasons', async () => {
+      // Verify concurrent modification detection happens BEFORE line validation
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const originalContent = 'Line 1\nLine 2';
+      await fs.writeFile(testFile, originalContent, 'utf-8');
+
+      setCachedChecksum(testFile, computeChecksum(originalContent));
+
+      // External process modifies file
+      const modifiedContent = 'Line 1\nLine 2\nLine 3';
+      await fs.writeFile(testFile, modifiedContent, 'utf-8');
+
+      // Try insert - concurrent modification detected BEFORE line range validation
+      await expect(
+        operations.insert(
+          { path: '/memories/test.txt', insert_line: 100, insert_text: 'New' },
+          context,
+        ),
+      ).rejects.toThrow('File has been modified by another process');
+
+      // After re-reading, operation succeeds with valid line
+      await operations.view({ path: '/memories/test.txt' }, context);
+      await expect(
+        operations.insert(
+          { path: '/memories/test.txt', insert_line: 2, insert_text: 'New' },
+          context,
+        ),
+      ).resolves.toBeDefined();
+    });
+
+    it('should not mask concurrent modifications when delete fails for other reasons', async () => {
+      // Verify concurrent modification detection happens BEFORE text matching
+      const testFile = path.join(memoryRoot, 'test.txt');
+      const originalContent = 'TODO: Buy milk';
+      await fs.writeFile(testFile, originalContent, 'utf-8');
+
+      setCachedChecksum(testFile, computeChecksum(originalContent));
+
+      // External process modifies file
+      const modifiedContent = 'TODO: Buy eggs';
+      await fs.writeFile(testFile, modifiedContent, 'utf-8');
+
+      // Try delete - concurrent modification detected BEFORE text matching
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', old_str: 'bread' }, context),
+      ).rejects.toThrow('File has been modified by another process');
+
+      // After re-reading, operation succeeds with correct text
+      await operations.view({ path: '/memories/test.txt' }, context);
+      await expect(
+        operations.deleteOp({ path: '/memories/test.txt', old_str: 'eggs' }, context),
+      ).resolves.toBeDefined();
     });
   });
 });
