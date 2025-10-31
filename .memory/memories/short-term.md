@@ -110,3 +110,5 @@ Will resume after checksum implementation merged to dev
 
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
+
+PR review audit found HIGH severity issue: Directory deletion uses wrong sequence (rm then clear cache) - should use try-finally to ensure cache cleared even on partial fs.rm() failure [⚠️💀🔧]
