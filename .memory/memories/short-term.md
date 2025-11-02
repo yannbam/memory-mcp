@@ -3,15 +3,15 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 6de84f3f-ff8d-4cbc-b074-04dad867e63a
-Branch: feature/checksum-concurrency-detection  
-Context: ~132k tokens
-Working on: PR review fixes implementation - COMPLETE
+Session: (new session - resuming after merge)
+Branch: dev
+Context: Starting fresh
+Working on: Public release preparation - final polishing
 
 ## Session Handoff
 _What was done, what's next, blockers_
 
-### Previous Session (69506829)
+### Previous Sessions Summary
 **COMPREHENSIVE REAL-WORLD TESTING COMPLETE - ALL TESTS PASSING**
 - 30 scenarios tested across 9 categories, 0 issues found
 - Cross-process detection proven via shared disk
@@ -46,25 +46,45 @@ _What was done, what's next, blockers_
 
 **Status:** Branch now ready to merge to dev!
 
-### What Next Session Should Do
+### This Session Accomplished
 
-**✅ ALL FIXES COMPLETE - READY TO MERGE**
+**✅ CHECKSUM FEATURE MERGED - Back on Track!**
+- PR #7 successfully merged to dev
+- Verified all 12 PR review fixes complete
+- Confirmed: 166/166 tests passing, ~93% coverage
 
-1. **Merge to dev**:
-   - Branch: feature/checksum-concurrency-detection
-   - All PR review fixes committed
-   - 166 tests passing, 93% coverage
-   - Linting clean, build successful
+**✅ NEW FOCUSED RELEASE PLAN CREATED**
+- Archived old public-release-beta-v2 plan (wasn't aligned)
+- Created public-release-v0.1.0-final plan (21 tasks, 0% complete)
+- Plan reflects actual requirements:
+  - Repository cleanup (human approval required)
+  - Development docs (ARCHITECTURE.md, dev guide)
+  - README.md polish (user-facing, not dev-facing)
+  - CONTRIBUTING.md (comprehensive)
+  - Release git practices (tags, CHANGELOG, semver)
+  - Pre-release verification (tests, build, integration)
 
-2. **Resume beta release work**:
-   - Continue public-release-beta-v2 plan (paused at 70%)
-   - Checksum feature now fully integrated and tested
+### Next Session Should Do
 
-**Branch**: feature/checksum-concurrency-detection (10 commits)
-**Status**: All fixes complete, fully tested, ready for merge
+**Start working through the release plan!**
+
+Recommended order:
+1. **Repository Cleanup** - Identify files to remove (get human approval first)
+2. **Pre-Release Verification** - Ensure everything works
+3. **README.md Polish** - Make it user-friendly
+4. **CONTRIBUTING.md** - Write comprehensive guide
+5. **Development Documentation** - Update/create dev docs
+6. **Release Git Practices** - Execute the release
+
+Use: `ViewPlan public-release-v0.1.0-final` to see full task hierarchy
+
+**Branch**: dev
+**Version**: 0.1.0 (ready to tag and release after polish)
+**Tests**: 166/166 passing
+**Coverage**: ~93%
 
 ### Current Blockers
-None - All PR review fixes complete, fully tested. Ready to merge to dev
+None - Ready to start release preparation work
 
 ### Key Files Created/Modified This Feature
 **Implementation:**
@@ -98,17 +118,16 @@ None - All PR review fixes complete, fully tested. Ready to merge to dev
 ## Active Plans
 _Current PlanAndTrack references_
 
-**COMPLETED & ARCHIVED**: checksum-concurrency-implementation (100% - 32/32 tasks)
-**COMPLETED & ARCHIVED**: checksum-real-world-testing (100% - 9/9 categories)
+**ACTIVE**: public-release-v0.1.0-final (0% - 21 tasks, 0 completed)
+New focused plan created based on actual requirements:
+1. Repository Cleanup (identification only, human approval needed)
+2. Development Documentation (3 sub-tasks)
+3. README.md Polish (4 sub-tasks) 
+4. CONTRIBUTING.md (single comprehensive file)
+5. Release Git Practices (3 sub-tasks: research, CHANGELOG, release plan)
+6. Pre-Release Verification (5 sub-tasks: tests, build, integration, docs, security)
 
-**ON HOLD**: public-release-beta-v2 (70% complete - 31/44 tasks)
-Resume after merging checksum feature to dev
-
-**ON HOLD**: public-release-beta-v2 (80% complete - 35/44 tasks)
-Paused for checksum feature development
-Will resume after checksum implementation merged to dev
+**ARCHIVED**: public-release-beta-v2 (was 70% but not aligned with actual needs)
 
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
-
-PR review audit found HIGH severity issue: Directory deletion uses wrong sequence (rm then clear cache) - should use try-finally to ensure cache cleared even on partial fs.rm() failure [⚠️💀🔧]
