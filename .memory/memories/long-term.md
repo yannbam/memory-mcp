@@ -166,3 +166,12 @@ EISDIR handling in withWriteLock: Directory paths (EISDIR) treated same as ENOEN
 Both skip concurrency checking (can't checksum directories), let operation validate and throw appropriate error
 Prevents "EISDIR: illegal operation on a directory, read" from being thrown before operation-level validation
 Operations throw better errors: "Path is not a file" or "Cannot delete line from directory"
+
+
+## Public Release Preparation
+
+README polish strategy: Move detailed API docs to separate files (docs/USAGE.md), condense user-facing README to ~300-350 lines [📖✅]
+CONTRIBUTING.md structure: Cover setup, workflow, code style (e/code), testing (≥80%), PR process, issue reporting, code review, community guidelines [📖💜]
+Repository cleanup for public release: Remove personal notes (JANBAM.md), redundant configs (.mcp.*.json), stale docs (PR-REVIEW*, TEST-FINDINGS*) [🧹✅]
+Keep valuable dev files in public repos: CLAUDE.md (contributor guidelines), .memory/ (dogfooding example), .mcp.json (working config) [📚💡]
+Pre-release verification checklist: Tests (all passing), build (clean), integration (all commands), security (npm audit), docs (links valid) [✅🔒]

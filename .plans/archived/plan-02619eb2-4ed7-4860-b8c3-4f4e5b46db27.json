@@ -1,0 +1,108 @@
+{
+  "uuid": "02619eb2-4ed7-4860-b8c3-4f4e5b46db27",
+  "name": "docs-accuracy-update",
+  "details": "Update documentation to match actual implementation after comprehensive source code review. Focus on factual accuracy, test counts, architecture completeness, and removing outdated claims.",
+  "tasks": [
+    {
+      "name": "ARCHITECTURE.md Updates",
+      "details": "Correct outdated information and add missing architectural components",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Update Test Counts",
+          "details": "Fix outdated test counts in sections: Path Security (L345), Memory Operations (L352), Tree View (L358). Add: Checksum utilities tests, Locking tests. Update file structure section (L333-341).",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "e8386455-55ca-43eb-9149-651c38d8b083",
+          "created_at": "2025-11-03T03:17:46.800Z",
+          "updated_at": "2025-11-03T03:18:43.702Z"
+        },
+        {
+          "name": "Remove 'Not Yet Tested' Section",
+          "details": "Section L367-370 says 'Multi-process concurrency (needs integration tests)' but test/integration/concurrent-checksum.test.ts exists with 3 tests. Remove or update this section.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "5da83e09-7ddf-464d-859a-6e4d79e35f49",
+          "created_at": "2025-11-03T03:17:46.800Z",
+          "updated_at": "2025-11-03T03:18:43.868Z"
+        },
+        {
+          "name": "Fix Memory Estimate",
+          "details": "L137 says '~102 bytes per cached file' but checksums.ts:L149 implementation says '~270 bytes per entry' with detailed calculation. Update to match implementation.",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "aa4373aa-ab2f-4c58-a437-62d641982314",
+          "created_at": "2025-11-03T03:17:46.800Z",
+          "updated_at": "2025-11-03T03:18:59.345Z"
+        },
+        {
+          "name": "Update Architecture Diagram",
+          "details": "L48-55 diagram shows locking.ts and path-security.ts but missing: checksums.ts, formatting.ts, tree-view.ts modules. Add these to the diagram.",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "48f10469-6d68-4c8f-bca0-54e7ed85fd66",
+          "created_at": "2025-11-03T03:17:46.800Z",
+          "updated_at": "2025-11-03T03:19:18.982Z"
+        }
+      ],
+      "uuid": "3d074449-c8cb-4e13-97d0-be03c2d28382",
+      "created_at": "2025-11-03T03:17:46.800Z",
+      "updated_at": "2025-11-03T03:17:46.800Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "README.md Updates",
+      "details": "Fix test count inconsistencies",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Fix Line 22",
+          "details": "Says '117 unit + integration + E2E tests' should be '166 tests'",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "47c55887-5a00-467a-9a14-37829f416b63",
+          "created_at": "2025-11-03T03:17:46.800Z",
+          "updated_at": "2025-11-03T03:19:26.068Z"
+        }
+      ],
+      "uuid": "4440583f-c45e-4176-9541-b3b863da7760",
+      "created_at": "2025-11-03T03:17:46.800Z",
+      "updated_at": "2025-11-03T03:17:46.800Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Verify Documentation Completeness",
+      "details": "Cross-check all architectural claims against implementation",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Verify Checksum Design Section",
+          "details": "Confirmed checksum section is accurate. Fixed one inaccuracy: error messages show complete file content with NO truncation (not 5000 char limit as previously documented).",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "e93047d1-64b7-4c84-b902-d24b4c9ec2cb",
+          "created_at": "2025-11-03T03:17:46.800Z",
+          "updated_at": "2025-11-03T03:20:05.598Z"
+        },
+        {
+          "name": "Verify Performance Claims",
+          "details": "All performance claims verified against implementation and test results: 38x speedup (concurrent reads), ~0.4ms overhead (checksums), ~500 MB/s (SHA-256), ~270 bytes (cache memory). All accurate.",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "7b3fd286-c51b-4993-b788-4f100ed13a3c",
+          "created_at": "2025-11-03T03:17:46.800Z",
+          "updated_at": "2025-11-03T03:20:25.808Z"
+        }
+      ],
+      "uuid": "661d289c-fee2-46b3-b3c3-b5eb48c75079",
+      "created_at": "2025-11-03T03:17:46.800Z",
+      "updated_at": "2025-11-03T03:17:46.800Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-11-03T03:17:46.800Z",
+  "updated_at": "2025-11-03T03:20:25.995Z"
+}

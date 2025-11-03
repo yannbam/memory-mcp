@@ -46,12 +46,19 @@ This MCP server implements Claude's native memory tool specification as a standa
 └────┬─────────────────────────┬──────────┘
      │                         │
 ┌────▼──────────┐    ┌────────▼──────────┐
-│  File Locking │    │  Path Security    │
-│  (locking.ts) │    │  (path-security.ts)│
+│  Locking &    │    │  Path Security    │
+│  Concurrency  │    │  & Utilities      │
 │               │    │                    │
-│ - Write locks │    │ - Traversal check │
-│ - Read locks  │    │ - /memories prefix│
-│ - Mtime check │    │ - Path resolution │
+│ locking.ts:   │    │ path-security.ts: │
+│ - RW locks    │    │ - Traversal check │
+│ - Multi-path  │    │ - /memories prefix│
+│               │    │                    │
+│ checksums.ts: │    │ formatting.ts:    │
+│ - SHA-256     │    │ - Line numbering  │
+│ - Cache       │    │                    │
+│               │    │ tree-view.ts:     │
+│               │    │ - Tree rendering  │
+│               │    │ - Metadata        │
 └───────────────┘    └───────────────────┘
 ```
 
@@ -117,7 +124,7 @@ Detection works because:
 
    Current contents of /memories/notes.txt:
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   [shows current file content, truncated at 5000 chars if needed]
+   [shows complete current file content with line numbers, no truncation]
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
    Please review the current contents and retry if appropriate."
@@ -134,7 +141,10 @@ Detection works because:
 - SHA-256 hashing: ~500 MB/s throughput
 - 10 KB file: ~0.02ms hashing time
 - Total overhead: ~0.4ms per write operation (one extra file read + two hash computations)
-- Memory: ~102 bytes per cached file (negligible for typical usage)
+- Memory: ~270 bytes per cached file (negligible for typical usage)
+  - Path key: ~100 bytes average
+  - Checksum value: 64 chars × 2 bytes (UTF-16) = ~128 bytes
+  - Map overhead: ~40-80 bytes (V8 implementation detail)
 
 **Cache Management**:
 - Cache checksum after: full file reads (not partial), all write operations
@@ -320,9 +330,10 @@ src/
 ├── index.ts                 # CLI entry, transport initialization
 ├── memory/
 │   ├── operations.ts        # 6 memory commands implementation
-│   ├── tree-view.ts         # Tree view rendering (optional feature)
-│   ├── locking.ts           # File locking + optimistic concurrency
-│   └── path-security.ts     # Path validation & security
+│   ├── checksums.ts         # SHA-256 content checksums for concurrency detection
+│   ├── formatting.ts        # Shared line numbering utility
+│   ├── locking.ts           # Reader-writer locks + checksum-based concurrency
+│   └── tree-view.ts         # Tree view rendering (optional feature)
 ├── server/
 │   ├── mcp-server.ts        # MCP server setup, tool registration
 │   └── transports.ts        # stdio and HTTP transport init
@@ -330,27 +341,51 @@ src/
     └── logger.ts            # Debug logging
 
 test/
-├── path-security.test.ts    # 27 security tests
-├── memory-operations.test.ts # 34 functional tests
-└── tree-view.test.ts        # 24 tree view tests
+├── checksum-utilities.test.ts          # 18 checksum utility tests
+├── locking.test.ts                     # 15 locking + concurrency tests
+├── memory-operations.test.ts           # 86 operation tests (includes checksum integration)
+├── path-security.test.ts               # 27 path validation tests
+├── tree-view.test.ts                   # 17 tree view tests
+└── integration/
+    └── concurrent-checksum.test.ts     # 3 multi-process integration tests
+
+Total: 166 tests across 6 test files
 ```
 
 ## Testing Strategy
 
-### Path Security Tests (27 tests)
+### Test Coverage (166 Total Tests)
+
+**Checksum Utilities Tests (18 tests)**
+- ✅ SHA-256 checksum computation
+- ✅ Cache operations (get, set, clear)
+- ✅ Cache statistics and memory estimates
+- ✅ Path normalization
+
+**Locking Tests (15 tests)**
+- ✅ Reader-writer lock acquisition and release
+- ✅ Concurrent read operations (no blocking)
+- ✅ Exclusive write operations
+- ✅ Multi-path atomic locking (deadlock prevention)
+- ✅ Lock cleanup and reference counting
+- ✅ Concurrent lock contention scenarios
+
+**Path Security Tests (27 tests)**
 - ✅ Valid paths accepted
 - ✅ Invalid prefixes rejected
 - ✅ Directory traversal blocked
 - ✅ URL-encoded attacks blocked
 - ✅ Edge cases handled
 
-### Memory Operations Tests (34 tests)
+**Memory Operations Tests (86 tests)**
 - ✅ Each operation tested in isolation
 - ✅ Edge cases (empty files, nested dirs)
 - ✅ Error conditions (not found, not unique)
 - ✅ Concurrent access patterns
+- ✅ Checksum integration (sequential & concurrent detection)
+- ✅ Cache management after operations
 
-### Tree View Tests (24 tests)
+**Tree View Tests (17 tests)**
 - ✅ File size formatting (B, KB, MB, GB, TB)
 - ✅ Modification date formatting ([YYYY/MM/DD - HH:MM:SS])
 - ✅ Line counting (Unix/Windows line endings, edge cases)
@@ -359,10 +394,15 @@ test/
 - ✅ Hidden file skipping (files starting with `.`)
 - ✅ Alphabetical sorting (directories first, then files)
 
-### Not Yet Tested
-- Multi-process concurrency (needs integration tests)
-- MCP protocol compliance (manual testing with Inspector)
-- Performance under load
+**Integration Tests (3 tests)**
+- ✅ Multi-process concurrent modifications (cross-process checksum detection)
+- ✅ Sequential modification detection across server instances
+- ✅ File creation race conditions
+
+### Manual Testing
+- ✅ MCP protocol compliance (validated with Claude Code and MCP Inspector)
+- ✅ Real-world usage (30+ scenarios across 9 categories documented)
+- 🔄 Performance under sustained load (not yet tested)
 
 ## Performance Characteristics
 

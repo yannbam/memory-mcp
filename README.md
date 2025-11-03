@@ -19,7 +19,7 @@ This project implements Claude's [memory tool](https://docs.claude.com/en/docs/a
 - ✅ **Dual Transport**: stdio (default) and streamable HTTP
 - ✅ **Type-Safe**: Full TypeScript with Zod runtime validation
 - ✅ **Debug Logging**: Optional structured JSON logging to `/tmp/memory-mcp/`
-- ✅ **Production Ready**: Fully tested (117 unit + integration + E2E tests)
+- ✅ **Production Ready**: Fully tested (166 unit + integration tests)
 
 ## Quick Start
 

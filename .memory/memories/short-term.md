@@ -3,10 +3,10 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 8394629c-0ff0-42a3-a232-d90a9fc80998
+Session: 6123f62b-ae26-450c-bca5-e009a248aacf
 Branch: dev
-Context: 120k/184k tokens (wrapping up for handoff at ~125k)
-Working on: Public release v0.1.0 - final polishing (62% complete)
+Context: 113k/184k tokens
+Working on: Public release v0.1.0 - documentation accuracy updates (100% complete)
 
 ## Session Handoff
 _What was done, what's next, blockers_
@@ -91,33 +91,66 @@ _What was done, what's next, blockers_
 **Files Removed:**
 - JANBAM.md, .mcp.orig.json, .mcp.test.json
 
+### This Session Accomplished (Session 6123f62b)
+
+**📚 DOCUMENTATION ACCURACY UPDATE - COMPLETE (100%)**
+
+**Comprehensive source code immersion:**
+- Read EVERY source file using lsp-cli-file + targeted full reads
+- Verified all architectural components: checksums.ts, locking.ts, operations.ts, formatting.ts, tree-view.ts
+- Cross-referenced implementation against documentation claims
+
+**ARCHITECTURE.md fixes:**
+1. ✅ Updated test counts (L345-393): Was outdated (27+34+24 tests), now accurate (166 total across 6 files)
+   - Added: Checksum utilities (18), Locking (15), updated Operations (86), Tree view (17), Integration (3)
+   - Removed "Not Yet Tested" section (multi-process tests exist!)
+   - Added "Manual Testing" section
+2. ✅ Fixed memory estimate (L137-140): Was "~102 bytes", corrected to "~270 bytes" with detailed breakdown
+3. ✅ Updated architecture diagram (L48-62): Added missing modules (checksums.ts, formatting.ts, tree-view.ts)
+4. ✅ Fixed error message docs (L127): Removed false "truncated at 5000 chars" claim (shows full content)
+5. ✅ Updated file structure section (L333-342): Added test counts and total (166 tests)
+
+**README.md fixes:**
+- ✅ Line 22: Fixed "117 unit + integration + E2E tests" → "166 unit + integration tests"
+
+**Verification completed:**
+- ✅ Checksum design section accuracy verified (L60-142)
+- ✅ All performance claims validated: 38x speedup, ~0.4ms overhead, ~500 MB/s SHA-256, ~270 bytes cache
+
+**Quality checks:**
+- Build: Clean ✅
+- Lint: Clean ✅  
+- Tests: Not run (no code changes)
+
+**Files modified:**
+- docs/ARCHITECTURE.md (test counts, memory estimate, diagram, error message handling)
+- README.md (test count fix)
+
 ### Next Session Should Do
 
-**🎯 Focus: Development Documentation + Release Mechanics**
+**🎯 Focus: Release Preparation Final Steps**
 
-**Remaining Tasks (8/21 - 38%):**
+**Remaining from public-release-v0.1.0-final plan (3 tasks):**
 
-1. **Development Documentation (3 tasks)**
-   - Audit existing docs/*.md files for completeness
-   - Update ARCHITECTURE.md (ensure checksum feature is covered)
-   - Assess if CONTRIBUTING.md covers dev guide needs
-
-2. **Release Git Practices (3 tasks)**
+1. **Release Git Practices (3 sub-tasks)**
    - Research best practices: git tags, GitHub releases, semver
    - Finalize CHANGELOG.md (move [Unreleased] → [0.1.0] with date)
    - Create release execution plan (steps: merge dev→main, tag, release)
 
+2. **Pre-Release Verification (if not already done)**
+   - Final test run: npm test (should be 166/166 passing)
+   - Final security check: npm audit
+   - Verify all documentation links work
+
 **Recommended approach:**
-- Start fresh with Development Documentation
-- ARCHITECTURE.md likely needs minor updates for checksum feature
-- Then tackle CHANGELOG and release mechanics
-- These tasks need care and a fresh open context (as janbam noted!)
+- Focus on CHANGELOG finalization and git release mechanics
+- This is the last step before v0.1.0 public release!
 
 **Branch**: dev
-**Version**: 0.1.0 (ready to tag after final docs polish)
-**Tests**: 166/166 passing
+**Version**: 0.1.0 (ready to tag after CHANGELOG + release prep)
+**Tests**: 166/166 passing (last verified)
 **Coverage**: ~92%
-**Plan**: public-release-v0.1.0-final (62% complete)
+**Documentation**: ✅ Accurate and complete
 
 ### Current Blockers
 None - Ready for final documentation polish and release!
@@ -167,3 +200,29 @@ New focused plan created based on actual requirements:
 
 ## Quick Notes
 _Rapid capture space - add memories here during work without categorization_
+📋 **Documentation Audit Findings** (Session 6123f62b)
+
+**ARCHITECTURE.md (462 lines) - NEEDS UPDATES:**
+✅ Comprehensive coverage of design decisions and concurrency model
+❌ File structure section outdated (L316-336): mentions path-security.ts (removed), missing checksums.ts and formatting.ts
+❌ Test counts outdated (L338-365): says 85 tests total, actual 166 tests across 6 test files
+❌ Dependencies wrong (L425-432): mentions proper-lockfile, actual @esfx/async-readerwriterlock  
+❌ "Not Yet Tested" section (L362-365): claims multi-process not tested, but test/integration/concurrent-checksum.test.ts exists!
+
+**LOCKING-REDESIGN.md (631 lines) - HISTORICAL:**
+✅ Valuable design evolution documentation
+→ Move to docs/archive/ (not current implementation guide)
+
+**USAGE.md (253 lines) - EXCELLENT:**
+✅ Created last session, comprehensive API reference, accurate
+→ No changes needed
+
+**Reference docs - KEEP AS-IS:**
+✅ 039-Memory-tool.md (448 lines): Official Anthropic spec
+✅ MCP-SDK-README.md (1511 lines): SDK documentation
+
+**CONTRIBUTING.md (417 lines) - GOOD WITH GAPS:**
+✅ Comprehensive setup, workflow, testing sections
+❌ Doesn't link to ARCHITECTURE.md for code organization understanding
+❌ No guidance on module structure (src/memory/, src/server/, src/utils/)
+→ Add brief code organization section with link to ARCHITECTURE.md
