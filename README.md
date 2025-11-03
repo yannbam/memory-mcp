@@ -54,19 +54,19 @@ Add to your Claude Code `.mcp.json` configuration. Two common setups:
   "mcpServers": {
     "project_memory": {
       "command": "node",
-      "args": ["./dist/index.js", "--tree-view"],
+      "args": ["/abs/path/to/memory-mcp/dist/index.js", "--tree-view"],
       "env": {}
     }
   }
 }
 ```
-Uses relative path, stores memory in `./.memory/memories/` within the project. Great for project-specific documentation.
+Uses absolute path, stores memory in `./.memory/memories/` within the project. Great for project-specific documentation.
 
-**2. Global System Memory** (shared across all projects):
+**2. Global Memory** (shared across all projects):
 ```json
 {
   "mcpServers": {
-    "system_memory": {
+    "global_memory": {
       "command": "node",
       "args": [
         "/absolute/path/to/memory-mcp/dist/index.js",
@@ -189,6 +189,8 @@ The server supports **multiple Claude instances** accessing the same memory file
 - **Content-Based Modification Detection**: SHA-256 checksums detect file changes across sequential operations
 
 **Performance**: ~38x speedup for read-heavy workloads (tested with 50 concurrent clients)
+
+**\*Note**: Conflict detection currently works for stdio transport only (multiple separate server instances). HTTP transport runs as a single server instance with shared lock pool.*
 
 **Modification Detection**:
 - **Sequential Detection**: Detects when file modified between separate operations (read → external change → write)
