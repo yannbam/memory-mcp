@@ -18,6 +18,7 @@ This project implements Claude's [memory tool](https://docs.claude.com/en/docs/a
 ## Features
 
 - ✅ **All 6 Memory Commands**: view, create, str_replace, insert, delete, rename
+- ✅ **Flexible Tool Modes**: Single unified `memory` tool (default, matches Anthropic spec) or 6 separate tools (`memory_view`, `memory_create`, etc.)
 - ✅ **Tree View Mode**: Optional hierarchical directory view with metadata (sizes, lines, timestamps)
 - ✅ **High-Performance Concurrency**: True reader-writer locks for parallel reads
 - ✅ **Path Security**: Comprehensive directory traversal protection
@@ -145,11 +146,15 @@ memory-mcp -m /var/memories -t http -p 3000 --tree-view --one-tool-per-command -
 
 ## Usage
 
-The server exposes a unified **`memory`** tool matching the [official Anthropic Memory tool specification](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool).
+The server supports two tool exposure modes:
+
+**Default Mode (Unified Tool)**: Exposes a single **`memory`** tool matching the [official Anthropic Memory tool specification](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool). All operations use a `command` parameter to dispatch.
+
+**One-Tool-Per-Command Mode** (`--one-tool-per-command`): Exposes 6 separate tools (`memory_view`, `memory_create`, `memory_str_replace`, `memory_insert`, `memory_delete`, `memory_rename`). Each tool has only its relevant parameters (no `command` field).
 
 ### Commands
 
-All 6 memory commands with `command` parameter:
+All 6 memory commands (unified tool uses `command` parameter, separate tools omit it):
 
 | Command | Purpose | Example |
 |---------|---------|---------|
