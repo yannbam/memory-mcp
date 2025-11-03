@@ -71,7 +71,7 @@ Uses absolute path, stores memory in `./.memory/memories/` within the project. G
       "args": [
         "/absolute/path/to/memory-mcp/dist/index.js",
         "--memory-root-path",
-        "/home/user/.memories",
+        "/abs/path/to/global/.memory",
         "--tree-view"
       ],
       "env": {}
