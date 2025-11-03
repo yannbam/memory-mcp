@@ -1,6 +1,6 @@
 {
   "name": "@yannbam/memory-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0-dev",
   "description": "MCP server implementation of Claude's native memory tool for persistent storage across conversations",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
