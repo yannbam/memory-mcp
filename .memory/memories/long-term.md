@@ -175,3 +175,6 @@ CONTRIBUTING.md structure: Cover setup, workflow, code style (e/code), testing (
 Repository cleanup for public release: Remove personal notes (JANBAM.md), redundant configs (.mcp.*.json), stale docs (PR-REVIEW*, TEST-FINDINGS*) [🧹✅]
 Keep valuable dev files in public repos: CLAUDE.md (contributor guidelines), .memory/ (dogfooding example), .mcp.json (working config) [📚💡]
 Pre-release verification checklist: Tests (all passing), build (clean), integration (all commands), security (npm audit), docs (links valid) [✅🔒]
+v0.1.0 release completed 2025-11-03: dev→main merge (d740c9a), annotated tag created/pushed, GitHub release published, dev bumped to 0.2.0-dev [✅🎉]
+Release workflow documented in RELEASE-PROCESS.md: merge dev→main (--no-ff), tag on main, push tag, create GitHub release, bump dev version [📚✅]
+CHANGELOG format: Keep a Changelog standard, [Unreleased] at top for next version, dated releases in [X.Y.Z] - YYYY-MM-DD format [📖💡]
