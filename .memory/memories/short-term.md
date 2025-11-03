@@ -5,8 +5,8 @@ _Session ID, active branch, context usage_
 
 Session: 26388472-9934-4033-9cc0-faecf33c1044
 Branch: dev
-Context: 75k/184k tokens
-Working on: Release preparation finalization - COMPLETE ✅
+Context: 105k/184k tokens
+Working on: v0.1.0 release + post-release polish - COMPLETE ✅
 
 ## Session Handoff
 _What was done, what's next, blockers_
