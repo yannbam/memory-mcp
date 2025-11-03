@@ -6,6 +6,11 @@
 
 MCP server implementation of Claude's native memory tool for persistent storage across conversations.
 
+✅ Based on Claude's native memory tool schema
+✅ Safe concurrent access with conflict detection
+🌳 Tree-view
+🙅‍♀️ `<boundary_setting_triggers>` *not* included
+
 ## Overview
 
 This project implements Claude's [memory tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool) as a Model Context Protocol (MCP) server. It enables any MCP client (Claude Code, MCP Inspector, etc.) to have persistent memory across sessions through secure, concurrent-safe filesystem storage.
