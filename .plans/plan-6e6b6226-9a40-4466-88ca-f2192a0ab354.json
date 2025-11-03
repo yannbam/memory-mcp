@@ -120,44 +120,44 @@
     {
       "name": "Release Git Practices",
       "details": "Implement proper git practices for v0.1.0 public release.\n\n**Research and implement:**\n\n1. **Git Tags**\n   - Should we create annotated tag v0.1.0?\n   - What's the format? (git tag -a v0.1.0 -m \"message\")\n   - When to push tags? (git push origin v0.1.0)\n\n2. **CHANGELOG.md Finalization**\n   - Currently has [Unreleased] section\n   - Move everything to [0.1.0] - 2025-10-31 (or today's date)\n   - Add GitHub compare link\n   - Follow Keep a Changelog format\n\n3. **GitHub Release**\n   - Should we create GitHub Release from tag?\n   - What goes in release notes? (copy from CHANGELOG?)\n   - Attach any build artifacts?\n\n4. **Version Bumping**\n   - package.json already at 0.1.0\n   - Any other files need version updates?\n\n5. **Branch Strategy**\n   - Merge dev -> main for release\n   - Keep dev as primary development branch\n   - Main = stable releases only\n   - Tag release on main branch\n\n6. **Post-Release**\n   - Bump version to 0.2.0-dev in dev branch?\n   - Start new [Unreleased] section in CHANGELOG?\n\n**Research best practices** for semantic versioning and release workflows.\nDocument the process for future releases.",
-      "status": "pending",
+      "status": "completed",
       "priority": "high",
       "sub_tasks": [
         {
           "name": "Research release practices",
           "details": "Look up best practices for: git tags, GitHub releases, semantic versioning, changelog format",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "sub_tasks": [],
           "uuid": "419bae0c-f5ff-49dc-9376-aec085478a72",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T03:48:01.113Z"
         },
         {
           "name": "Finalize CHANGELOG",
           "details": "Move [Unreleased] to [0.1.0] with date, add compare links",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "sub_tasks": [],
           "uuid": "a1c78a65-1b4c-4d25-8d27-4d6d2eccb298",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T03:49:20.419Z"
         },
         {
           "name": "Create release plan",
           "details": "Document exact steps: merge, tag, release, version bump",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "sub_tasks": [],
           "uuid": "d2cf7c79-226d-407f-ab8d-188344825786",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T03:49:30.717Z"
         }
       ],
       "uuid": "f015962b-fe0e-4ffc-9a24-49e1ed6ff57d",
       "created_at": "2025-10-31T15:44:29.639Z",
       "updated_at": "2025-10-31T15:44:29.639Z",
-      "completion_percentage": 0
+      "completion_percentage": 100
     },
     {
       "name": "Pre-Release Verification",
@@ -223,5 +223,5 @@
     }
   ],
   "created_at": "2025-10-31T15:44:29.639Z",
-  "updated_at": "2025-11-03T03:23:42.293Z"
+  "updated_at": "2025-11-03T03:49:30.717Z"
 }
