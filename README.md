@@ -6,9 +6,9 @@
 
 Memory MCP
 
-✅ Based on Claude's native memory tool schema
-✅ Safe concurrent access with conflict detection
-🌳 Tree-view
+✅ Based on Claude's native memory tool schema<br>
+✅ Safe concurrent access with conflict detection<br>
+🌳 Tree-view<br>
 🙅‍♀️ `<boundary_setting_triggers>` *not* included
 
 ## Overview
