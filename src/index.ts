@@ -28,6 +28,7 @@ interface CliConfig {
   port: number;
   debug: boolean;
   treeView: boolean;
+  oneToolPerCommand: boolean;
 }
 
 /**
@@ -44,6 +45,7 @@ function parseArgs(args: string[]): CliConfig {
     port: 3000,
     debug: false,
     treeView: false,
+    oneToolPerCommand: false,
   };
 
   // Parse arguments
@@ -103,6 +105,11 @@ function parseArgs(args: string[]): CliConfig {
         config.treeView = true;
         break;
 
+      case '--one-tool-per-command':
+        // Enable one tool per command mode
+        config.oneToolPerCommand = true;
+        break;
+
       case '--version':
       case '-v':
         // Show version and exit
@@ -145,6 +152,7 @@ OPTIONS:
   --transport TYPE, -t TYPE          Transport type: stdio | http (default: stdio)
   --port PORT, -p PORT               HTTP server port (default: 3000, http transport only)
   --tree-view                        Enable tree view for directory listings (default: false)
+  --one-tool-per-command             Expose each command as separate tool (default: single tool)
   --debug, -d                        Enable debug logging to /tmp/memory-mcp/<instance-id>.log
   --version, -v                      Show version
   --help, -h                         Show this help message
@@ -164,6 +172,9 @@ EXAMPLES:
 
   # With tree view for directory listings
   memory-mcp --tree-view
+
+  # With one tool per command mode
+  memory-mcp --one-tool-per-command
 
 For more information, visit: https://github.com/janbam/memory-mcp
   `);
@@ -196,7 +207,12 @@ async function main(): Promise<void> {
     }
 
     // Create MCP server
-    const server = createMemoryServer(path.join(memoryRoot, 'memories'), logger, config.treeView);
+    const server = createMemoryServer(
+      path.join(memoryRoot, 'memories'),
+      logger,
+      config.treeView,
+      config.oneToolPerCommand,
+    );
 
     // Initialize transport
     if (config.transport === 'stdio') {

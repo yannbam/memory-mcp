@@ -1,0 +1,63 @@
+{
+  "uuid": "42bd2d39-244d-4f00-b0d1-3978bdbe6129",
+  "name": "implement-parameter-combinations",
+  "details": "Implement 4 approved parameter combinations from PARAMETER-COMBINATIONS-IMPLEMENTATION.md:\n1. create with optional file_text (create empty file)\n2. insert with optional insert_line (append to end)\n3. delete with old_str/old_string (delete matching text)\n4. str_replace empty string deletion (document existing behavior)\n\nAll specifications are complete and approved by janbam. This is pure implementation work with comprehensive testing.",
+  "tasks": [
+    {
+      "name": "Schema Updates",
+      "details": "Update Zod schemas in BOTH unified and individual tool modes.\n\nFiles:\n- src/server/mcp-server.ts\n\nChanges:\n1. CreateCommandSchema: file_text optional with .default('')\n2. InsertCommandSchema: insert_line optional\n3. DeleteCommandSchema: add old_str/old_string optional params\n4. StrReplaceCommandSchema: update descriptions for empty string deletion\n\nMust update BOTH:\n- Individual schemas (76-116)\n- Unified schema MemoryCommandSchema (21-64)",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "e8d468cd-3841-43cb-ba52-27e4092e4de6",
+      "created_at": "2025-10-28T17:31:27.499Z",
+      "updated_at": "2025-10-28T18:31:40.814Z"
+    },
+    {
+      "name": "Interface Updates",
+      "details": "Update TypeScript interfaces in operations.ts to match new optional parameters.\n\nFile: src/memory/operations.ts\n\nChanges:\n1. CreateCommand: file_text?: string\n2. InsertCommand: insert_line?: number\n3. DeleteCommand: add old_str?: string, old_string?: string",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "268eff12-443d-45a8-9b00-a5696ec21d34",
+      "created_at": "2025-10-28T17:31:27.499Z",
+      "updated_at": "2025-10-28T18:32:00.302Z"
+    },
+    {
+      "name": "Handler Implementation",
+      "details": "Implement logic for new parameter combinations.\n\nFile: src/memory/operations.ts\n\nChanges:\n1. insert(): Handle missing insert_line (append to end) - lines 362-408\n2. deleteOp(): Add validation for parameter conflicts - lines 417-513\n3. deleteOp(): Implement deleteMatchingText() helper\n4. Add escapeRegExp() utility function\n\nNo changes needed for create() - default value handles it.",
+      "status": "completed",
+      "priority": "urgent",
+      "uuid": "5fd6929f-1ac0-414a-88e5-6d4251fd6fb8",
+      "created_at": "2025-10-28T17:31:27.499Z",
+      "updated_at": "2025-10-28T18:33:09.965Z"
+    },
+    {
+      "name": "Test Implementation",
+      "details": "Add ~12 comprehensive tests to test/memory-operations.test.ts\n\nTests:\n- 3 tests for create with optional file_text\n- 3 tests for insert with optional insert_line  \n- 6 tests for delete with old_str (including regex escaping)\n- 1 test for str_replace empty string deletion (verify exists)\n\nTarget: 100 → 112 passing tests",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "830fba10-b887-4de7-8bf1-a60c1b841086",
+      "created_at": "2025-10-28T17:31:27.499Z",
+      "updated_at": "2025-10-28T18:37:14.756Z"
+    },
+    {
+      "name": "Documentation Updates",
+      "details": "Update README and CHANGELOG with new features.\n\nFiles:\n- README.md: Update str_replace section with deletion example\n- CHANGELOG.md: Add release note for parameter combinations feature\n\nEmphasize:\n- Forgiving parameter naming (old_str OR old_string)\n- Empty string deletion behavior\n- Optional parameters provide sensible defaults",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "a2a63cbe-6b50-42e9-947d-4f71d6a3ee59",
+      "created_at": "2025-10-28T17:31:27.499Z",
+      "updated_at": "2025-10-28T18:38:02.059Z"
+    },
+    {
+      "name": "Manual Testing",
+      "details": "Test with actual MCP tooling to verify both modes work.\n\nTests:\n1. Unified tool mode (default)\n2. One-tool-per-command mode\n3. Edge cases: empty files, special characters, multiple occurrences\n4. Verify all 4 features work as specified\n\nUse MCP-Debug if available, otherwise request user to reconnect MCP.",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "00601eea-64da-4fe8-95c2-2ac0420324df",
+      "created_at": "2025-10-28T17:31:27.499Z",
+      "updated_at": "2025-10-28T18:39:53.916Z"
+    }
+  ],
+  "created_at": "2025-10-28T17:31:27.499Z",
+  "updated_at": "2025-10-28T18:40:03.369Z"
+}

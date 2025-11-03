@@ -267,6 +267,14 @@ function printTreeNodes(nodes: TreeNode[], prefix: string = ''): string {
  * @returns Formatted tree view string with header and metadata
  */
 export async function renderDirectoryTree(fullPath: string, memoryPath: string): Promise<string> {
+  // Build tree structure
+  const tree = await buildDirectoryTree(fullPath, fullPath);
+
+  // Check if directory is empty (after filtering hidden files)
+  if (tree.length === 0) {
+    return 'Directory is empty.';
+  }
+
   // Get timezone for header
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -274,8 +282,7 @@ export async function renderDirectoryTree(fullPath: string, memoryPath: string):
   let result = `Showing contents of: ${memoryPath}\n`;
   result += `Modification dates shown in [YYYY/MM/DD - HH:MM:SS] format (${timeZone} timezone)\n\n`;
 
-  // Build and print tree structure
-  const tree = await buildDirectoryTree(fullPath, fullPath);
+  // Print tree structure
   result += printTreeNodes(tree);
 
   return result;

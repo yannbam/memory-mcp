@@ -1,9 +1,21 @@
 {
   "mcpServers": {
-    "memory": {
+    "project_memory": {
       "command": "node",
-      "args": ["/home/jan/projects/memory-mcp/dist/index.js", "--tree-view"],
+      "args": ["./dist/index.js", "--tree-view"],
       "env": {}
+    },
+    "test-memory-A": {
+      "command": "node",
+      "args": ["/home/jan/projects/memory-mcp/dist/index.js", "-m", "/tmp/test-memory"]
+    },
+    "test-memory-B": {
+      "command": "node",
+      "args": ["/home/jan/projects/memory-mcp/dist/index.js", "-m", "/tmp/test-memory"]
+    },
+    "test-memory-multitool": {
+      "command": "node",
+      "args": ["/home/jan/projects/memory-mcp/dist/index.js", "--one-tool-per-command", "-m", "/tmp/test-memory"]
     },
     "MCP-Debug": {
       "command": "node",

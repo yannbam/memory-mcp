@@ -1,0 +1,162 @@
+{
+  "uuid": "7e174440-fd56-4838-8fb3-4650a81889ab",
+  "name": "memory-system-implementation",
+  "details": "Implement the complete evolutionary memory system combining Memory System 2.0 (Refined) and 3.0 (Evolution) into CLAUDE.md and restructure the memory files to support learning across sessions.",
+  "tasks": [
+    {
+      "name": "Update CLAUDE.md Memory Section",
+      "details": "Replace the current memory section in CLAUDE.md with comprehensive guide including: Core Philosophy (memory preserves what matters + enables learning), What Goes in Memory (surprises, facts, deferred tasks, etc.), Three Memory Zones, Session Lifecycle Workflow, Memory Format Rules, Evolution Mechanisms, Emoji Freedom, and Key Principles",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Write Core Philosophy",
+          "details": "Document that memory preserves what matters across sessions AND enables evolutionary learning - not just storage but active knowledge refinement",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "ae6209c8-b9e4-4842-b987-3ad7b9c7198a",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:24.526Z"
+        },
+        {
+          "name": "Document What Goes in Memory",
+          "details": "List all types: surprises, important facts, deferred tasks, reminders, partial progress, contextual breadcrumbs. Include the test: 'Is this worth preserving across sessions?'",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "59af7833-7772-4a3e-84a8-9cbfbe1d6734",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:24.526Z"
+        },
+        {
+          "name": "Explain Three Memory Zones",
+          "details": "Document the three zones: Plan (via PlanAndTrack), Short-term memory (active discoveries + handoff), Long-term memory (enduring wisdom)",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "3015ee5b-006a-417d-ab3d-c9c7efced42c",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:24.526Z"
+        },
+        {
+          "name": "Write Session Lifecycle Workflow",
+          "details": "Document SESSION START (read, plan, clear space), DURING SESSION (immediate capture in Quick Notes), and SESSION END (reflect, promote, prune, handoff)",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "db35dfc2-aae0-4449-95e7-16ae3d9ac1f4",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:24.526Z"
+        },
+        {
+          "name": "Add Memory Format Rules",
+          "details": "One line = one atomic memory (1-3 sentences), no human formatting, Claude's notepad not a document, self-contained clarity",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "c13b7ff7-c2ea-4116-9268-a935b4a0764a",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:24.527Z"
+        },
+        {
+          "name": "Document Evolution Mechanisms",
+          "details": "Search before add, update in place, annotate evolution, consolidate related, prune obsolete. Show knowledge evolution example",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "08228e4a-a065-474f-bce4-272644ca480d",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:24.527Z"
+        },
+        {
+          "name": "Add Emoji Freedom Section",
+          "details": "Give 2-3 examples then emphasize ANY emoji can be used for creative expression. Different projects need different markers",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "07da79e6-91e1-4be7-a767-e274aec78c57",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:24.527Z"
+        }
+      ],
+      "uuid": "b0b7c4af-a429-403b-b630-456a9853cb2d",
+      "created_at": "2025-10-27T19:06:39.617Z",
+      "updated_at": "2025-10-27T19:06:39.617Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Restructure long-term.md",
+      "details": "Replace MCP-specific sections with universal categories that apply to any project",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Delete old sections",
+          "details": "Remove MCP SDK Quirks, Schema Conversion Patterns, and other project-specific sections",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "e719cdf1-159b-4ec4-a53d-f4f95a35f69a",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:52.077Z"
+        },
+        {
+          "name": "Add universal sections",
+          "details": "Add: Architecture & Design, Performance & Optimization, Environment & Dependencies, Mistakes to Avoid, Proven Solutions, Testing & Debugging, Deferred Work, Project-Specific Knowledge",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "2f6be4e4-a4e4-4936-b09c-06cb2e4fb36d",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:52.077Z"
+        },
+        {
+          "name": "Add extensibility note",
+          "details": "Note that these are starter sections - future Claudes should add new sections as needed",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "51b1d491-a1d9-4b57-8282-694ef64da5d9",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:08:52.077Z"
+        }
+      ],
+      "uuid": "97858048-cf6c-4344-9619-194a0c697385",
+      "created_at": "2025-10-27T19:06:39.618Z",
+      "updated_at": "2025-10-27T19:06:39.618Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Restructure short-term.md",
+      "details": "Reorganize with Quick Notes moved to the end for rapid capture during sessions",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Move Quick Notes to end",
+          "details": "Relocate Quick Notes section to the very end of the file as the main space for rapid memory capture",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "cb9da442-6f34-4ed8-ab14-be62dce7cb46",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:09:31.550Z"
+        },
+        {
+          "name": "Simplify structure",
+          "details": "Keep only essential sections: Current Session, Session Handoff, Active Plans, Quick Notes",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "237d8fef-c3b9-4616-9169-d2e3f38d970d",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:09:31.550Z"
+        },
+        {
+          "name": "Update descriptions",
+          "details": "Update section descriptions to emphasize rapid capture in Quick Notes and session-specific context",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "2c4443d4-eb35-4818-bf9a-ea79df1cbcd0",
+          "created_at": "2025-10-27T19:06:39.618Z",
+          "updated_at": "2025-10-27T19:09:31.550Z"
+        }
+      ],
+      "uuid": "38109e31-43a3-45f0-80e2-7a44a9ba3625",
+      "created_at": "2025-10-27T19:06:39.618Z",
+      "updated_at": "2025-10-27T19:06:39.618Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-10-27T19:06:39.619Z",
+  "updated_at": "2025-10-27T19:09:38.205Z"
+}

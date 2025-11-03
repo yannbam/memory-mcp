@@ -1,0 +1,384 @@
+{
+  "uuid": "c656929d-192e-40ee-964c-f2cc0accd0d1",
+  "name": "public-release-beta",
+  "details": "Prepare memory-mcp repository for public beta release (v0.1.0). This project will dogfood its own memory system - using memory-mcp to document memory-mcp development.\n\nKey decisions:\n- Actually USE memory system for this project (adopt from mcp-ts-api)\n- Commit .memory/ and .mcp.json as living examples\n- Add .mcp.example.json for users to copy\n- Prepare for npm (@yannbam/memory-mcp) but don't publish yet (0.1.0 = public beta)\n- Repository becomes both: production tool AND best-practice example\n\nTarget: Clean public beta ready for GitHub, prepared for future npm publish",
+  "tasks": [
+    {
+      "name": "Adopt Memory System",
+      "details": "Use memory-mcp to develop memory-mcp! Set up real memory system based on mcp-ts-api structure. This becomes our living example and improves our own workflow.",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Study mcp-ts-api memory structure",
+          "details": "Read ~/projects/mcp-ts-api/.memory/memories/ to understand:\n- Directory organization patterns\n- What types of information to store\n- How to structure architecture vs development vs releases\n- File naming conventions",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "c32e9656-3dfc-4831-93a0-c51764113d89",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:22:17.480Z"
+        },
+        {
+          "name": "Create memory directory hierarchy",
+          "details": "Set up ./.memory/memories/ structure with TWO files (simpler approach from mcp-ts-api):\n- long-term.md - Evolving discoveries across all sessions\n- short-term.md - Session handoff and current context\n\nClear out existing test artifacts from .memory/memories/ first.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "831d4a8f-baeb-461a-a7b9-d0bec63a8bcd",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:23:39.629Z"
+        },
+        {
+          "name": "Populate architecture memories",
+          "details": "Document key architectural decisions:\n- architecture/rw-locks.md - Why RW locks, performance benefits, tradeoffs\n- architecture/unified-tool.md - Single memory tool vs 6 tools, spec compliance\n- architecture/path-security.md - Security layers, attack vectors, test strategy\n- architecture/transport-design.md - stdio vs HTTP, stateless design",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "5bf89e01-144a-4493-9744-e946191d3cf9",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:24:01.345Z"
+        },
+        {
+          "name": "Populate development memories",
+          "details": "Document development practices:\n- development/typescript-esm-setup.md - Node16, isolatedModules, jest config\n- development/testing-strategy.md - Unit + integration + E2E, adversarial testing\n- development/code-style.md - e/code conventions, commenting philosophy\n- development/ci-pipeline.md - GitHub Actions, coverage, multi-node",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "303c2281-5586-4a85-bc68-f217b75313dd",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:24:01.345Z"
+        },
+        {
+          "name": "Populate release memories",
+          "details": "Document version history:\n- releases/v0.1.0.md - Initial public beta, features, test results, E2E validation\n- releases/milestones.md - Key achievements during development\n- releases/future-roadmap.md - Potential features, improvements",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "5ad22e70-b38c-4576-b3cf-8ad82ee654d0",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:24:01.345Z"
+        },
+        {
+          "name": "Update .gitignore for committed memory",
+          "details": "Current .gitignore has:\n/.memory/\n/memory/\n\nRemove /.memory/ line so we commit our memory files as examples.\nKeep /memory/ line (prevents accidental commits of user memory).",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "ac50c770-4fc2-4544-a779-9f6ce7e7c481",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:23:52.549Z"
+        }
+      ],
+      "uuid": "3b13a669-90f9-4fcf-99ab-0e6503573a35",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Configure MCP for Project",
+      "details": "Set up .mcp.json to use local memory system, and create .mcp.example.json for users to copy.",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Create .mcp.json for this project",
+          "details": "Configure to use relative path:\n{\n  \"mcpServers\": {\n    \"project_memory\": {\n      \"command\": \"node\",\n      \"args\": [\"./dist/index.js\", \"--tree-view\"],\n      \"env\": {}\n    }\n  }\n}\n\nThis will be committed as working example.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "13229efe-80d3-4ff7-83f4-32478477170a",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:24:14.660Z"
+        },
+        {
+          "name": "Create .mcp.example.json",
+          "details": "Template for users:\n{\n  \"mcpServers\": {\n    \"project_memory\": {\n      \"command\": \"node\",\n      \"args\": [\"/absolute/path/to/memory-mcp/dist/index.js\", \"--tree-view\"],\n      \"env\": {}\n    }\n  }\n}\n\nInclude comment in README pointing to this file.",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "aaf77354-4ecc-491d-9728-7c8c62d5d2c9",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:24:14.661Z"
+        },
+        {
+          "name": "Test memory system works",
+          "details": "Verify:\n1. Build project: npm run build\n2. Reconnect MCP in Claude Code\n3. Test memory commands work\n4. Verify tree view displays correctly\n5. Create a test memory file to confirm functionality",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "e8ef64a5-a892-438e-b33d-b4703eb38349",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:46:06.721Z"
+        }
+      ],
+      "uuid": "cb512ccc-31b5-4903-a12e-4b0add0dae47",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Repository Cleanup",
+      "details": "Remove development artifacts while keeping important infrastructure. Clean up for public consumption.",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Clean empty directories",
+          "details": "Remove:\n- .notes/ (empty, not needed)\n- .state/ (empty, not needed)\n\nKeep:\n- .plans/ (development history, shows planning process)\n- coverage/ (gitignored, generated by tests)",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "d8ee7883-185d-45a4-b3d4-bed9d556219d",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:47:53.124Z"
+        },
+        {
+          "name": "Handle INTEGRATION-TEST-RESULTS.md",
+          "details": "Options:\n1. Move to docs/INTEGRATION-TEST-RESULTS.md\n2. Move to .memory/memories/releases/integration-test-results.md\n3. Delete (info is in git history)\n\nRecommend: Move to memory system as release documentation",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "d7048754-38ca-4eb4-b8ec-eb7e5677cc9e",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:47:53.124Z"
+        },
+        {
+          "name": "Rename reference TypeScript file",
+          "details": "Rename:\ndocs/tools-helpers-memory.ts\n→ docs/tools-helpers-memory-anthropic-reference.ts\n\nAdd header comment:\n/**\n * Reference Implementation from Anthropic\n * \n * Source: Anthropic's internal memory tool implementation\n * This is the original TypeScript reference implementation that\n * inspired this MCP server. Kept for reference and comparison.\n * \n * Original file: tools/helpers/memory.ts (Anthropic codebase)\n */",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "7c05db76-9da1-4248-829e-ce48bec478d8",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:47:53.125Z"
+        },
+        {
+          "name": "Review .plans for sensitive info",
+          "details": "Quick scan of archived plans:\n- Ensure no API keys, passwords, or sensitive paths\n- Plans show development process (good for transparency)\n- Keep as-is unless issues found",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "0ab1ed9c-607c-4a50-aa8f-3d1952630f0f",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:47:53.125Z"
+        }
+      ],
+      "uuid": "702096b1-635e-4a01-88dd-6b944a9f6a8e",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Documentation Updates",
+      "details": "Polish all documentation for public beta. Add missing files, update existing ones.",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Create LICENSE file",
+          "details": "Add MIT license:\n- Standard MIT license text\n- Copyright: \"Copyright (c) 2025 Claude (claude-sonnet-4-5-20250929) and janbam\"\n- Matches package.json declaration",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "637dc0ee-e42d-4786-8da9-7eff6e455cea",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:48:16.313Z"
+        },
+        {
+          "name": "Create CHANGELOG.md",
+          "details": "Version history following Keep a Changelog format:\n\n# Changelog\n\n## [0.1.0] - 2025-10-16 - Public Beta\n\n### Added\n- All 6 memory commands (view, create, str_replace, insert, delete, rename)\n- Tree view mode for hierarchical directory display\n- Reader-writer locks (38x performance improvement)\n- stdio and HTTP transports\n- Path security with 27 comprehensive tests\n- Debug logging to /tmp/memory-mcp/\n- Full TypeScript with Zod validation\n- 85 unit tests + integration tests + E2E validation\n\n### Security\n- Multi-layer path traversal protection\n- Comprehensive security test suite\n\n## [Unreleased]\n- Future enhancements will be listed here",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "952bad5a-6f19-4d7f-9a6f-b23a5d752e4d",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:48:16.314Z"
+        },
+        {
+          "name": "Update README.md",
+          "details": "Enhancements:\n1. Add Installation section showing BOTH configurations in README:\n   - Local project_memory with relative path (./dist/index.js)\n   - Global system_memory with absolute path (/absolute/path/to/memory-mcp/dist/index.js)\n2. REMOVE .mcp.example.json file (redundant - just show configs in README)\n3. Add note about committed .memory/ as example\n4. Update status to 'Public Beta (v0.1.0)'\n5. Add 'Future npm' section (prepared but not published)\n6. Add GitHub repository URL (https://github.com/yannbam/memory-mcp)\n7. Polish contributing section",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "3ac417a3-afca-476c-b85a-62b33ba04edb",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:49:23.284Z"
+        },
+        {
+          "name": "Update CLAUDE.md",
+          "details": "Restructure CLAUDE.md into lean, focused format:\n\n**New Structure:**\n1. **Static Section**: Core project info that rarely changes\n   - Project overview and purpose\n   - Architecture principles (reference docs/)\n   - Development guidelines (e/code, e/coll conventions)\n   - Testing approach\n   - Key technical details\n\n2. **Memory Section**: Just @ references\n   - @.memory/memories/architecture/ - Design decisions\n   - @.memory/memories/development/ - Dev patterns\n   - @.memory/memories/releases/ - Version history\n   - @.memory/memories/short-term/ - Current session context\n\n**What to Remove:**\n- Duplications from README.md (installation, features, etc.)\n- Session-specific handoff details (move to short-term memory)\n- Redundant information already in docs/\n\n**New Philosophy:**\n- CLAUDE.md = stable reference that rarely changes\n- Memory system = dynamic session-to-session information\n- Only update CLAUDE.md when static content genuinely needs changes",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "3f3fe4cf-08b1-4a18-a8b6-0ed07699a65b",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:50:21.383Z"
+        },
+        {
+          "name": "Verify docs/ accuracy",
+          "details": "Review all documentation files:\n- 039-Memory-tool.md (official Anthropic spec - verify accuracy)\n- ARCHITECTURE.md - check for accuracy, update if needed\n- LOCKING-REDESIGN.md - verify describes current implementation\n- MCP-SDK-README.md (MCP SDK reference - keep as-is)\n- tools-helpers-memory-anthropic-reference.ts (renamed - add provenance)",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "f982891e-7d1d-4153-a7a3-7c81bd02a289",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:50:31.452Z"
+        }
+      ],
+      "uuid": "9ea4e34b-9b0e-4047-8e47-e5437e964a7c",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Prepare for npm (Don't Publish Yet)",
+      "details": "Get package.json ready for future npm publish as @yannbam/memory-mcp, but don't actually publish (0.1.0 = public beta).",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [
+        {
+          "name": "Update package.json metadata",
+          "details": "Add/update fields for npm:\n- name: \"@yannbam/memory-mcp\" (scoped package)\n- repository: {\"type\": \"git\", \"url\": \"https://github.com/yannbam/memory-mcp.git\"}\n- homepage: \"https://github.com/yannbam/memory-mcp\"\n- bugs: {\"url\": \"https://github.com/yannbam/memory-mcp/issues\"}\n- files: Verify what gets published (or add .npmignore)",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "087d0ea6-d4ee-4772-a989-2f76b03036f5",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:50:50.557Z"
+        },
+        {
+          "name": "Create .npmignore or verify files field",
+          "details": "Ensure npm publish only includes:\n- dist/ (compiled code)\n- README.md, LICENSE, CHANGELOG.md\n- package.json\n\nExclude:\n- src/, test/, tests/, coverage/\n- .memory/ (or keep as example?)\n- .plans/, .notes/, .state/\n- *.test.ts, jest.config.js, tsconfig.json\n- .mcp.json (or keep as example?)\n\nDecision: Keep .memory/ and .mcp.json as examples?",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "81c5e73b-7fed-4059-b2a2-459263e82601",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:50:50.557Z"
+        },
+        {
+          "name": "Test npm pack locally",
+          "details": "Before any future publish:\n1. npm pack (creates tarball)\n2. Extract and inspect contents\n3. Verify dist/ structure correct\n4. Check file sizes reasonable\n5. Verify no sensitive files included",
+          "status": "completed",
+          "priority": "low",
+          "uuid": "75028101-5cbc-4c2f-b403-98897448d6e2",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:50:50.557Z"
+        }
+      ],
+      "uuid": "4b2d3a14-0ce9-4499-95d2-36257e0f93a7",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Optional Professional Touches",
+      "details": "Nice-to-have files that improve project polish. Optional but quick wins.",
+      "status": "pending",
+      "priority": "low",
+      "sub_tasks": [
+        {
+          "name": "Create CONTRIBUTING.md",
+          "details": "Contribution guidelines:\n- Development setup (npm install, npm run build)\n- Code style (e/code conventions, TypeScript strict mode)\n- Testing requirements (write tests, 80%+ coverage)\n- PR process (fork, branch, test, PR)\n- Issue reporting guidelines\n- Reference memory system as example of good practices",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "eab254de-cbde-4712-a660-a6c2d83d9a10",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        },
+        {
+          "name": "Add GitHub templates",
+          "details": "Create .github/ directory:\n- ISSUE_TEMPLATE.md (bug report, feature request)\n- PULL_REQUEST_TEMPLATE.md (checklist: tests, docs, lint)\n- SECURITY.md (vulnerability reporting process)\n- Optional: CODE_OF_CONDUCT.md (contributor covenant)",
+          "status": "pending",
+          "priority": "low",
+          "uuid": "c501c61e-9eb3-49fc-9cb4-91934d186c5a",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        }
+      ],
+      "uuid": "081f1c3d-8ae6-467e-abb6-8b8947fae6e2",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Pre-Release Verification",
+      "details": "Final checks before making repository public. Ensure everything builds, tests pass, and quality is high.",
+      "status": "pending",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run full test suite",
+          "details": "Verify all tests pass:\n- npm test (should show 85/85 passing)\n- npm run test:coverage (verify ≥80% coverage)\n- npm run lint (no errors)\n- Check integration tests in tests/integration/",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "67f52cac-dfa9-4ed4-8b72-47bb7a606fc0",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        },
+        {
+          "name": "Test clean build",
+          "details": "Verify build from scratch:\n1. rm -rf dist/ node_modules/\n2. npm install\n3. npm run build\n4. Verify dist/ structure looks correct\n5. Test: node dist/index.js --help\n6. Test: node dist/index.js --version",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "1bdd053f-f406-4f31-8b21-85610cce70f1",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        },
+        {
+          "name": "Security audit",
+          "details": "Run security checks:\n- npm audit (check for known vulnerabilities)\n- npm audit fix (if safe fixes available)\n- Review dependency count and licenses\n- Verify path security tests comprehensive (already have 27)",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "401464c3-f33d-47bd-bab8-e64d1bc400c4",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        },
+        {
+          "name": "Test memory system integration",
+          "details": "Verify our own memory system works:\n1. Reconnect memory-mcp in Claude Code\n2. Test all 6 memory commands\n3. Verify tree view displays correctly\n4. Test concurrent access (multiple operations)\n5. Verify debug logging works (if enabled)",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "ce0370f7-bd90-4cc7-bd2d-6d943f3c1ecd",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        }
+      ],
+      "uuid": "b37f4231-d44f-4d91-abd9-4ba7005a61a1",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 0
+    },
+    {
+      "name": "Comprehensive Code Review",
+      "details": "Final review using PR review agents and manual inspection. Catch any issues before public release.",
+      "status": "pending",
+      "priority": "urgent",
+      "sub_tasks": [
+        {
+          "name": "Run code-reviewer agent",
+          "details": "Use pr-review-toolkit:code-reviewer to audit:\n- All TypeScript files in src/\n- Code quality and style issues\n- Potential bugs or edge cases\n- Best practice adherence\n- Focus on public-facing code",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "f81eaef1-9fc7-4feb-ac2d-21accee1d8fe",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        },
+        {
+          "name": "Run type-design-analyzer",
+          "details": "Use pr-review-toolkit:type-design-analyzer for:\n- TypeScript type quality\n- Interface design\n- Type safety and encapsulation\n- API surface design\nFocus on exported types and interfaces",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "53fc0e18-3a77-4176-9f78-14ebc52f6cab",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        },
+        {
+          "name": "Run comment-analyzer",
+          "details": "Use pr-review-toolkit:comment-analyzer to verify:\n- Comment accuracy and completeness\n- Documentation quality\n- Avoiding future technical debt\n- e/code convention adherence",
+          "status": "pending",
+          "priority": "medium",
+          "uuid": "1850ed1c-78dc-4695-ae0c-11efb2ab428b",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        },
+        {
+          "name": "Manual review",
+          "details": "Human review checklist:\n- README clear for new users?\n- Installation instructions work?\n- Examples accurate and helpful?\n- No remaining personal/system-specific references?\n- Overall professional appearance?\n- Memory system demonstrates tool well?",
+          "status": "pending",
+          "priority": "high",
+          "uuid": "04517048-7c1f-4b73-96fe-ca218c27d4cb",
+          "created_at": "2025-10-25T16:08:44.495Z",
+          "updated_at": "2025-10-25T16:08:44.495Z"
+        }
+      ],
+      "uuid": "5e637916-f308-41bb-a417-2fd16b282560",
+      "created_at": "2025-10-25T16:08:44.495Z",
+      "updated_at": "2025-10-25T16:08:44.495Z",
+      "completion_percentage": 0
+    }
+  ],
+  "created_at": "2025-10-25T16:08:44.495Z",
+  "updated_at": "2025-10-28T14:37:45.040Z"
+}

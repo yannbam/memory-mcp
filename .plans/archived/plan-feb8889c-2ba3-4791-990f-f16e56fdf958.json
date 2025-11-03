@@ -1,0 +1,99 @@
+{
+  "uuid": "feb8889c-2ba3-4791-990f-f16e56fdf958",
+  "name": "checksum-real-world-testing",
+  "details": "Comprehensive real-world testing of checksum-based concurrency detection using two separate MCP instances (test-memory-A and test-memory-B) that share the same memory root directory. Tests will validate all scenarios described in CHECKSUM-CONCURRENCY-DESIGN.md.",
+  "tasks": [
+    {
+      "name": "Sequential Modification Detection",
+      "details": "Test the main benefit: detecting modifications that occur BETWEEN separate operations (not during lock wait)\n\nScenarios:\n1. A reads file → B modifies → A writes (based on stale data) → Error expected\n2. A views full file → B str_replace → A str_replace (expecting old text) → Error with current content shown\n3. A views with range (not cached) → B modifies → A writes → Should NOT error (partial read not cached)",
+      "status": "completed",
+      "priority": "urgent",
+      "sub_tasks": [],
+      "uuid": "6787cbb9-74b6-4547-8b95-3a8e476e7717",
+      "created_at": "2025-10-30T14:54:36.117Z",
+      "updated_at": "2025-10-30T14:56:18.279Z"
+    },
+    {
+      "name": "Successful Operations",
+      "details": "Verify operations succeed when content matches expectations\n\nScenarios:\n1. A reads file → A immediately modifies → Success (checksum matches cache)\n2. A reads file → B does nothing → A modifies → Success\n3. A creates file → A modifies immediately → Success (checksum cached on create)\n4. Fresh operation with no cache → Success (no cached checksum to compare)",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "478bb271-9022-418e-8afd-24b857247648",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T14:56:50.651Z"
+    },
+    {
+      "name": "Error Message Quality",
+      "details": "Verify error messages show current file contents when concurrent modification detected\n\nValidate:\n1. Error message includes 'File has been modified by another process'\n2. Current content is shown (truncated if >5000 chars)\n3. Truncation indicator present for large files\n4. Error message is actionable (tells user to re-read and retry)",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "8ba282f8-4520-49fa-bc49-2eaaee7e8396",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T15:00:04.873Z"
+    },
+    {
+      "name": "File Deletion Scenarios",
+      "details": "Test cache behavior when files are deleted\n\nScenarios:\n1. A reads file → B deletes file → A writes → Appropriate error (ENOENT, not checksum error)\n2. A reads file → A deletes file → Cache cleared\n3. A deletes file → B tries to access → File not found",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "9a695d6d-4600-432d-8832-57db81f00f62",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T14:58:33.483Z"
+    },
+    {
+      "name": "Rename Operations",
+      "details": "Test cache invalidation on rename\n\nScenarios:\n1. A reads /memories/old.txt → B renames to /memories/new.txt → A writes to old path → File not found\n2. A reads /memories/old.txt → A renames to /memories/new.txt → Cache cleared for old path\n3. A renames file → B reads new path → No cache (fresh read)",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "948adbaa-e983-489e-b3e1-cc8aeb64c2a2",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T14:58:45.397Z"
+    },
+    {
+      "name": "Multiple File Operations",
+      "details": "Test checksum caching across multiple files\n\nScenarios:\n1. A reads file1 and file2 → B modifies file1 → A writes to file1 (error) and file2 (success)\n2. Cache isolation: Operations on different files don't interfere\n3. Cache per-path: Same filename in different directories treated separately",
+      "status": "completed",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "0cadf139-00a1-45ca-9a5b-5c802afce39e",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T14:59:17.075Z"
+    },
+    {
+      "name": "Large File Handling",
+      "details": "Test content preview truncation for large files\n\nScenarios:\n1. Create file >5000 chars → B modifies → A writes → Error message truncates content with indicator\n2. Verify hash computation time acceptable for typical files (<50KB)\n3. Edge case: Very large file (1MB+) - still works, just slower",
+      "status": "completed",
+      "priority": "low",
+      "sub_tasks": [],
+      "uuid": "c61f9291-adba-41ca-a8d9-122b4dccb4ae",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T14:58:19.342Z"
+    },
+    {
+      "name": "Directory Operations",
+      "details": "Verify directories are NOT checksummed\n\nScenarios:\n1. A views directory → No cache created\n2. B adds file to directory → A views directory again → Success (directories not cached)\n3. Operations on files within directories work normally",
+      "status": "completed",
+      "priority": "low",
+      "sub_tasks": [],
+      "uuid": "e4a49dff-c552-4315-8a33-f471efa5132b",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T14:59:29.880Z"
+    },
+    {
+      "name": "Edge Cases",
+      "details": "Test boundary conditions and unusual scenarios\n\nScenarios:\n1. Empty file handling (checksum of empty string)\n2. File with only whitespace/newlines\n3. Unicode content (ensure UTF-8 encoding consistent)\n4. Rapid sequential operations (A reads, A writes, A writes again)\n5. Same content, different operations (str_replace vs insert vs create)",
+      "status": "completed",
+      "priority": "low",
+      "sub_tasks": [],
+      "uuid": "c2eb9390-7807-4c37-873a-899d9c3fc579",
+      "created_at": "2025-10-30T14:54:36.118Z",
+      "updated_at": "2025-10-30T15:00:04.624Z"
+    }
+  ],
+  "created_at": "2025-10-30T14:54:36.118Z",
+  "updated_at": "2025-10-30T15:00:05.153Z"
+}

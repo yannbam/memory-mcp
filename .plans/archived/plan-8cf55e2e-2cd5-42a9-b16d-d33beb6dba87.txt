@@ -1,0 +1,13 @@
+🌳 "delete-line-session"
+📝 Implement delete_line parameter for delete command. Feature 3 of 4 from public-release-beta-v2 plan.
+
+Scope: Targeted single-line deletion capability as alternative to read/remove/write pattern.
+📊 ██████████ 100% (7/7 tasks)
+
+├── ✅ |Update DeleteCommand interface| "Add optional delete_line parameter to DeleteCommand interface in operations.ts (line 50-52)" (🔴)
+├── ✅ |Update DeleteCommandSchema| "Add optional delete_line parameter to Zod schema in mcp-server.ts (line 97-99) with proper description" (🔴)
+├── ✅ |Implement line deletion logic| "Modify deleteOp function in operations.ts (416-467) to:\n- Check if delete_line parameter is provided\n- If yes: validate file exists, is file not directory, read content, validate line number (1-based), delete line, write back\n- If no: existing file/directory deletion behavior\n- Use same validation pattern as insert function (lines.length bounds checking)" (🔴)
+├── ✅ |Add comprehensive tests| "Add tests to memory-operations.test.ts:\n- Delete single line from middle of file\n- Delete first line\n- Delete last line\n- Delete from single-line file (results in empty file)\n- Error: line number out of range (too high)\n- Error: line number < 1\n- Error: delete_line on directory (should fail)\n- Error: delete_line on non-existent file" (🔴)
+├── ✅ |Run full test suite| "Verify all tests pass (should be 100+ tests after adding ~8 new tests)" (🔴)
+├── ✅ |Manual testing with MCP-Debug| "Test both tool modes:\n- Unified tool: memory(command: 'delete', path: '/memories/test.txt', delete_line: 2)\n- Individual tool: memory_delete(path: '/memories/test.txt', delete_line: 2)\nVerify correct line deletion in both modes" (🟡)
+└── ✅ |Update plan progress| "Mark delete_line feature complete in public-release-beta-v2 plan (will be 75% complete, 3 of 4 features done)" (🔵)

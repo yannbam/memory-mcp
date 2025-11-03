@@ -1,0 +1,72 @@
+{
+  "uuid": "8cf55e2e-2cd5-42a9-b16d-d33beb6dba87",
+  "name": "delete-line-session",
+  "details": "Implement delete_line parameter for delete command. Feature 3 of 4 from public-release-beta-v2 plan.\n\nScope: Targeted single-line deletion capability as alternative to read/remove/write pattern.",
+  "tasks": [
+    {
+      "name": "Update DeleteCommand interface",
+      "details": "Add optional delete_line parameter to DeleteCommand interface in operations.ts (line 50-52)",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "837dcdf9-68b3-4684-aa55-2982945124ed",
+      "created_at": "2025-10-28T16:14:16.717Z",
+      "updated_at": "2025-10-28T16:14:34.522Z"
+    },
+    {
+      "name": "Update DeleteCommandSchema",
+      "details": "Add optional delete_line parameter to Zod schema in mcp-server.ts (line 97-99) with proper description",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "f3871f50-8755-48a5-aa9b-bd2c3f877eef",
+      "created_at": "2025-10-28T16:14:16.718Z",
+      "updated_at": "2025-10-28T16:15:10.007Z"
+    },
+    {
+      "name": "Implement line deletion logic",
+      "details": "Modify deleteOp function in operations.ts (416-467) to:\n- Check if delete_line parameter is provided\n- If yes: validate file exists, is file not directory, read content, validate line number (1-based), delete line, write back\n- If no: existing file/directory deletion behavior\n- Use same validation pattern as insert function (lines.length bounds checking)",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "5170176b-b87c-433a-94d1-bc5f614987c4",
+      "created_at": "2025-10-28T16:14:16.718Z",
+      "updated_at": "2025-10-28T16:15:19.316Z"
+    },
+    {
+      "name": "Add comprehensive tests",
+      "details": "Add tests to memory-operations.test.ts:\n- Delete single line from middle of file\n- Delete first line\n- Delete last line\n- Delete from single-line file (results in empty file)\n- Error: line number out of range (too high)\n- Error: line number < 1\n- Error: delete_line on directory (should fail)\n- Error: delete_line on non-existent file",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "c8656518-5b94-4bd8-9f1f-269af55f0dd3",
+      "created_at": "2025-10-28T16:14:16.718Z",
+      "updated_at": "2025-10-28T16:15:51.440Z"
+    },
+    {
+      "name": "Run full test suite",
+      "details": "Verify all tests pass (should be 100+ tests after adding ~8 new tests)",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "e5254bc8-2d1c-4d28-bfff-6383af038f16",
+      "created_at": "2025-10-28T16:14:16.718Z",
+      "updated_at": "2025-10-28T16:16:03.635Z"
+    },
+    {
+      "name": "Manual testing with MCP-Debug",
+      "details": "Test both tool modes:\n- Unified tool: memory(command: 'delete', path: '/memories/test.txt', delete_line: 2)\n- Individual tool: memory_delete(path: '/memories/test.txt', delete_line: 2)\nVerify correct line deletion in both modes",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "35319c2d-b85c-4ed7-813d-5937149700f2",
+      "created_at": "2025-10-28T16:14:16.718Z",
+      "updated_at": "2025-10-28T16:26:41.278Z"
+    },
+    {
+      "name": "Update plan progress",
+      "details": "Mark delete_line feature complete in public-release-beta-v2 plan (will be 75% complete, 3 of 4 features done)",
+      "status": "completed",
+      "priority": "low",
+      "uuid": "2c2339fe-8ac2-4a0b-92e6-89beb28a3d80",
+      "created_at": "2025-10-28T16:14:16.718Z",
+      "updated_at": "2025-10-28T16:26:48.029Z"
+    }
+  ],
+  "created_at": "2025-10-28T16:14:16.718Z",
+  "updated_at": "2025-10-28T16:26:48.029Z"
+}

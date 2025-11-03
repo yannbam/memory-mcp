@@ -1,0 +1,43 @@
+🌳 "public-release-prep"
+📝 Comprehensive plan for preparing memory-mcp repository for clean public release. This includes setting up proper memory system, cleanup, documentation updates, licensing, and final review.
+
+The repo will serve dual purposes:
+1. Production-ready MCP server for public use
+2. Example of best practices for using memory-mcp in Claude Code projects
+
+Target: Ready for npm publish and GitHub release
+📊 ░░░░░░░░░░ 0% (0/33 tasks)
+
+├── ⏸️ |Setup Project Memory System| "Transform this repo into an example of memory-mcp usage. Create ./.project_memory/ with organized structure demonstrating best practices. Document architecture decisions, development patterns, and project knowledge.\n\nReference: ~/projects/mcp-ts-api/ as template for structure and organization." (🚨) (0%)
+│   ├── ⏸️ |Create memory directory structure| "Set up ./.project_memory/memories/ with logical hierarchy:\n- architecture/ - Design decisions, patterns\n- development/ - Dev workflow, conventions\n- testing/ - Test strategies, results\n- releases/ - Version history, milestones" (🔴)
+│   ├── ⏸️ |Document architecture decisions| "Create architecture/*.md files documenting:\n- RW lock design rationale\n- Unified tool interface decision\n- Path security approach\n- Transport choices (stdio vs HTTP)" (🔴)
+│   ├── ⏸️ |Document development patterns| "Create development/*.md files covering:\n- TypeScript + ESM setup\n- Testing strategy (unit + integration + E2E)\n- e/code commenting conventions used\n- Linting and code quality standards" (🟡)
+│   └── ⏸️ |Update project .mcp.json| "Configure project to use its own memory system:\n- Add project_memory instance pointing to ./.project_memory\n- Keep as example in README\n- Document in CLAUDE.md" (🟡)
+├── ⏸️ |Repository Cleanup| "Remove test artifacts, temporary files, and development clutter. Ensure only production-relevant files remain while keeping important development infrastructure (tests, CI, docs)." (🔴) (0%)
+│   ├── ⏸️ |Clean test artifacts| "Remove/clean:\n- .memory/ directory (test data from E2E)\n- .notes/ directory (empty)\n- .state/ directory (empty)\n- Move INTEGRATION-TEST-RESULTS.md to docs/ or remove\n- coverage/ already gitignored" (🔴)
+│   ├── ⏸️ |Audit .gitignore completeness| "Ensure .gitignore covers:\n- ✅ node_modules, dist, coverage (already covered)\n- ✅ .notes, .state (already listed as .notes/)\n- Verify .project_memory should be gitignored\n- Add any missing patterns" (🟡)
+│   └── ⏸️ |Clean .plans directory| "Review archived plans:\n- Keep archived/ structure (shows development history)\n- Ensure no sensitive info in plan files\n- Current plan will be archived at session end" (🔵)
+├── ⏸️ |Fix System-Specific Hardcoding| "Audit codebase for machine-specific paths, user names, or configurations. Ensure everything uses relative paths or environment variables." (🔴) (0%)
+│   ├── ⏸️ |Audit source code paths| "Search for hardcoded paths in src/:\n- ✅ Already verified: no /home/ paths\n- ✅ Default memoryRoot already relative: ./.memory\n- Verify debug log path /tmp/memory-mcp/ is acceptable\n- Check for any username references" (🔴)
+│   ├── ⏸️ |Audit configuration files| "Check:\n- .mcp.json has /home/jan/ paths - update to relative example\n- package.json metadata - looks good\n- tsconfig.json - check for absolute paths" (🔴)
+│   └── ⏸️ |Audit documentation| "Search docs and README for:\n- /home/user/ examples (already present - verify they're generic)\n- System-specific instructions\n- Machine-specific assumptions" (🟡)
+├── ⏸️ |Documentation Updates| "Ensure all documentation is accurate, complete, and polished for public release. Add missing files and improve existing ones." (🔴) (0%)
+│   ├── ⏸️ |Update README.md| "Enhancements:\n- Add project-specific .mcp.json example (project_memory vs system_memory)\n- Clarify default path is relative ./.memory\n- Show both local project and global ~/.claude.json examples\n- Add npm installation instructions (once published)\n- Verify all examples are accurate\n- Polish contributing section" (🔴)
+│   ├── ⏸️ |Create LICENSE file| "Add MIT license file (license already declared in package.json).\nInclude:\n- Standard MIT license text\n- Copyright: Claude (claude-sonnet-4-5-20250929) with janbam\n- Year: 2025" (🔴)
+│   ├── ⏸️ |Create CHANGELOG.md| "Document version history:\n- v0.1.0 (current) - Initial release\n  - All 6 memory commands\n  - Tree view mode\n  - RW locks (38x speedup)\n  - stdio and HTTP transports\n  - Path security (27 tests)\n  - Production ready (85 tests + E2E)\n- Keep format for future updates" (🔴)
+│   ├── ⏸️ |Update CLAUDE.md| "Prepare CLAUDE.md for public repo:\n- Keep project overview and architecture\n- Keep technical details (useful for contributors)\n- Update session handoff to be more general\n- Ensure nothing overly personal/internal\n- Keep e/code and e/coll references (good practices)\n- Update 'Next Steps' to reflect public release status" (🟡)
+│   └── ⏸️ |Verify docs/ accuracy| "Review all files in docs/:\n- 039-Memory-tool.md (official spec - keep as-is)\n- ARCHITECTURE.md - verify accuracy\n- LOCKING-REDESIGN.md - verify accuracy\n- MCP-SDK-README.md (reference - keep)\n- tools-helpers-memory.ts (reference - keep or remove?)" (🟡)
+├── ⏸️ |Optional Professional Touches| "Additional files that improve project professionalism and community engagement. Optional but recommended for open source projects." (🔵) (0%)
+│   ├── ⏸️ |Create CONTRIBUTING.md| "Contribution guidelines:\n- How to set up development environment\n- Code style (e/code conventions)\n- Testing requirements\n- PR process\n- Issue reporting" (🔵)
+│   ├── ⏸️ |Add GitHub templates| "Create .github/ templates:\n- ISSUE_TEMPLATE.md\n- PULL_REQUEST_TEMPLATE.md\n- SECURITY.md (vulnerability reporting)\nOptional: CODE_OF_CONDUCT.md" (🔵)
+│   └── ⏸️ |Add npm badge and links| "Once published to npm:\n- Add npm version badge to README\n- Add npm download stats badge\n- Update installation instructions with npm command" (🔵)
+├── ⏸️ |Pre-Release Verification| "Final checks before public release. Ensure everything works, builds, tests pass, and code quality is high." (🚨) (0%)
+│   ├── ⏸️ |Run full test suite| "Verify all tests pass:\n- npm test (85 unit tests)\n- npm run test:coverage (verify 80%+ coverage)\n- Integration tests\n- Lint checks (npm run lint)" (🔴)
+│   ├── ⏸️ |Test build process| "Verify clean build:\n- rm -rf dist/\n- npm run build\n- Verify dist/ structure\n- Test running: node dist/index.js --help" (🔴)
+│   ├── ⏸️ |Verify package.json metadata| "Check for npm publish:\n- version, description, keywords ✅\n- repository field (add GitHub URL)\n- homepage field (add GitHub URL)\n- bugs field (add GitHub issues URL)\n- Verify files field or .npmignore" (🔴)
+│   └── ⏸️ |Security audit| "Run security checks:\n- npm audit (check for vulnerabilities)\n- Review dependencies for security issues\n- Verify path security tests are comprehensive" (🟡)
+└── ⏸️ |Comprehensive PR Review| "Use PR review agents to audit the entire repository for issues, inconsistencies, and improvements before final release." (🚨) (0%)
+    ├── ⏸️ |Run code-reviewer agent| "Review entire codebase for:\n- Code quality issues\n- Style violations\n- Potential bugs\n- Best practice adherence\nFocus on src/ directory" (🔴)
+    ├── ⏸️ |Run type-design-analyzer| "Review TypeScript types for:\n- Proper encapsulation\n- Strong invariants\n- Type safety\n- API design quality" (🟡)
+    ├── ⏸️ |Run comment-analyzer| "Review code comments for:\n- Accuracy\n- Completeness\n- Avoiding technical debt\n- Documentation quality" (🟡)
+    └── ⏸️ |Final manual review| "Human review of:\n- README clarity for new users\n- Installation instructions completeness\n- Example accuracy\n- Overall polish and professionalism" (🔴)

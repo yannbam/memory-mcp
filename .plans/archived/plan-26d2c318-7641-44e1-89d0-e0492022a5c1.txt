@@ -1,0 +1,23 @@
+🌳 "switchable-tool-exposure"
+📝 Implement switchable tool exposure for memory MCP server.
+Currently uses single 'memory' tool with command parameter.
+Add --one-tool-per-command CLI flag to expose 6 separate tools instead.
+Both approaches use same underlying operations.
+📊 ██████████ 100% (16/16 tasks)
+
+├── ✅ |Architecture Analysis| "Review current implementation and understand tool registration patterns" (🔴)
+├── ✅ |Update CLI Interface| "Add --one-tool-per-command flag to src/index.ts with parsing and help text" (🔴) (100%)
+│   ├── ✅ |Add oneToolPerCommand to CliConfig| "Add boolean field to CliConfig interface with default false" (🔴)
+│   ├── ✅ |Implement flag parsing| "Add case for --one-tool-per-command in parseArgs() switch statement" (🔴)
+│   ├── ✅ |Update help text| "Document new flag in showHelp() with usage examples" (🟡)
+│   └── ✅ |Pass flag to createMemoryServer| "Add oneToolPerCommand parameter to createMemoryServer() call" (🔴)
+├── ✅ |Refactor MCP Server Setup| "Implement dual tool registration in src/server/mcp-server.ts" (🔴) (100%)
+│   ├── ✅ |Update createMemoryServer signature| "Add oneToolPerCommand: boolean parameter to function signature" (🔴)
+│   ├── ✅ |Create individual command schemas| "Extract 6 individual Zod schemas from discriminated union (without command field)" (🔴)
+│   ├── ✅ |Implement conditional registration| "Branch logic: if oneToolPerCommand then register 6 tools, else register 1 unified tool" (🔴)
+│   ├── ✅ |Create individual tool handlers| "Implement 6 separate handler functions (memory_view, memory_create, etc.)" (🔴)
+│   └── ✅ |Preserve existing single-tool behavior| "Ensure current unified tool approach remains as default" (🟡)
+└── ✅ |Testing| "Verify both tool exposure modes work correctly" (🔴) (100%)
+    ├── ✅ |Test default behavior| "Verify single tool mode works (no flag) by testing with MCP inspector" (🔴)
+    ├── ✅ |Test one-tool-per-command mode| "Verify 6 separate tools appear with --one-tool-per-command flag" (🔴)
+    └── ✅ |Test all operations| "Test view, create, str_replace, insert, delete, rename in both modes" (🟡)

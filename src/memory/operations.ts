@@ -10,6 +10,37 @@
  * - rename: Rename or move files/directories
  *
  * All operations use file locking for concurrent access safety.
+ *
+ * ## Parameter Combinations Reference
+ *
+ * **view:**
+ * - path (required)
+ * - view_range (optional) - only for files, e.g., [1, 10] or [5, -1] for EOF
+ *
+ * **create:**
+ * - path (required)
+ * - file_text (optional) - omit or use "" to create empty file
+ *
+ * **str_replace:**
+ * - path (required)
+ * - old_str/old_string (required, use either variant)
+ * - new_str/new_string (optional) - omit or use "" to delete text
+ *
+ * **insert:**
+ * - path (required)
+ * - insert_text (required)
+ * - insert_line (optional) - omit to append to end of file
+ *
+ * **delete:**
+ * - path (required)
+ * - delete_line (optional) - delete specific line number
+ * - old_str/old_string (optional) - delete unique text occurrence
+ * - Note: Cannot mix delete_line with old_str (choose one approach)
+ * - Note: Without either, deletes entire file/directory
+ *
+ * **rename:**
+ * - old_path (required)
+ * - new_path (required)
  */
 
 import * as fs from 'fs/promises';
@@ -17,6 +48,13 @@ import * as path from 'path';
 import { withReadLock, withWriteLock, withMultipleWriteLocks } from './locking.js';
 import { validatePath } from './path-security.js';
 import { renderDirectoryTree } from './tree-view.js';
+import {
+  computeChecksum,
+  setCachedChecksum,
+  clearCachedChecksum,
+  getAllCachedEntries,
+} from './checksums.js';
+import { formatFileContent } from './formatting.js';
 import type { Logger } from '../utils/logger.js';
 
 /**
@@ -30,23 +68,28 @@ export interface ViewCommand {
 
 export interface CreateCommand {
   path: string;
-  file_text: string;
+  file_text?: string;
 }
 
 export interface StrReplaceCommand {
   path: string;
-  old_str: string;
-  new_str: string;
+  old_str?: string;
+  old_string?: string;
+  new_str?: string;
+  new_string?: string;
 }
 
 export interface InsertCommand {
   path: string;
-  insert_line: number;
+  insert_line?: number;
   insert_text: string;
 }
 
 export interface DeleteCommand {
   path: string;
+  delete_line?: number;
+  old_str?: string;
+  old_string?: string;
 }
 
 export interface RenameCommand {
@@ -121,11 +164,22 @@ export async function view(command: ViewCommand, context: OperationsContext): Pr
     const stat = await fs.stat(fullPath);
 
     if (stat.isDirectory()) {
-      // View directory contents
+      // View directory contents (don't cache - directories change frequently)
       return await viewDirectory(fullPath, command.path, context);
     } else if (stat.isFile()) {
       // View file contents
-      return await viewFile(fullPath, command.view_range);
+      const fileContent = await viewFile(fullPath, command.view_range);
+
+      // Cache checksum after reading entire file (not partial reads with view_range)
+      if (!command.view_range) {
+        // TODO: Optimize - viewFile() already read content, avoid double-read
+        // Current: Read separately because viewFile() may format/transform content
+        // Better: Refactor viewFile() to return both raw content and formatted output
+        const content = await fs.readFile(fullPath, 'utf-8');
+        setCachedChecksum(fullPath, computeChecksum(content));
+      }
+
+      return fileContent;
     } else {
       throw new Error(`Path not found: ${command.path}`);
     }
@@ -175,6 +229,11 @@ async function viewDirectory(
     items.push(itemStat.isDirectory() ? `${item}/` : item);
   }
 
+  // Check if directory is empty (after filtering hidden files)
+  if (items.length === 0) {
+    return 'Directory is empty.';
+  }
+
   // Format output
   return `Directory: ${memoryPath}\n` + items.map((item) => `- ${item}`).join('\n');
 }
@@ -185,49 +244,9 @@ async function viewDirectory(
 async function viewFile(fullPath: string, viewRange?: [number, number]): Promise<string> {
   // Read file content
   const content = await fs.readFile(fullPath, 'utf-8');
-  const lines = content.split('\n');
 
-  // Determine which lines to display
-  let displayLines = lines;
-  let startNum = 1;
-
-  if (viewRange && viewRange.length === 2) {
-    // Validate line range
-    const requestedStart = viewRange[0];
-    const requestedEnd = viewRange[1];
-
-    // Check if start line is valid (1-based, or -1 for special meaning)
-    if (requestedStart < 1) {
-      throw new Error(`Invalid line range: start line must be >= 1, got ${requestedStart}`);
-    }
-
-    // Check if range is within file bounds
-    if (requestedStart > lines.length) {
-      throw new Error(
-        `Line range out of bounds: requested start line ${requestedStart}, but file only has ${lines.length} lines`
-      );
-    }
-
-    // Check if end line is valid (must be >= start, or -1 for EOF)
-    if (requestedEnd !== -1 && requestedEnd < requestedStart) {
-      throw new Error(
-        `Invalid line range: end line ${requestedEnd} is before start line ${requestedStart}`
-      );
-    }
-
-    // Extract line range
-    const startLine = Math.max(1, requestedStart) - 1;
-    const endLine = requestedEnd === -1 ? lines.length : Math.min(requestedEnd, lines.length);
-    displayLines = lines.slice(startLine, endLine);
-    startNum = startLine + 1;
-  }
-
-  // Format with line numbers
-  const numberedLines = displayLines.map(
-    (line, i) => `${String(i + startNum).padStart(4, ' ')}: ${line}`,
-  );
-
-  return numberedLines.join('\n');
+  // Use shared formatting function
+  return formatFileContent(content, viewRange);
 }
 
 /**
@@ -243,10 +262,9 @@ export async function create(command: CreateCommand, context: OperationsContext)
   // Validate and convert path
   const fullPath = validatePath(command.path, context.memoryRoot);
 
-  // Execute with write lock and concurrency check
-  // Always enable concurrency checking - locking module handles non-existent files correctly
-  // (mtimeBefore will be null, wasFileModified returns false)
-  await withWriteLock(fullPath, true, async () => {
+  // Execute with write lock (no concurrency check needed - create is for new files only)
+  let writtenContent: string = '';
+  await withWriteLock(fullPath, false, async () => {
     // Ensure parent directory exists
     const dir = path.dirname(fullPath);
     if (!(await exists(dir))) {
@@ -254,19 +272,30 @@ export async function create(command: CreateCommand, context: OperationsContext)
       await fs.mkdir(dir, { recursive: true });
     }
 
-    // Write file content
-    await fs.writeFile(fullPath, command.file_text, 'utf-8');
+    // Check if file already exists - fail fast if it does
+    if (await exists(fullPath)) {
+      throw new Error(`File already exists at ${command.path}`);
+    }
+
+    // Write file content (default to empty string if not provided)
+    writtenContent = command.file_text ?? '';
+    await fs.writeFile(fullPath, writtenContent, 'utf-8');
+
+    // Cache checksum of newly created file
+    setCachedChecksum(fullPath, computeChecksum(writtenContent));
   });
 
   // Log operation
   await context.logger.debug('create', {
     path: command.path,
-    file_size: command.file_text.length,
+    file_size: (command.file_text ?? '').length,
     duration_ms: Date.now() - startTime,
     success: true,
   });
 
-  return `File created successfully at ${command.path}`;
+  // Return appropriate message based on whether file has content
+  const isEmpty = !command.file_text || command.file_text === '';
+  return isEmpty ? 'Created empty memory file.' : `File created successfully at ${command.path}`;
 }
 
 /**
@@ -281,6 +310,23 @@ export async function str_replace(
   context: OperationsContext,
 ): Promise<string> {
   const startTime = Date.now();
+
+  // Normalize parameter names: accept both old_str/new_str and old_string/new_string
+  // Validate that only one variant of each parameter is provided
+  if (command.old_str && command.old_string) {
+    throw new Error('Cannot provide both old_str and old_string - use one or the other');
+  }
+  if (command.new_str && command.new_string) {
+    throw new Error('Cannot provide both new_str and new_string - use one or the other');
+  }
+
+  const oldStr = command.old_str ?? command.old_string;
+  const newStr = command.new_str ?? command.new_string ?? '';
+
+  // Validate that at least one variant of each parameter is provided
+  if (!oldStr) {
+    throw new Error('Must provide either old_str or old_string');
+  }
 
   // Validate and convert path
   const fullPath = validatePath(command.path, context.memoryRoot);
@@ -302,7 +348,7 @@ export async function str_replace(
     const content = await fs.readFile(fullPath, 'utf-8');
 
     // Count occurrences of old_str
-    const count = content.split(command.old_str).length - 1;
+    const count = content.split(oldStr).length - 1;
 
     if (count === 0) {
       throw new Error(`Text not found in ${command.path}`);
@@ -311,17 +357,20 @@ export async function str_replace(
     }
 
     // Replace text
-    const newContent = content.replace(command.old_str, command.new_str);
+    const newContent = content.replace(oldStr, newStr);
 
     // Write updated content
     await fs.writeFile(fullPath, newContent, 'utf-8');
+
+    // Cache checksum of modified file
+    setCachedChecksum(fullPath, computeChecksum(newContent));
   });
 
   // Log operation
   await context.logger.debug('str_replace', {
     path: command.path,
-    old_str_length: command.old_str.length,
-    new_str_length: command.new_str.length,
+    old_str_length: oldStr.length,
+    new_str_length: newStr.length,
     duration_ms: Date.now() - startTime,
     success: true,
   });
@@ -357,19 +406,32 @@ export async function insert(command: InsertCommand, context: OperationsContext)
 
     // Read file content
     const content = await fs.readFile(fullPath, 'utf-8');
-    const lines = content.split('\n');
+    // Handle empty file: split('') gives [''], but we want []
+    const lines = content === '' ? [] : content.split('\n');
 
-    // Validate insert_line
-    if (command.insert_line < 0 || command.insert_line > lines.length) {
-      throw new Error(`Invalid insert_line ${command.insert_line}. Must be 0-${lines.length}`);
+    // Determine insert position
+    let insertLine: number;
+    if (command.insert_line === undefined) {
+      // Append to end - insert after last line
+      insertLine = lines.length + 1;
+    } else {
+      insertLine = command.insert_line;
+      // Validate insert_line (1-based indexing)
+      if (insertLine < 1 || insertLine > lines.length + 1) {
+        throw new Error(`Invalid insert_line ${insertLine}. Must be 1-${lines.length + 1}`);
+      }
     }
 
-    // Insert text at specified line
+    // Insert text at specified line (convert from 1-based to 0-based array index)
     // Remove trailing newline from insert_text to avoid double newlines
-    lines.splice(command.insert_line, 0, command.insert_text.replace(/\n$/, ''));
+    lines.splice(insertLine - 1, 0, command.insert_text.replace(/\n$/, ''));
 
     // Write updated content
-    await fs.writeFile(fullPath, lines.join('\n'), 'utf-8');
+    const newContent = lines.join('\n');
+    await fs.writeFile(fullPath, newContent, 'utf-8');
+
+    // Cache checksum of modified file
+    setCachedChecksum(fullPath, computeChecksum(newContent));
   });
 
   // Log operation
@@ -381,7 +443,28 @@ export async function insert(command: InsertCommand, context: OperationsContext)
     success: true,
   });
 
-  return `Text inserted at line ${command.insert_line} in ${command.path}`;
+  if (command.insert_line === undefined) {
+    return `Text appended to end of ${command.path}`;
+  } else {
+    return `Text inserted at line ${command.insert_line} in ${command.path}`;
+  }
+}
+
+/**
+ * Clear cached checksums for a directory and all children
+ * Prevents memory leaks when deleting directories
+ *
+ * @param dirPath - Absolute directory path
+ */
+function clearCachedChecksumsRecursive(dirPath: string): void {
+  const normalizedDir = path.resolve(dirPath);
+
+  // Iterate through cache and remove entries under this directory
+  for (const [cachedPath] of getAllCachedEntries()) {
+    if (cachedPath.startsWith(normalizedDir + path.sep) || cachedPath === normalizedDir) {
+      clearCachedChecksum(cachedPath);
+    }
+  }
 }
 
 /**
@@ -402,13 +485,77 @@ export async function deleteOp(
     throw new Error('Cannot delete the /memories directory itself');
   }
 
+  // Normalize parameter names for old_str (forgiving naming)
+  const old_str = command.old_str ?? command.old_string;
+
+  // Validation: Cannot mix position-based and content-based deletion
+  if (command.delete_line !== undefined && old_str !== undefined) {
+    throw new Error(
+      'Cannot use both delete_line and old_str - choose position-based OR content-based deletion'
+    );
+  }
+
   // Validate and convert path
   const fullPath = validatePath(command.path, context.memoryRoot);
+
+  // Handle text-based deletion
+  if (old_str !== undefined) {
+    return await deleteMatchingText(command.path, fullPath, old_str, context, startTime);
+  }
+
+  // Handle line-specific deletion
+  if (command.delete_line !== undefined) {
+    const deleteLine = command.delete_line;
+
+    // Execute with write lock and concurrency check for line deletion
+    await withWriteLock(fullPath, true, async () => {
+      // Check if file exists
+      if (!(await exists(fullPath))) {
+        throw new Error(`File not found: ${command.path}`);
+      }
+
+      // Verify it's a file, not a directory
+      const stat = await fs.stat(fullPath);
+      if (!stat.isFile()) {
+        throw new Error(`Cannot delete line from directory: ${command.path}`);
+      }
+
+      // Read file content
+      const content = await fs.readFile(fullPath, 'utf-8');
+      const lines = content.split('\n');
+
+      // Validate delete_line (1-based indexing)
+      if (deleteLine < 1 || deleteLine > lines.length) {
+        throw new Error(`Invalid delete_line ${deleteLine}. Must be 1-${lines.length}`);
+      }
+
+      // Delete the specified line (convert from 1-based to 0-based array index)
+      lines.splice(deleteLine - 1, 1);
+
+      // Write updated content
+      const newContent = lines.join('\n');
+      await fs.writeFile(fullPath, newContent, 'utf-8');
+
+      // Cache checksum of modified file
+      setCachedChecksum(fullPath, computeChecksum(newContent));
+    });
+
+    // Log operation
+    await context.logger.debug('delete', {
+      path: command.path,
+      delete_line: deleteLine,
+      type: 'line',
+      duration_ms: Date.now() - startTime,
+      success: true,
+    });
+
+    return `Line ${deleteLine} deleted from ${command.path}`;
+  }
 
   // Track what was deleted for return message
   let deletedType: 'file' | 'directory' = 'file';
 
-  // Execute with write lock (no concurrency check needed for delete)
+  // Execute with write lock (no concurrency check needed for file/directory delete)
   await withWriteLock(fullPath, false, async () => {
     // Check if path exists
     if (!(await exists(fullPath))) {
@@ -422,10 +569,16 @@ export async function deleteOp(
       // Delete file
       await fs.unlink(fullPath);
       deletedType = 'file';
+
+      // Clear cache for deleted file
+      clearCachedChecksum(fullPath);
     } else if (stat.isDirectory()) {
       // Delete directory recursively
       await fs.rm(fullPath, { recursive: true });
       deletedType = 'directory';
+
+      // Clear cache for deleted directory and all children
+      clearCachedChecksumsRecursive(fullPath);
     } else {
       throw new Error(`Path not found: ${command.path}`);
     }
@@ -442,6 +595,79 @@ export async function deleteOp(
   return deletedType === 'file'
     ? `File deleted: ${command.path}`
     : `Directory deleted: ${command.path}`;
+}
+
+/**
+ * Helper: Delete all occurrences of matching text from a file
+ * Empty lines resulting from deletion are also removed
+ */
+async function deleteMatchingText(
+  memoryPath: string,
+  fullPath: string,
+  searchText: string,
+  context: OperationsContext,
+  startTime: number,
+): Promise<string> {
+  // Count occurrences for return message
+  let occurrences = 0;
+
+  // Execute with write lock and concurrency check
+  await withWriteLock(fullPath, true, async () => {
+    // Check if file exists
+    if (!(await exists(fullPath))) {
+      throw new Error(`File not found: ${memoryPath}`);
+    }
+
+    // Verify it's a file, not a directory
+    const stat = await fs.stat(fullPath);
+    if (!stat.isFile()) {
+      throw new Error(`Cannot delete text from directory: ${memoryPath}`);
+    }
+
+    // Read file content
+    const content = await fs.readFile(fullPath, 'utf-8');
+
+    // Count occurrences before deletion
+    occurrences = (content.match(new RegExp(escapeRegExp(searchText), 'g')) || []).length;
+
+    if (occurrences === 0) {
+      throw new Error(`Text not found in file: "${searchText}"`);
+    } else if (occurrences > 1) {
+      throw new Error(`Text appears ${occurrences} times in ${memoryPath}. Must be unique.`);
+    }
+
+    // Delete the unique occurrence of the text
+    const afterDeletion = content.replace(searchText, '');
+
+    // Remove empty lines
+    const lines = afterDeletion.split('\n');
+    const nonEmptyLines = lines.filter((line) => line.trim() !== '');
+
+    // Write cleaned content
+    const finalContent = nonEmptyLines.join('\n');
+    await fs.writeFile(fullPath, finalContent, 'utf-8');
+
+    // Cache checksum of modified file
+    setCachedChecksum(fullPath, computeChecksum(finalContent));
+  });
+
+  // Log operation
+  await context.logger.debug('delete_text', {
+    path: memoryPath,
+    searchText,
+    occurrences,
+    duration_ms: Date.now() - startTime,
+    success: true,
+  });
+
+  return `Deleted ${occurrences} occurrence(s) of "${searchText}" from ${memoryPath}`;
+}
+
+/**
+ * Helper: Escape special regex characters for literal string matching
+ */
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
@@ -495,6 +721,9 @@ export async function rename(command: RenameCommand, context: OperationsContext)
         // Other errors (EXDEV for cross-filesystem, etc.)
         throw error;
       }
+
+      // Clear cache for old path (new path will be cached on next access)
+      clearCachedChecksum(oldFullPath);
     } else if (sourceStat.isDirectory()) {
       // For directories: Use fs.rename (link doesn't work for directories)
       // Check if destination exists first (has TOCTOU race, but unavoidable for directories)
@@ -502,6 +731,9 @@ export async function rename(command: RenameCommand, context: OperationsContext)
         throw new Error(`Destination already exists: ${command.new_path}`);
       }
       await fs.rename(oldFullPath, newFullPath);
+
+      // Clear cache for old path
+      clearCachedChecksum(oldFullPath);
     } else {
       throw new Error(`Source path not found: ${command.old_path}`);
     }

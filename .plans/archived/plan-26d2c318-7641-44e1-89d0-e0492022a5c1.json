@@ -1,0 +1,162 @@
+{
+  "uuid": "26d2c318-7641-44e1-89d0-e0492022a5c1",
+  "name": "switchable-tool-exposure",
+  "details": "Implement switchable tool exposure for memory MCP server.\nCurrently uses single 'memory' tool with command parameter.\nAdd --one-tool-per-command CLI flag to expose 6 separate tools instead.\nBoth approaches use same underlying operations.",
+  "tasks": [
+    {
+      "name": "Architecture Analysis",
+      "details": "Review current implementation and understand tool registration patterns",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "789e69c4-d891-47b5-9aba-96e451b1ea1b",
+      "created_at": "2025-10-28T10:30:02.488Z",
+      "updated_at": "2025-10-28T10:30:02.488Z"
+    },
+    {
+      "name": "Update CLI Interface",
+      "details": "Add --one-tool-per-command flag to src/index.ts with parsing and help text",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Add oneToolPerCommand to CliConfig",
+          "details": "Add boolean field to CliConfig interface with default false",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "b6d79093-e1a7-4c97-a447-fff1b1fe7255",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:39:38.140Z"
+        },
+        {
+          "name": "Implement flag parsing",
+          "details": "Add case for --one-tool-per-command in parseArgs() switch statement",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "2f9ebaa9-5e58-49e4-abc7-00f566d154a5",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:39:55.561Z"
+        },
+        {
+          "name": "Update help text",
+          "details": "Document new flag in showHelp() with usage examples",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "8246a93f-470c-4e02-b7b3-632ed1829fdb",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:40:10.280Z"
+        },
+        {
+          "name": "Pass flag to createMemoryServer",
+          "details": "Add oneToolPerCommand parameter to createMemoryServer() call",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "f61b3bc9-ae56-4932-a259-1e2772b5f262",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:40:22.932Z"
+        }
+      ],
+      "uuid": "65bfc390-849c-4be6-9355-9b549f07146d",
+      "created_at": "2025-10-28T10:30:02.488Z",
+      "updated_at": "2025-10-28T10:30:02.488Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Refactor MCP Server Setup",
+      "details": "Implement dual tool registration in src/server/mcp-server.ts",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Update createMemoryServer signature",
+          "details": "Add oneToolPerCommand: boolean parameter to function signature",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "04543577-b7e8-4537-abaa-b5c9d6b37cd3",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:40:37.143Z"
+        },
+        {
+          "name": "Create individual command schemas",
+          "details": "Extract 6 individual Zod schemas from discriminated union (without command field)",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "dd259f5a-389c-4732-ad26-70a657b381a4",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:40:46.322Z"
+        },
+        {
+          "name": "Implement conditional registration",
+          "details": "Branch logic: if oneToolPerCommand then register 6 tools, else register 1 unified tool",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "cfb04e21-d455-421c-a9c7-eb160535d9e9",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:41:50.972Z"
+        },
+        {
+          "name": "Create individual tool handlers",
+          "details": "Implement 6 separate handler functions (memory_view, memory_create, etc.)",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "eacdda9c-ffca-4e08-bc5c-fd59feb757a2",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:41:50.972Z"
+        },
+        {
+          "name": "Preserve existing single-tool behavior",
+          "details": "Ensure current unified tool approach remains as default",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "20318c34-d4ea-4dbb-bfd8-7cac43209804",
+          "created_at": "2025-10-28T10:30:02.488Z",
+          "updated_at": "2025-10-28T10:41:50.972Z"
+        }
+      ],
+      "uuid": "d760c53c-1df1-4349-920f-3e82344729c1",
+      "created_at": "2025-10-28T10:30:02.488Z",
+      "updated_at": "2025-10-28T10:30:02.488Z",
+      "completion_percentage": 100
+    },
+    {
+      "name": "Testing",
+      "details": "Verify both tool exposure modes work correctly",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [
+        {
+          "name": "Test default behavior",
+          "details": "Verify single tool mode works (no flag) by testing with MCP inspector",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "b0626a38-2525-4ef8-93f8-31b417a42aa7",
+          "created_at": "2025-10-28T10:30:02.489Z",
+          "updated_at": "2025-10-28T10:44:25.445Z"
+        },
+        {
+          "name": "Test one-tool-per-command mode",
+          "details": "Verify 6 separate tools appear with --one-tool-per-command flag",
+          "status": "completed",
+          "priority": "high",
+          "uuid": "c3bdd5cc-86cf-4f01-a924-e06f6e65ec30",
+          "created_at": "2025-10-28T10:30:02.489Z",
+          "updated_at": "2025-10-28T10:44:49.120Z"
+        },
+        {
+          "name": "Test all operations",
+          "details": "Test view, create, str_replace, insert, delete, rename in both modes",
+          "status": "completed",
+          "priority": "medium",
+          "uuid": "3fb273b7-f435-4e7c-aeb1-eb984a60d8c0",
+          "created_at": "2025-10-28T10:30:02.489Z",
+          "updated_at": "2025-10-28T10:44:49.120Z"
+        }
+      ],
+      "uuid": "eeb71c40-becd-4163-b272-f63bc22b82ff",
+      "created_at": "2025-10-28T10:30:02.488Z",
+      "updated_at": "2025-10-28T10:30:02.488Z",
+      "completion_percentage": 100
+    }
+  ],
+  "created_at": "2025-10-28T10:30:02.489Z",
+  "updated_at": "2025-10-28T10:44:55.624Z"
+}

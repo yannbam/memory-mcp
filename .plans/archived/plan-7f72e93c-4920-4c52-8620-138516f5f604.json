@@ -1,0 +1,81 @@
+{
+  "uuid": "7f72e93c-4920-4c52-8620-138516f5f604",
+  "name": "empty-content-ux-messages",
+  "details": "Improve UX messaging for empty content scenarios in memory operations.\n\nThree improvements needed:\n1. view command with empty file → \"Memory file is empty.\"\n2. view command with empty directory → \"Directory is empty.\" (both simple and tree modes)\n3. create command without file_text → \"Created empty memory file.\"\n\nImplementation locations:\n- src/memory/operations.ts (viewFile, viewDirectory, create functions)\n- src/memory/tree-view.ts (renderDirectoryTree function)\n\nAfter implementation: comprehensive testing with both tool modes",
+  "tasks": [
+    {
+      "name": "Implement empty file message",
+      "details": "Modify viewFile function in operations.ts (line 190-236):\n- After reading content, check if content === ''\n- Return 'Memory file is empty.' immediately\n- Avoids showing '1: ' for empty files",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "27874284-4550-4ee0-a607-66ea6cb43d88",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:07:21.736Z"
+    },
+    {
+      "name": "Implement empty directory message (simple mode)",
+      "details": "Modify viewDirectory function in operations.ts (line 153-185):\n- After building items array (line 181), check if items.length === 0\n- Return 'Directory is empty.' instead of formatted output\n- Only applies to simple mode (non-tree-view)",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "e4ba64ab-177e-49f7-8a2f-1c643be965cf",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:07:32.814Z"
+    },
+    {
+      "name": "Implement empty directory message (tree mode)",
+      "details": "Modify renderDirectoryTree function in tree-view.ts (line 269-282):\n- After building tree (line 278), check if tree.length === 0\n- Return 'Directory is empty.' instead of header + empty content\n- Applies when tree view is enabled",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "4cb57864-898d-4025-8443-211b8cf1a7ff",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:07:42.600Z"
+    },
+    {
+      "name": "Implement empty file creation message",
+      "details": "Modify create function in operations.ts (line 245-276):\n- Check if file_text is undefined or empty string\n- Return 'Created empty memory file.' for empty files\n- Return 'File created successfully at {path}' for non-empty files",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "0eff11ed-b48d-4327-8f6d-be089c67c238",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:07:49.878Z"
+    },
+    {
+      "name": "Test empty file view",
+      "details": "Test with both tool modes:\n- Create empty file, then view it\n- Verify message: 'Memory file is empty.'\n- Test with both unified and separate tool modes",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "6eaa49d8-46f4-4d21-aa0e-928745c6ce33",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:10:13.216Z"
+    },
+    {
+      "name": "Test empty directory view",
+      "details": "Test with both tool modes and both view modes:\n- Create empty directory, then view it (simple mode)\n- View empty directory with tree view enabled\n- Verify message: 'Directory is empty.' in both cases\n- Test with both unified and separate tool modes",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "e1f9412c-f7ca-43bc-b5bb-b4957d74139a",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:10:13.216Z"
+    },
+    {
+      "name": "Test empty file creation",
+      "details": "Test create command without file_text:\n- Call create without file_text parameter\n- Verify message: 'Created empty memory file.'\n- Call create with non-empty file_text\n- Verify message: 'File created successfully at {path}'\n- Test with both unified and separate tool modes",
+      "status": "completed",
+      "priority": "high",
+      "uuid": "4abca5e5-7a74-47f8-a879-d5c19d50f802",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:10:13.216Z"
+    },
+    {
+      "name": "Update README examples",
+      "details": "Update README.md to reflect new messages:\n- Update view command examples for empty files/directories\n- Update create command example for empty file creation\n- Ensure examples are accurate and helpful",
+      "status": "completed",
+      "priority": "medium",
+      "uuid": "a0036260-0289-4057-ac20-0d927534deb9",
+      "created_at": "2025-10-28T19:06:56.696Z",
+      "updated_at": "2025-10-28T19:10:38.301Z"
+    }
+  ],
+  "created_at": "2025-10-28T19:06:56.696Z",
+  "updated_at": "2025-10-28T19:10:38.540Z"
+}

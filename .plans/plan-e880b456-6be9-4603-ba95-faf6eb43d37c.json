@@ -1,0 +1,59 @@
+{
+  "uuid": "e880b456-6be9-4603-ba95-faf6eb43d37c",
+  "name": "doc-gardening-session",
+  "details": "Session-focused plan for Development Documentation gardening.\n\nBased on deep code immersion, identified specific issues to fix:\n\n**ARCHITECTURE.md Issues:**\n- File structure section outdated (mentions path-security.ts, missing checksums.ts/formatting.ts)\n- Test counts outdated (says 85 tests, we have 166)\n- Dependencies section wrong (mentions proper-lockfile, we use @esfx/async-readerwriterlock)\n- \"Not Yet Tested\" section claims multi-process not tested (but we have integration tests!)\n\n**docs/ Organization:**\n- LOCKING-REDESIGN.md is historical design doc - should it be in docs/archive/?\n- Reference docs (MCP-SDK-README.md, 039-Memory-tool.md) are fine as-is\n- USAGE.md is great!\n\n**CONTRIBUTING.md:**\n- Verify it adequately covers development workflow\n- Check if needs section on code organization/architecture\n\nSession goal: Polish existing dev docs to reflect actual codebase accurately",
+  "tasks": [
+    {
+      "name": "Audit docs directory",
+      "details": "Read all docs/*.md files and create findings report:\n- What's accurate?\n- What's outdated?\n- What's missing?\n- What should be archived?\n\nFiles to check: ARCHITECTURE.md, LOCKING-REDESIGN.md, USAGE.md, plus reference docs",
+      "status": "completed",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "ae3b4f99-dbaf-49ca-8a4a-d4abe5442256",
+      "created_at": "2025-11-03T03:11:11.626Z",
+      "updated_at": "2025-11-03T03:12:24.049Z"
+    },
+    {
+      "name": "Update ARCHITECTURE.md",
+      "details": "Fix all identified issues:\n1. File structure section (add checksums.ts, formatting.ts, remove path-security.ts)\n2. Update test counts (166 tests, break down by category)\n3. Fix dependencies section (@esfx/async-readerwriterlock)\n4. Update 'Not Yet Tested' section (integration tests exist!)\n5. Verify all line number references are still accurate\n6. Check if checksum feature is fully documented",
+      "status": "in_progress",
+      "priority": "high",
+      "sub_tasks": [],
+      "uuid": "acfc1ffd-567f-479a-b038-7bf506b53829",
+      "created_at": "2025-11-03T03:11:11.626Z",
+      "updated_at": "2025-11-03T03:12:24.189Z"
+    },
+    {
+      "name": "Organize historical docs",
+      "details": "Handle historical/design documents:\n- Create docs/archive/ directory\n- Move LOCKING-REDESIGN.md to archive (historical design doc)\n- Add README in archive explaining what's there\n- Keep reference docs (039-Memory-tool.md, MCP-SDK-README.md) in main docs/",
+      "status": "pending",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "bd0fe153-ab6a-4217-a9db-b5790b15dfd3",
+      "created_at": "2025-11-03T03:11:11.626Z",
+      "updated_at": "2025-11-03T03:11:11.626Z"
+    },
+    {
+      "name": "Verify CONTRIBUTING.md coverage",
+      "details": "Review CONTRIBUTING.md against checklist:\n- Setup instructions complete?\n- Development workflow clear?\n- Testing guide adequate?\n- Code organization explained?\n- e/code conventions mentioned?\n- Link to ARCHITECTURE.md for deeper understanding?\n\nAdd missing sections if needed",
+      "status": "pending",
+      "priority": "medium",
+      "sub_tasks": [],
+      "uuid": "79cfdf03-2e0d-47a4-b0c5-900311528d72",
+      "created_at": "2025-11-03T03:11:11.626Z",
+      "updated_at": "2025-11-03T03:11:11.626Z"
+    },
+    {
+      "name": "Cross-reference verification",
+      "details": "Ensure consistency across all docs:\n- README → CONTRIBUTING.md → ARCHITECTURE.md flow\n- Line numbers in docs match actual code\n- Test counts consistent everywhere\n- File paths and structure accurate\n- No contradictions between docs",
+      "status": "pending",
+      "priority": "low",
+      "sub_tasks": [],
+      "uuid": "b9feedf4-d812-4b52-8e20-aadea3b5757b",
+      "created_at": "2025-11-03T03:11:11.626Z",
+      "updated_at": "2025-11-03T03:11:11.626Z"
+    }
+  ],
+  "created_at": "2025-11-03T03:11:11.626Z",
+  "updated_at": "2025-11-03T03:12:24.190Z"
+}
