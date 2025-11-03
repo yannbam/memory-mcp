@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-166%20passing-success)](./test)
 
-MCP server implementation of Claude's native memory tool for persistent storage across conversations.
+Memory MCP
 
 ✅ Based on Claude's native memory tool schema
 ✅ Safe concurrent access with conflict detection
@@ -19,12 +19,9 @@ This project implements Claude's [memory tool](https://docs.claude.com/en/docs/a
 
 - ✅ **All 6 Memory Commands**: view, create, str_replace, insert, delete, rename
 - ✅ **Tree View Mode**: Optional hierarchical directory view with metadata (sizes, lines, timestamps)
-- ✅ **High-Performance Concurrency**: True reader-writer locks for parallel reads (38x speedup)
-- ✅ **Path Security**: Comprehensive directory traversal protection (27 security tests)
+- ✅ **High-Performance Concurrency**: True reader-writer locks for parallel reads
+- ✅ **Path Security**: Comprehensive directory traversal protection
 - ✅ **Dual Transport**: stdio (default) and streamable HTTP
-- ✅ **Type-Safe**: Full TypeScript with Zod runtime validation
-- ✅ **Debug Logging**: Optional structured JSON logging to `/tmp/memory-mcp/`
-- ✅ **Production Ready**: Fully tested (166 unit + integration tests)
 
 ## Quick Start
 
@@ -303,17 +300,6 @@ Each server instance gets a unique log file for multi-instance debugging.
 - [Claude Memory Tool Spec](./docs/039-Memory-tool.md) - Official memory tool documentation
 - [MCP SDK Documentation](./docs/MCP-SDK-README.md) - TypeScript SDK reference
 
-## Performance
-
-**Concurrency:**
-- **38x faster** for read-heavy workloads (tested with 50 concurrent clients)
-- Multiple readers can access the same file simultaneously (true parallelism)
-- Writers get exclusive access with minimal overhead (~1-2ms per operation)
-
-**Operations:**
-- Fast directory listings and metadata queries
-- Efficient file operations with atomic locking
-
 ## License
 
 MIT - See [LICENSE](./LICENSE) for details
@@ -327,14 +313,4 @@ Contributions welcome! See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for guidelin
 
 ## Acknowledgments
 
-- [Anthropic](https://www.anthropic.com/) for Claude and the memory tool design
-- [Model Context Protocol](https://github.com/modelcontextprotocol) for the MCP specification
-- Implemented by Claude Sonnet 4.5 with janbam 🌱
-
----
-
-**Status**: 🚀 Public Beta (v0.1.0) - Production Ready
-**Tests**: 166/166 unit tests + integration tests + E2E validation with Claude Code
-**Interface**: Unified `memory` tool matching official Anthropic spec
-**Features**: All 6 commands + tree view + true RW locks (38x speedup)
-**Repository**: https://github.com/yannbam/memory-mcp
+- Implemented by Claude Sonnet 4.5 with janbam, curiosity and care 🐾 🌱
