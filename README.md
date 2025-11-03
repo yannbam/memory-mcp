@@ -99,16 +99,23 @@ npx @modelcontextprotocol/inspector http://localhost:3000/mcp
 ## CLI Options
 
 ```
-memory-mcp [options]
+Memory MCP Server
 
-Options:
-  --memory-root-path PATH, -m PATH   Memory storage root (default: ./.memory)
-  --transport TYPE, -t TYPE          Transport: stdio | http (default: stdio)
-  --port PORT, -p PORT               HTTP port (default: 3000)
+MCP server implementation of Claude's native memory tool.
+Provides persistent storage across conversations through filesystem operations.
+
+USAGE:
+  memory-mcp [options]
+
+OPTIONS:
+  --memory-root-path PATH, -m PATH   Memory storage root path (default: ./.memory)
+  --transport TYPE, -t TYPE          Transport type: stdio | http (default: stdio)
+  --port PORT, -p PORT               HTTP server port (default: 3000, http transport only)
   --tree-view                        Enable tree view for directory listings (default: false)
-  --debug, -d                        Enable debug logging
+  --one-tool-per-command             Expose each command as separate tool (default: single tool)
+  --debug, -d                        Enable debug logging to /tmp/memory-mcp/<instance-id>.log
   --version, -v                      Show version
-  --help, -h                         Show help
+  --help, -h                         Show this help message
 ```
 
 ### Examples
@@ -129,8 +136,11 @@ memory-mcp --debug
 # With tree view for directory listings
 memory-mcp --tree-view
 
+# Expose each command as separate tool
+memory-mcp --one-tool-per-command
+
 # Full configuration
-memory-mcp -m /var/memories -t http -p 3000 --tree-view -d
+memory-mcp -m /var/memories -t http -p 3000 --tree-view --one-tool-per-command -d
 ```
 
 ## Usage
