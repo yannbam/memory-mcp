@@ -6,12 +6,12 @@
     {
       "name": "Repository Cleanup",
       "details": "Identify files that shouldn't be in public release.\n\nIMPORTANT: This is IDENTIFICATION only - NO deletions without human approval!\n\nAreas to audit:\n- Root directory (any personal notes, temp files, test artifacts?)\n- docs/ directory (any internal-only docs, draft files?)\n- .plans/ directory (keep or remove? These show our process)\n- PR-REVIEW-*.md files (keep as examples or remove?)\n- TEST-FINDINGS-*.md files (valuable or clutter?)\n- Any .env.example or config examples that need updating\n- Check .gitignore is comprehensive\n\nFor each file/directory:\n1. State what it is\n2. Recommend: KEEP or REMOVE\n3. Provide rationale\n4. Wait for human approval before any deletions\n\nNote: We maintain dev->main workflow post-release, so dev files are fine!",
-      "status": "pending",
+      "status": "completed",
       "priority": "high",
       "sub_tasks": [],
       "uuid": "21551f41-7297-4360-8678-3a8ce5035d58",
       "created_at": "2025-10-31T15:44:29.638Z",
-      "updated_at": "2025-10-31T15:44:29.638Z"
+      "updated_at": "2025-11-03T01:05:08.951Z"
     },
     {
       "name": "Development Documentation",
@@ -58,64 +58,64 @@
     {
       "name": "README.md Polish",
       "details": "Polish README.md for PUBLIC release - user-facing, not developer-facing.\n\nCurrent README needs review for:\n\n**Structure should be:**\n1. What is memory-mcp (1-2 sentences)\n2. Key features (bullet points)\n3. Installation (clear steps for Claude Code)\n4. Basic usage examples\n5. Configuration options\n6. Link to full documentation\n7. Development/Contributing section (brief, link to CONTRIBUTING.md)\n\n**Remove/relocate:**\n- Excessive technical details (move to docs/)\n- Internal development notes\n- Implementation details users don't need\n- Overly verbose explanations\n\n**Ensure:**\n- Installation instructions are crystal clear\n- Examples are practical and accurate\n- Links work and point to right places\n- No personal references or system-specific paths\n- Professional tone throughout\n\n**Keep:**\n- Concurrent access explanation (key differentiator)\n- Security features (important for users)\n- Memory structure example (helpful)\n- Tool modes (unified vs separate)",
-      "status": "pending",
+      "status": "completed",
       "priority": "urgent",
       "sub_tasks": [
         {
           "name": "Review current README",
           "details": "Read through and note: what's good, what's too detailed, what's missing",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "sub_tasks": [],
           "uuid": "34d85270-4b1c-455e-a913-4c6c584b71b1",
           "created_at": "2025-10-31T15:44:29.638Z",
-          "updated_at": "2025-10-31T15:44:29.638Z"
+          "updated_at": "2025-11-03T00:47:22.927Z"
         },
         {
           "name": "Restructure if needed",
           "details": "Organize into clear user-focused sections",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "sub_tasks": [],
           "uuid": "6698ed80-34ed-4582-b993-0781cd7cce4e",
           "created_at": "2025-10-31T15:44:29.638Z",
-          "updated_at": "2025-10-31T15:44:29.638Z"
+          "updated_at": "2025-11-03T00:49:33.697Z"
         },
         {
           "name": "Trim verbosity",
           "details": "Remove fluff, move technical details to docs/, keep it concise",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "sub_tasks": [],
           "uuid": "f08abd39-6c64-4902-aaef-6a56eb5bd629",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T00:49:33.697Z"
         },
         {
           "name": "Verify accuracy",
           "details": "Test all installation steps, verify examples work, check links",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "sub_tasks": [],
           "uuid": "da780a90-3c86-4a1c-84b0-d4dcde453310",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T00:49:55.018Z"
         }
       ],
       "uuid": "313c7d0a-7636-4dd5-b5ce-187ea81e3082",
       "created_at": "2025-10-31T15:44:29.638Z",
-      "updated_at": "2025-10-31T15:44:29.638Z",
-      "completion_percentage": 0
+      "updated_at": "2025-11-03T00:34:37.712Z",
+      "completion_percentage": 100
     },
     {
       "name": "CONTRIBUTING.md",
       "details": "Create comprehensive contribution guidelines.\n\nShould cover:\n\n**Getting Started**\n- Prerequisites (Node.js version, etc.)\n- Fork and clone\n- Install dependencies: npm install\n- Run tests: npm test\n- Build: npm run build\n\n**Development Workflow**\n- Branch naming conventions\n- Commit message format\n- Code style (e/code conventions, TypeScript strict)\n- Linting: npm run lint\n- Pre-commit checks\n\n**Testing**\n- Writing tests (unit, integration)\n- Running tests with coverage\n- Coverage requirements (≥80%)\n- Test file organization\n\n**Documentation**\n- When to update README vs docs/\n- e/code comment conventions\n- Documenting new features\n\n**Pull Request Process**\n1. Create feature branch from dev\n2. Make changes with tests\n3. Run full test suite\n4. Update documentation\n5. Submit PR to dev (not main)\n6. PR checklist items\n\n**Issue Reporting**\n- Bug reports (what to include)\n- Feature requests (how to propose)\n- Security issues (private reporting)\n\n**Code Review Standards**\n- What reviewers look for\n- Expected turnaround time\n- How to address feedback\n\n**Community Guidelines**\n- Be respectful and inclusive\n- Assume good intent\n- Help others learn\n\nReference: This project dogfoods its own memory system - a great example!",
-      "status": "pending",
+      "status": "completed",
       "priority": "high",
       "sub_tasks": [],
       "uuid": "d66198ed-ecf1-467b-b8f3-2874ab1b6e5f",
       "created_at": "2025-10-31T15:44:29.639Z",
-      "updated_at": "2025-10-31T15:44:29.639Z"
+      "updated_at": "2025-11-03T01:17:02.306Z"
     },
     {
       "name": "Release Git Practices",
@@ -162,66 +162,66 @@
     {
       "name": "Pre-Release Verification",
       "details": "Final verification before release - ensure everything works.\n\n**Run all checks:**\n\n1. **Tests**\n   - npm test (should show 166/166 passing)\n   - npm run test:coverage (verify ≥80%, ideally 93%+)\n   - npm run lint (no errors)\n\n2. **Build**\n   - Clean build: rm -rf dist/ node_modules/\n   - npm install\n   - npm run build\n   - Verify dist/ structure\n\n3. **Integration Test**\n   - Test with actual Claude Code\n   - Reconnect memory-mcp\n   - Test all 6 commands\n   - Verify tree view\n   - Check error messages\n\n4. **Documentation**\n   - All links in README work\n   - Installation instructions accurate\n   - Examples run successfully\n\n5. **Security**\n   - npm audit (check vulnerabilities)\n   - npm audit fix (if safe)\n   - Review dependencies\n\nIf ANY issues found, fix before release!",
-      "status": "pending",
+      "status": "completed",
       "priority": "urgent",
       "sub_tasks": [
         {
           "name": "Run test suite",
           "details": "npm test, test:coverage, lint - verify all pass",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "sub_tasks": [],
           "uuid": "9e9915c6-779c-4b17-9d83-12724e27df88",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-02T23:31:33.397Z"
         },
         {
           "name": "Clean build test",
           "details": "Fresh install and build from scratch",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "sub_tasks": [],
           "uuid": "27cb97ed-34a1-4fd6-a6c9-6cf9e1b69520",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-02T23:32:00.173Z"
         },
         {
           "name": "Integration test",
           "details": "Test with actual Claude Code instance",
-          "status": "pending",
+          "status": "completed",
           "priority": "urgent",
           "sub_tasks": [],
           "uuid": "7f77e624-6e58-4698-b8c0-11dc2d3e075d",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T00:32:56.147Z"
         },
         {
           "name": "Documentation verification",
           "details": "Test installation steps, verify examples, check links",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "sub_tasks": [],
           "uuid": "af4e24a2-7434-4ba9-ab6c-54d9eb7e7343",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T00:33:58.958Z"
         },
         {
           "name": "Security audit",
           "details": "npm audit and dependency review",
-          "status": "pending",
+          "status": "completed",
           "priority": "high",
           "sub_tasks": [],
           "uuid": "ee0dd99d-3a8c-419d-af03-a051e04be1c0",
           "created_at": "2025-10-31T15:44:29.639Z",
-          "updated_at": "2025-10-31T15:44:29.639Z"
+          "updated_at": "2025-11-03T00:34:12.699Z"
         }
       ],
       "uuid": "ab2ac6f3-0392-4778-b7d2-62549df721ca",
       "created_at": "2025-10-31T15:44:29.639Z",
-      "updated_at": "2025-10-31T15:44:29.639Z",
-      "completion_percentage": 0
+      "updated_at": "2025-11-02T23:30:43.714Z",
+      "completion_percentage": 100
     }
   ],
   "created_at": "2025-10-31T15:44:29.639Z",
-  "updated_at": "2025-10-31T15:44:36.690Z"
+  "updated_at": "2025-11-03T01:28:18.048Z"
 }

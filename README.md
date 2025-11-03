@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/yannbam/memory-mcp/workflows/CI/badge.svg)](https://github.com/yannbam/memory-mcp/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-117%20passing-success)](./test)
+[![Tests](https://img.shields.io/badge/tests-166%20passing-success)](./test)
 
 MCP server implementation of Claude's native memory tool for persistent storage across conversations.
 
@@ -131,199 +131,50 @@ memory-mcp --tree-view
 memory-mcp -m /var/memories -t http -p 3000 --tree-view -d
 ```
 
-## Memory Tool
+## Usage
 
-The server exposes a single unified **`memory`** tool with a `command` parameter that determines the operation.
+The server exposes a unified **`memory`** tool matching the [official Anthropic Memory tool specification](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool).
 
-This matches the [official Anthropic Memory tool specification](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool).
+### Commands
 
-### Parameter Combinations Quick Reference
+All 6 memory commands with `command` parameter:
 
-| Command | Required | Optional | Notes |
-|---------|----------|----------|-------|
-| **view** | `path` | `view_range` | `view_range` only for files: `[start, end]` or `[start, -1]` for EOF |
-| **create** | `path` | `file_text` | Omit `file_text` to create empty file |
-| **str_replace** | `path`<br>`old_str` or `old_string` | `new_str` or `new_string` | Omit `new_str` to delete text. Text must be unique. |
-| **insert** | `path`<br>`insert_text` | `insert_line` | Omit `insert_line` to append to end |
-| **delete** | `path` | `delete_line`<br>`old_str` or `old_string` | Choose one: line number, text match, or neither (deletes file/dir). Text must be unique. |
-| **rename** | `old_path`<br>`new_path` | - | Creates parent directories as needed |
+| Command | Purpose | Example |
+|---------|---------|---------|
+| **view** | Show directory/file contents | `{ command: "view", path: "/memories" }` |
+| **create** | Create new file | `{ command: "create", path: "/memories/notes.txt", file_text: "..." }` |
+| **str_replace** | Replace unique text | `{ command: "str_replace", path: "...", old_str: "...", new_str: "..." }` |
+| **insert** | Insert/append text | `{ command: "insert", path: "...", insert_text: "..." }` |
+| **delete** | Delete file/dir/line/text | `{ command: "delete", path: "/memories/file.txt" }` |
+| **rename** | Move/rename file/dir | `{ command: "rename", old_path: "...", new_path: "..." }` |
 
-**Forgiving parameter naming:** Both `old_str`/`new_str` and `old_string`/`new_string` are accepted interchangeably.
+### Quick Examples
 
-### view
-Show directory contents or file contents with optional line ranges.
-
-**Directory View Modes:**
-- **Simple mode** (default): Flat list of files and directories
-- **Tree view mode** (with `--tree-view` flag): Hierarchical structure with metadata
-
+**View directory:**
 ```typescript
-// View directory (simple mode - default)
-await memory({
-  command: "view",
-  path: "/memories"
-})
-// → "Directory: /memories\n- notes.txt\n- ideas/"
+await memory({ command: "view", path: "/memories" })
+```
 
-// View empty directory
+**Create file:**
+```typescript
 await memory({
-  command: "view",
-  path: "/memories/empty"
-})
-// → "Directory is empty."
-
-// View directory (tree view mode - with --tree-view flag)
-// Shows hierarchical structure, file sizes, line counts, and modification times
-// → "Showing contents of: /memories
-// → Modification dates shown in [YYYY/MM/DD - HH:MM:SS] format (UTC timezone)
-// →
-// → ├── notes.txt	(2.3KB / 45 lines)	[2025/10/15 - 14:23:17]
-// → └── projects/		[2025/10/15 - 15:01:42]
-// →     ├── backend/		[2025/10/14 - 09:15:33]
-// →     │   └── api.md	(5.1KB / 128 lines)	[2025/10/14 - 09:15:33]
-// →     └── frontend/		[2025/10/15 - 15:01:42]
-// →         └── ui.md	(1.8KB / 42 lines)	[2025/10/15 - 15:01:42]"
-
-// View file
-await memory({
-  command: "view",
-  path: "/memories/notes.txt"
-})
-// → "   1: First note\n   2: Second note"
-
-// View specific lines
-await memory({
-  command: "view",
+  command: "create",
   path: "/memories/notes.txt",
-  view_range: [2, 5]
+  file_text: "My notes here"
 })
-// → "   2: Second note\n   3: Third note..."
-
-// View empty file
-await memory({
-  command: "view",
-  path: "/memories/empty.txt"
-})
-// → "Memory file is empty."
 ```
 
-### create
-Create new files (fails if file already exists, creates parent directories as needed).
-
-**Note**: This implementation differs from Anthropic's spec which allows overwriting. This MCP server enforces create-only semantics for safety.
-
+**Edit file:**
 ```typescript
-// Create file with content
-await memory({
-  command: "create",
-  path: "/memories/todo.txt",
-  file_text: "- Task 1\n- Task 2"
-})
-// → "File created successfully at /memories/todo.txt"
-
-// Create empty file (omit file_text)
-await memory({
-  command: "create",
-  path: "/memories/empty.txt"
-})
-// → "Created empty memory file."
-```
-
-### str_replace
-Replace unique text in a file (text must appear exactly once).
-
-```typescript
-// Replace text
 await memory({
   command: "str_replace",
   path: "/memories/notes.txt",
-  old_str: "old value",
-  new_str: "new value"
+  old_str: "old text",
+  new_str: "new text"
 })
-// → "File /memories/notes.txt has been edited"
-
-// Delete text by omitting new_str (defaults to empty string)
-await memory({
-  command: "str_replace",
-  path: "/memories/notes.txt",
-  old_str: "debug code"
-  // new_str omitted - deletes the text
-})
-// → "File /memories/notes.txt has been edited"
 ```
 
-**Note**: Both `old_str`/`new_str` and `old_string`/`new_string` parameter names are accepted for flexibility.
-
-### insert
-Insert text at a specific line number, or append to end of file.
-
-```typescript
-// Insert at specific line
-await memory({
-  command: "insert",
-  path: "/memories/todo.txt",
-  insert_line: 2,
-  insert_text: "- Urgent task"
-})
-// → "Text inserted at line 2 in /memories/todo.txt"
-
-// Append to end (omit insert_line)
-await memory({
-  command: "insert",
-  path: "/memories/todo.txt",
-  insert_text: "- Last task"
-})
-// → "Text appended to end of /memories/todo.txt"
-```
-
-### delete
-Delete files, directories, specific lines, or unique text occurrences.
-
-```typescript
-// Delete file
-await memory({
-  command: "delete",
-  path: "/memories/old-notes.txt"
-})
-// → "File deleted: /memories/old-notes.txt"
-
-// Delete directory
-await memory({
-  command: "delete",
-  path: "/memories/archive"
-})
-// → "Directory deleted: /memories/archive"
-
-// Delete specific line (1-based)
-await memory({
-  command: "delete",
-  path: "/memories/notes.txt",
-  delete_line: 5
-})
-// → "Line 5 deleted from /memories/notes.txt"
-
-// Delete unique text occurrence
-await memory({
-  command: "delete",
-  path: "/memories/notes.txt",
-  old_str: "debug code"
-})
-// → "Deleted 1 occurrence(s) of "debug code" from /memories/notes.txt"
-```
-
-**Note**: `old_str` and `old_string` are interchangeable. Text must appear exactly once (unique occurrence).
-
-### rename
-Rename or move files/directories (creates parent directories as needed).
-
-```typescript
-await memory({
-  command: "rename",
-  old_path: "/memories/draft.txt",
-  new_path: "/memories/final.txt"
-})
-// → "Renamed /memories/draft.txt to /memories/final.txt"
-```
+📖 **[Full API Reference](./docs/USAGE.md)** - Complete documentation with all parameters and examples
 
 ## Concurrent Access
 
@@ -388,46 +239,16 @@ Filesystem paths: `<memory-root>/memories/notes.txt`
 
 ## Development
 
-### Prerequisites
-
-- Node.js >= 18.0.0
-- npm
-
-### Setup
-
+**Quick Start:**
 ```bash
 git clone https://github.com/yannbam/memory-mcp.git
 cd memory-mcp
 npm install
 npm run build
+npm test                 # 166 tests passing
 ```
 
-### Testing
-
-```bash
-npm test                 # Run all tests (117 passing)
-npm run test:coverage    # Run with coverage report (80%+ target)
-npm run test:watch       # Watch mode
-```
-
-**Test Coverage**:
-- 27 path security tests (directory traversal attacks)
-- 34 memory operations tests (all 6 commands + edge cases)
-- 24 tree view tests (formatting, rendering, integration)
-
-### Linting
-
-```bash
-npm run lint             # Check code
-npm run lint:fix         # Auto-fix issues
-```
-
-### Development Mode
-
-```bash
-npm run watch            # Auto-rebuild on changes
-npm run dev              # Build and run
-```
+📖 **[Contributing Guide](./CONTRIBUTING.md)** - Setup, testing, code style, and PR process
 
 ## Architecture
 
@@ -479,32 +300,14 @@ Each server instance gets a unique log file for multi-instance debugging.
 
 ## Performance
 
-**Operation Costs**:
-- View: O(1) for directories, O(n) for files
-- Create/Delete/Rename: O(1)
-- Str_replace/Insert: O(n) where n = file size
+**Concurrency:**
+- **38x faster** for read-heavy workloads (tested with 50 concurrent clients)
+- Multiple readers can access the same file simultaneously (true parallelism)
+- Writers get exclusive access with minimal overhead (~1-2ms per operation)
 
-**Concurrency Performance**:
-- **38x speedup** for read-heavy workloads (tested with 50 concurrent clients)
-- Read operations: True parallelism (non-blocking when no writers)
-- Write operations: Exclusive access with minimal overhead
-- Locking overhead: ~1-2ms per operation (uncontended)
-
-**Stress Test Results** (50 concurrent clients, 40 readers + 10 writers):
-- Theoretical serial: 3237ms
-- Actual with RW locks: 85ms
-- Speedup: 38x
-
-## Future npm Package
-
-This package is configured for npm publication as **`@yannbam/memory-mcp`** but is not yet published. Currently distributed via GitHub.
-
-To prepare for future npm installation:
-```bash
-npm install @yannbam/memory-mcp
-```
-
-Stay tuned for the official npm release!
+**Operations:**
+- Fast directory listings and metadata queries
+- Efficient file operations with atomic locking
 
 ## License
 
@@ -512,14 +315,10 @@ MIT - See [LICENSE](./LICENSE) for details
 
 ## Contributing
 
-Contributions welcome! Please:
-1. Fork the repository and create a feature branch
-2. Follow existing code style (e/code conventions from CLAUDE.md)
-3. Add tests for new features (maintain 80%+ coverage)
-4. Update documentation as needed
-5. Ensure all tests pass (`npm test`)
-6. Run linting (`npm run lint`)
-7. Submit a pull request with clear description
+Contributions welcome! See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for guidelines on:
+- Development setup and workflow
+- Code style and testing requirements
+- Pull request process
 
 ## Acknowledgments
 
@@ -530,7 +329,7 @@ Contributions welcome! Please:
 ---
 
 **Status**: 🚀 Public Beta (v0.1.0) - Production Ready
-**Tests**: 117/117 unit tests + integration tests + E2E validation with Claude Code
+**Tests**: 166/166 unit tests + integration tests + E2E validation with Claude Code
 **Interface**: Unified `memory` tool matching official Anthropic spec
 **Features**: All 6 commands + tree view + true RW locks (38x speedup)
 **Repository**: https://github.com/yannbam/memory-mcp
