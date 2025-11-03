@@ -178,3 +178,5 @@ Pre-release verification checklist: Tests (all passing), build (clean), integrat
 v0.1.0 release completed 2025-11-03: dev→main merge (d740c9a), annotated tag created/pushed, GitHub release published, dev bumped to 0.2.0-dev [✅🎉]
 Release workflow documented in RELEASE-PROCESS.md: merge dev→main (--no-ff), tag on main, push tag, create GitHub release, bump dev version [📚✅]
 CHANGELOG format: Keep a Changelog standard, [Unreleased] at top for next version, dated releases in [X.Y.Z] - YYYY-MM-DD format [📖💡]
+memory-mcp v0.1.0 released and made public 2025-11-03! Repository at https://github.com/yannbam/memory-mcp [🎉🌍✅]
+Documentation polish completed across 5 commits (Session 6a8b15f6): README consistency fixes, GitHub markdown rendering, CLI completeness, tool mode explanations [📖✅]

@@ -3,10 +3,10 @@
 ## Current Session
 _Session ID, active branch, context usage_
 
-Session: 26388472-9934-4033-9cc0-faecf33c1044
+Session: 6a8b15f6-dc3c-4342-ba0e-3280d9294695
 Branch: dev
-Context: 105k/184k tokens
-Working on: v0.1.0 release + post-release polish - COMPLETE ✅
+Context: 81k/184k tokens
+Working on: Final pre-public-release README polish - COMPLETE ✅
 
 ## Session Handoff
 _What was done, what's next, blockers_
@@ -91,40 +91,27 @@ _What was done, what's next, blockers_
 **Files Removed:**
 - JANBAM.md, .mcp.orig.json, .mcp.test.json
 
-### This Session Accomplished (Session 26388472)
+### This Session Accomplished (Session 6a8b15f6)
 
-**🎉 RELEASE PREPARATION COMPLETE - 100% READY FOR v0.1.0**
+**🎉 FINAL PRE-PUBLIC-RELEASE POLISH - COMPLETE!**
 
-**Research & Documentation:**
-- Researched git release best practices (annotated tags, semantic versioning, Keep a Changelog format)
-- Researched GitHub release workflows and automation options
-- Documented comprehensive release process in RELEASE-PROCESS.md (213 lines)
+**README.md Final Polish (5 commits on PR #8):**
+1. bd422bc: Changed local project config to absolute path, renamed system_memory → global_memory, added stdio-only note for conflict detection, updated .mcp.json
+2. 3145fe3: Fixed GitHub markdown rendering with `<br>` tags for highlight list
+3. 1d806dd: Made global memory path example consistent with `/abs/path/to/...` format
+4. 1c11214: Added missing `--one-tool-per-command` CLI flag to Options section with complete help output
+5. d13d514: Added one-tool-per-command feature to Features and Usage sections (based on source code analysis)
 
-**CHANGELOG.md Finalization:**
-- Consolidated confusing dual sections ([0.1.0] from Oct 16 + [Unreleased])
-- Single coherent [0.1.0] section dated 2025-11-03
-- Corrected test count: 85 → 166 tests
-- Included ALL features: checksums, parameter combinations, improved error messages
-- Left empty [Unreleased] section for future changes
-- Follows Keep a Changelog format perfectly
+**Documentation Completeness:**
+- All CLI flags documented (including --one-tool-per-command)
+- Tool modes explained clearly (unified vs separate tools)
+- Examples consistent and accurate
+- GitHub markdown rendering verified
 
-**RELEASE-PROCESS.md (NEW):**
-- Step-by-step release workflow (6 detailed steps)
-- Prerequisites checklist (tests, linting, coverage, documentation)
-- Git commands for merge, tag, push
-- GitHub release creation (UI and CLI methods)
-- Post-release version bump process
-- Semantic versioning guidelines with examples
-- Emergency hotfix workflow
-- Best practices and notes
+**Cleanup:**
+- Archived old doc-gardening-session plan (100% complete)
 
-**Plan Tracking:**
-- public-release-v0.1.0-final: 100% complete (21/21 tasks) ✅
-- All "Release Git Practices" tasks finished
-
-**Commit:** b47acd4 - "chore: complete release preparation for v0.1.0"
-
-**Status:** Ready for human execution of release steps!
+**Status:** PR #8 ready to merge - Repository ready for public release! 🌳✨
 
 ### This Session Accomplished (Session 6123f62b)
 
@@ -163,28 +150,30 @@ _What was done, what's next, blockers_
 
 ### Next Session Should Do
 
-**🎯 Post-Release Focus: Ongoing Development**
+**🎯 Repository Is Public! 🌍**
 
-**v0.1.0 PUBLIC RELEASE COMPLETE!** 🎉
+**memory-mcp v0.1.0 is live on GitHub!** 🎉
 
-The first public release is now live on GitHub. The project is ready for:
-- Community contributions (CONTRIBUTING.md in place)
-- Issue tracking and bug reports
-- Feature requests and discussions
-- Future npm package publication (optional)
+The project is now publicly available with complete, accurate documentation:
+- ✅ README polished and ready for users
+- ✅ All features documented (including tool modes)
+- ✅ CLI help complete and accurate
+- ✅ Examples consistent with best practices
+- ✅ GitHub markdown rendering verified
 
-**Potential next steps (no pressure, just ideas):**
-- Monitor GitHub for issues or feedback
-- Consider npm package publication: `npm publish --access public`
-- Start [Unreleased] section in CHANGELOG for v0.2.0 features
-- Add GitHub issue templates for bugs/features
-- Consider GitHub Actions for automated releases
+**Repository Status:**
+- **Branch**: dev (at v0.2.0-dev)
+- **Latest Release**: v0.1.0 (2025-11-03)
+- **Tests**: 166/166 passing
+- **Coverage**: 93%+
+- **Documentation**: Complete and accurate
+- **Public**: YES! Ready for community use 🌍
 
-**Branch**: dev (at v0.2.0-dev)
-**Latest Release**: v0.1.0 (2025-11-03)
-**Tests**: 166/166 passing
-**Coverage**: 93%+
-**Documentation**: Complete and accurate
+**Future possibilities:**
+- Monitor for community feedback and issues
+- Consider npm package publication
+- Plan v0.2.0 features based on user needs
+- Community contributions welcome!
 
 ### Current Blockers
 None - Ready for final documentation polish and release!
