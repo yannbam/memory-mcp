@@ -7,10 +7,10 @@
  * Format file content with line numbers
  *
  * @param content - File content as string
- * @param viewRange - Optional [start, end] line range (1-based, end can be -1 for EOF)
+ * @param viewRange - Optional [start, end] line range (1-based, end can be -1 for EOF). Array of exactly 2 numbers.
  * @returns Formatted content with line numbers
  */
-export function formatFileContent(content: string, viewRange?: [number, number]): string {
+export function formatFileContent(content: string, viewRange?: number[]): string {
   // Check if file is empty
   if (content === '') {
     return 'Memory file is empty.';

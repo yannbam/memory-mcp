@@ -63,7 +63,7 @@ import type { Logger } from '../utils/logger.js';
 
 export interface ViewCommand {
   path: string;
-  view_range?: [number, number];
+  view_range?: number[]; // Array of exactly 2 numbers [start, end], validated by Zod schema
 }
 
 export interface CreateCommand {
@@ -241,7 +241,7 @@ async function viewDirectory(
 /**
  * Helper: View file contents with optional line range
  */
-async function viewFile(fullPath: string, viewRange?: [number, number]): Promise<string> {
+async function viewFile(fullPath: string, viewRange?: number[]): Promise<string> {
   // Read file content
   const content = await fs.readFile(fullPath, 'utf-8');
 
