@@ -45,3 +45,6 @@ temp/
 # Note: .memory/ is committed as example of our own memory system (dogfooding)
 # /memory/ prevents accidental commits of user memory when testing
 /memory/
+
+#
+.claude/
