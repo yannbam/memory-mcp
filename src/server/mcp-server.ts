@@ -23,7 +23,8 @@ const MemoryCommandSchema = z.discriminatedUnion('command', [
     command: z.literal('view'),
     path: z.string().describe('Memory path starting with /memories'),
     view_range: z
-      .tuple([z.number(), z.number()])
+      .array(z.number())
+      .length(2)
       .optional()
       .describe('Optional line range [start, end]. Use -1 for end to read until EOF'),
   }),
@@ -80,7 +81,8 @@ export type MemoryCommand = z.infer<typeof MemoryCommandSchema>;
 const ViewCommandSchema = z.object({
   path: z.string().describe('Memory path starting with /memories'),
   view_range: z
-    .tuple([z.number(), z.number()])
+    .array(z.number())
+    .length(2)
     .optional()
     .describe('Optional line range [start, end]. Use -1 for end to read until EOF'),
 });
@@ -190,7 +192,7 @@ function registerUnifiedTool(server: McpServer, context: operations.OperationsCo
       inputSchema: {
         command: z.enum(['view', 'create', 'str_replace', 'insert', 'delete', 'rename']),
         path: z.string().optional(),
-        view_range: z.tuple([z.number(), z.number()]).optional(),
+        view_range: z.array(z.number()).length(2).optional(),
         file_text: z.string().optional(),
         old_str: z.string().optional(),
         old_string: z.string().optional(),

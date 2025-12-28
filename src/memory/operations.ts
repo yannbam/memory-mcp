@@ -63,7 +63,7 @@ import type { Logger } from '../utils/logger.js';
 
 export interface ViewCommand {
   path: string;
-  view_range?: [number, number];
+  view_range?: number[]; // Array of exactly 2 numbers [start, end], validated by Zod schema
 }
 
 export interface CreateCommand {
@@ -241,7 +241,7 @@ async function viewDirectory(
 /**
  * Helper: View file contents with optional line range
  */
-async function viewFile(fullPath: string, viewRange?: [number, number]): Promise<string> {
+async function viewFile(fullPath: string, viewRange?: number[]): Promise<string> {
   // Read file content
   const content = await fs.readFile(fullPath, 'utf-8');
 
@@ -272,9 +272,13 @@ export async function create(command: CreateCommand, context: OperationsContext)
       await fs.mkdir(dir, { recursive: true });
     }
 
-    // Check if file already exists - fail fast if it does
+    // Check if file already exists - fail fast unless it's empty
     if (await exists(fullPath)) {
-      throw new Error(`File already exists at ${command.path}`);
+      const existingContent = await fs.readFile(fullPath, 'utf-8');
+      if (existingContent !== '') {
+        throw new Error(`File already exists at ${command.path}`);
+      }
+      // Empty file - allow overwrite (common case: created empty, now want content)
     }
 
     // Write file content (default to empty string if not provided)

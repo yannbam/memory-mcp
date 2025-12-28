@@ -170,6 +170,21 @@ describe('Memory Operations', () => {
       expect(fileContent).toBe('original');
     });
 
+    it('should allow overwriting empty file', async () => {
+      // Create empty file first
+      await fs.writeFile(path.join(memoryRoot, 'empty.txt'), '');
+
+      // Create with content should succeed on empty file
+      const result = await operations.create(
+        { path: '/memories/empty.txt', file_text: 'now has content' },
+        context
+      );
+
+      expect(result).toBe('File created successfully at /memories/empty.txt');
+      const fileContent = await fs.readFile(path.join(memoryRoot, 'empty.txt'), 'utf-8');
+      expect(fileContent).toBe('now has content');
+    });
+
     it('should create empty file with file_text=""', async () => {
       const result = await operations.create({ path: '/memories/empty.txt', file_text: '' }, context);
 
