@@ -272,9 +272,13 @@ export async function create(command: CreateCommand, context: OperationsContext)
       await fs.mkdir(dir, { recursive: true });
     }
 
-    // Check if file already exists - fail fast if it does
+    // Check if file already exists - fail fast unless it's empty
     if (await exists(fullPath)) {
-      throw new Error(`File already exists at ${command.path}`);
+      const existingContent = await fs.readFile(fullPath, 'utf-8');
+      if (existingContent !== '') {
+        throw new Error(`File already exists at ${command.path}`);
+      }
+      // Empty file - allow overwrite (common case: created empty, now want content)
     }
 
     // Write file content (default to empty string if not provided)
