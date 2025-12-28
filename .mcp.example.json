@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "project_memory": {
+      "command": "node",
+      "args": ["/home/jan/projects/memory-mcp/dist/index.js", "--tree-view"],
+      "env": {}
+    }
+  }
+}
