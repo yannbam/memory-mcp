@@ -28,28 +28,18 @@ The server exposes a single unified **`memory`** tool with a `command` parameter
 Show directory contents or file contents with optional line ranges.
 
 **Directory View Modes:**
-- **Simple mode** (default): Flat list of files and directories
-- **Tree view mode** (with `--tree-view` flag): Hierarchical structure with metadata
+- **Tree view mode** (default): Hierarchical structure with metadata
+- **Simple mode** (with `--flat-view` flag): Flat list of files and directories
 
 **Examples:**
 
 ```typescript
-// View directory (simple mode - default)
+// View directory (tree view mode - default)
+// Shows hierarchical structure, file sizes, line counts, and modification times
 await memory({
   command: "view",
   path: "/memories"
 })
-// → "Directory: /memories\n- notes.txt\n- ideas/"
-
-// View empty directory
-await memory({
-  command: "view",
-  path: "/memories/empty"
-})
-// → "Directory is empty."
-
-// View directory (tree view mode - with --tree-view flag)
-// Shows hierarchical structure, file sizes, line counts, and modification times
 // → "Showing contents of: /memories
 // → Modification dates shown in [YYYY/MM/DD - HH:MM:SS] format (UTC timezone)
 // →
@@ -59,6 +49,20 @@ await memory({
 // →     │   └── api.md	(5.1KB / 128 lines)	[2025/10/14 - 09:15:33]
 // →     └── frontend/		[2025/10/15 - 15:01:42]
 // →         └── ui.md	(1.8KB / 42 lines)	[2025/10/15 - 15:01:42]"
+
+// View empty directory
+await memory({
+  command: "view",
+  path: "/memories/empty"
+})
+// → "Directory is empty."
+
+// View directory (simple flat mode - with --flat-view flag)
+await memory({
+  command: "view",
+  path: "/memories"
+})
+// → "Directory: /memories\n- notes.txt\n- ideas/"
 
 // View file
 await memory({

@@ -55,7 +55,7 @@ Add to your Claude Code `.mcp.json` configuration. Two common setups:
   "mcpServers": {
     "project_memory": {
       "command": "node",
-      "args": ["/abs/path/to/memory-mcp/dist/index.js", "--tree-view"],
+      "args": ["/abs/path/to/memory-mcp/dist/index.js"],
       "env": {}
     }
   }
@@ -72,8 +72,7 @@ Uses absolute path, stores memory in `./.memory/memories/` within the project. G
       "args": [
         "/absolute/path/to/memory-mcp/dist/index.js",
         "--memory-root-path",
-        "/abs/path/to/global/.memory",
-        "--tree-view"
+        "/abs/path/to/global/.memory"
       ],
       "env": {}
     }
@@ -112,7 +111,7 @@ OPTIONS:
   --memory-root-path PATH, -m PATH   Memory storage root path (default: ./.memory)
   --transport TYPE, -t TYPE          Transport type: stdio | http (default: stdio)
   --port PORT, -p PORT               HTTP server port (default: 3000, http transport only)
-  --tree-view                        Enable tree view for directory listings (default: false)
+  --flat-view                        Use simple flat directory listing (default: tree view)
   --one-tool-per-command             Expose each command as separate tool (default: single tool)
   --debug, -d                        Enable debug logging to /tmp/memory-mcp/<instance-id>.log
   --version, -v                      Show version
@@ -134,14 +133,14 @@ memory-mcp -t http -p 8080
 # With debug logging
 memory-mcp --debug
 
-# With tree view for directory listings
-memory-mcp --tree-view
+# Use simple flat directory listing (instead of default tree view)
+memory-mcp --flat-view
 
 # Expose each command as separate tool
 memory-mcp --one-tool-per-command
 
 # Full configuration
-memory-mcp -m /var/memories -t http -p 3000 --tree-view --one-tool-per-command -d
+memory-mcp -m /var/memories -t http -p 3000 --one-tool-per-command -d
 ```
 
 ## Usage

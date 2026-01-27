@@ -278,7 +278,7 @@ switch (command.command) {
 
 **Use Case**: Claude instances ALWAYS call `memory:view "/memories"` at the start of EVERY session (per official spec). This is the first thing Claude sees, and it's shared across all Claude instances (Code, claude.ai, etc.).
 
-**Solution**: Optional tree view mode enabled via `--tree-view` CLI flag.
+**Solution**: Tree view mode is now the default. Use `--flat-view` flag for simple listing.
 
 **Tree View Shows**:
 - Hierarchical directory structure with unlimited depth
@@ -288,7 +288,7 @@ switch (command.command) {
 - Directories marked with `/` suffix
 
 **Design Rationale**:
-1. **Optional**: Default simple mode preserves backward compatibility and minimal token usage
+1. **Default tree view**: Rich metadata helps Claude decide what to read; use `--flat-view` for minimal token usage
 2. **Metadata-rich**: Helps Claude decide what to read without reading everything
 3. **Recency signals**: Modification times show which files are active/recent
 4. **No arbitrary limits**: No depth limits or file count truncation (memory directories expected to be reasonable)

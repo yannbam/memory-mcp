@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_Future changes will be tracked here_
+### Changed
+- **Tree view is now default** for directory listings
+  - Shows hierarchical structure with file sizes, line counts, modification times
+  - Use `--flat-view` flag for simple flat listing (previous default behavior)
+  - Renamed `--tree-view` to `--flat-view` (inverted semantics)
 
 ## [0.1.0] - 2025-11-03
 

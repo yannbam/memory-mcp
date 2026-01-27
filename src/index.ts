@@ -44,7 +44,7 @@ function parseArgs(args: string[]): CliConfig {
     transport: 'stdio',
     port: 3000,
     debug: false,
-    treeView: false,
+    treeView: true,
     oneToolPerCommand: false,
   };
 
@@ -100,9 +100,9 @@ function parseArgs(args: string[]): CliConfig {
         config.debug = true;
         break;
 
-      case '--tree-view':
-        // Enable tree view for directory listings
-        config.treeView = true;
+      case '--flat-view':
+        // Disable tree view, use simple flat directory listing
+        config.treeView = false;
         break;
 
       case '--one-tool-per-command':
@@ -151,7 +151,7 @@ OPTIONS:
   --memory-root-path PATH, -m PATH   Memory storage root path (default: ./.memory)
   --transport TYPE, -t TYPE          Transport type: stdio | http (default: stdio)
   --port PORT, -p PORT               HTTP server port (default: 3000, http transport only)
-  --tree-view                        Enable tree view for directory listings (default: false)
+  --flat-view                        Use simple flat directory listing (default: tree view)
   --one-tool-per-command             Expose each command as separate tool (default: single tool)
   --debug, -d                        Enable debug logging to /tmp/memory-mcp/<instance-id>.log
   --version, -v                      Show version
@@ -170,8 +170,8 @@ EXAMPLES:
   # With debug logging
   memory-mcp --debug --transport http
 
-  # With tree view for directory listings
-  memory-mcp --tree-view
+  # With simple flat directory listing (instead of default tree view)
+  memory-mcp --flat-view
 
   # With one tool per command mode
   memory-mcp --one-tool-per-command
